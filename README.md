@@ -1,17 +1,9 @@
 # EMS Stroke Triage and Transport Model (ESTTM)
 Discrete event simulation model to estimate the impact of EMS stroke triage and transport plans
 
-Files:
+See model documentation and code for details:
 
-(1) The "base" model includes random map and patient generation and triage outcomes.
+The "base" model does random map and patient generation and computes triage outcomes (ESSTM_documentation.docx, ESSTM_code.ipynb).
 
-ESSTM_documentation.docx
-
-ESSTM_code.ipynb
-
-(2) The "extended" model includes treatments, inter-hospital transfers, and outcomes. See model documentation and code for details.
-
-ESSTM_documentation_EXTENDED.docx
-
-ESSTM_code_EXTENDED.ipynb
+The "extended" model includes treatments, inter-hospital transfers, and patient outcomes (ESSTM_documentation_EXTENDED.docx, ESSTM_code_EXTENDED.ipynb).
 
