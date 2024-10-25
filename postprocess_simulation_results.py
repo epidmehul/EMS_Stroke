@@ -315,7 +315,7 @@ def generate_line_graphs(df, title_str = "", col_names = None, differenced = Fal
         if not errorbar:
             ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = None)
         else:
-            ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = lambda x: np.percentile(x, (100 * (1 - alpha)/2, 100 * (1- (1-alpha)/2))))
+            ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = ('pi', 100 * alpha))
         ax.set_title(f"{title_str}: {col_name}")
         if save:
             if output_path is None:
