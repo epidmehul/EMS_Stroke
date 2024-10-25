@@ -15,6 +15,7 @@ def triage_outcomes(df):
     # Arguments: ground truth, predicted label
     # Resulting metrics: Check index 1 for results for class 1 (which here is going to CSC)
 
+    df = df.loc[df['closest_destination'] != 'CSC', :]
     cm = confusion_matrix(df['hasLVO'], df['destination_type'] == 'CSC')
     # print('---------------')
     # print(cm)
@@ -82,7 +83,7 @@ def all_time_results(df):
     # Ischemic patients
     prehospital = time_results(df.loc[df['ischemic'], 'lkw2door'])
     ems_transport = time_results(df.loc[df['ischemic'],'time2Hospital'])
-    ivt = time_results(df.loc[df['ischemic'] & df['IVTtime'] <= 270,'IVTtime'])
+    ivt = time_results(df.loc[(df['ischemic']) & (df['IVTtime'] <= 270),'IVTtime'])
     evt = time_results(df.loc[df['ischemic'],'EVTtime'])
     for key in ['mean', 'std', 'median', 'iqr', 'min', 'max']:
         retval['prehospital_ischemic_' + key] = prehospital[key]
@@ -94,7 +95,7 @@ def all_time_results(df):
     prehospital = time_results(df.loc[df['hasLVO'], 'lkw2door'])
     ems_transport = time_results(df.loc[df['hasLVO'],'time2Hospital'])
     ivt = time_results(df.loc[df['hasLVO'],'IVTtime'])
-    evt = time_results(df.loc[df['hasLVO'] & df['EVTtime'] <= 600,'EVTtime'])
+    evt = time_results(df.loc[(df['hasLVO']) & (df['EVTtime'] <= 24 * 60),'EVTtime'])
     for key in ['mean', 'std', 'median', 'iqr', 'min', 'max']:
         retval['prehospital_lvo_' + key] = prehospital[key]
         retval['ems_transport_lvo_' + key] = ems_transport[key]
@@ -439,8 +440,9 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
         if not output_dir.is_dir():
             output_dir.mkdir(parents = True)
 
-        # if map_csv_path.exists():
-        #     map_csv_path.unlink()
+        map_csv_path = output_dir / 'maps.csv'
+        if map_csv_path.exists():
+            map_csv_path.unlink()
 
         output_file = output_dir / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.xlsx'
         

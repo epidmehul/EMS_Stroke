@@ -48,15 +48,24 @@ def generate_patient_cohort(num_patients, seed):
     lvo_status = np.full(num_patients, False)
     lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387) # currently set to 38.7% 
 
-    probs = np.array([0.44, 0.22, 0.29, 0.05])
-    lastWell_bins = rng.choice(a = [1, 2, 3, 4], p = probs / np.sum(probs, dtype = float), size = num_patients)
+    # probs = np.array([0.44, 0.22, 0.29, 0.05])
+    probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
+    lastWell_bins = rng.choice(a = [i for i in range(1, len(probs) + 1)], p = probs / np.sum(probs, dtype = float), size = num_patients)
 
     # Note uniform distribution from numpy.random takes different arguments
     # than the uniform distribution from scipy.stats
-    last_well = ( (lastWell_bins == 1) * rng.uniform(0.1, 3, num_patients) + 
-                (lastWell_bins == 2) * rng.uniform(3, 6, num_patients) + 
-                (lastWell_bins == 3) * rng.uniform(6, 24, num_patients) + 
-                (lastWell_bins == 4) * rng.uniform(24, 48, num_patients) )
+    # last_well = ( (lastWell_bins == 1) * rng.uniform(0.1, 3, num_patients) + 
+    #             (lastWell_bins == 2) * rng.uniform(3, 6, num_patients) + 
+    #             (lastWell_bins == 3) * rng.uniform(6, 24, num_patients) + 
+    #             (lastWell_bins == 4) * rng.uniform(24, 48, num_patients) )
+
+    
+    last_well = ( (lastWell_bins == 1) * rng.uniform(0.1, 2, num_patients) + 
+                (lastWell_bins == 2) * rng.uniform(2, 3.5, num_patients) + 
+                (lastWell_bins == 3) * rng.uniform(3.5, 8, num_patients) + 
+                (lastWell_bins == 4) * rng.uniform(8, 24, num_patients)  +
+                (lastWell_bins == 5) * rng.uniform(24, 48, num_patients) )
+
 
     patient_df = pd.DataFrame({
         'ID': np.arange(1, num_patients + 1),
@@ -231,6 +240,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'specificity': np.broadcast_to(np.expand_dims(sens_spec_vals[:,1], axis = (0, 2)), (num_patients, num_scenarios, num_thresholds)).flatten(),
         'threshold': thresholds_arr.flatten(),
         'destination': destination_arr.flatten(),
+        'closest_destination': np.broadcast_to(np.expand_dims(closest_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
         'x_coord': np.repeat(patient_df['x_coord'].values, num_scenarios * num_thresholds),
         'y_coord': np.repeat(patient_df['y_coord'].values, num_scenarios * num_thresholds),
         'map_number': np.full(num_patients * num_scenarios * num_thresholds, map_seed),
