@@ -54,7 +54,9 @@ if __name__ == '__main__':
     if not map_csv_path.parent.exists():
         map_csv_path.parent.mkdir(parents = True)
     with mp.Pool(10) as pool:
+        i = 0
         for result in pool.imap_unordered(analyze_parquet, map_seeds, chunksize = 100):
             result.to_csv(map_csv_path, header = False, index = False, mode = 'a')
+            i += 1
     
         # pool.map(analyze_parquet, map_seeds)
