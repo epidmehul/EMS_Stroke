@@ -467,12 +467,18 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
 
         get_map_plot(sim_results, map_number = map_number, output_path = output_dir, threshold = threshold, additional_file_name=additional_file_name, save = save)
 
-    classification_metrics = ['overtriage','undertriage']
-    time_metrics = ['ivt_ischemic', 'evt_lvo']
-    mRS_metrics = ['ischemic_patients', 'lvo_patients']
+    classification_metrics = ['overtriage','undertriage','overtriage_diff','undertriage_diff']
+    time_metrics = ['ivt_ischemic_mean', 'evt_lvo_mean','ivt_ischemic_mean_diff','evt_lvo_mean_diff']
+    mRS_metrics = ['ischemic_patients', 'lvo_patients','ischemic_patients_diff','lvo_patients_diff']
 
-    
-    return None
+    retval = class_mean_df.loc[:, classification_metrics].copy()
+    retval = pd.concat(
+        [retval, time_mean_df.loc[:, time_metrics]], axis = 1
+    )
+    retval = pd.concat(
+        [retval, mRS_mean_df.loc[:, mRS_metrics]], axis = 1
+    )    
+    return retval
 
 def get_map_output_path(map_number, output_dir = 'output'):
     return pathlib.Path(f'{output_dir}/map_{str(map_number).zfill(3)}')

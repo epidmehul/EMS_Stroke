@@ -46,8 +46,15 @@ def analyze_output_file(filepath):
 def analyze_parquet(map_num):
     file_name = f'map_{str(map_num).zfill(3)}.parquet'
     df = read_output(pathlib.Path(current_dir) / file_name, save_format = 'parquet')
-    single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output/results') 
+    return single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output/results', line_errorbars = True) 
 
 if __name__ == '__main__':
+    # pool = mp.Pool(10)
+    map_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/maps.csv')
+    if not map_csv_path.parent.exists():
+        map_csv_path.parent.mkdir(parents = True)
     with mp.Pool(10) as pool:
-        pool.map(analyze_parquet, map_seeds)
+        for result in pool.imap_unordered(analyze_parquet, map_seeds, chunksize = 100):
+            result.to_csv(map_csv_path, header = False, index = False, mode = 'a')
+    
+        # pool.map(analyze_parquet, map_seeds)
