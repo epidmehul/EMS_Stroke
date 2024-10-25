@@ -32,16 +32,21 @@ def generate_patient_cohort(num_patients, seed):
 
     patient_coords_normalized = rng.random((num_patients, 2))
 
+    # where does the 0.4 come from?
     stroke = (rng.random(num_patients) < 0.4) 
+
+    # Around 85-87% of strokes due to ischemic event
     hemorrhaging = np.full(num_patients, False)
     ischemic = np.full(num_patients, False)
 
-    hemorrhaging_ischemic_rng = (rng.random(np.sum(stroke)) < 0.13)
+    hemorrhaging_ischemic_rng = (rng.random(np.sum(stroke)) < 0.13) # indicator for hemorrhaging
     hemorrhaging[stroke] = hemorrhaging_ischemic_rng
     ischemic[stroke] = ~hemorrhaging_ischemic_rng
 
+    # Of ischemic stroke patients, 10-46% depending on definition of LVO (Saini)
+    # Up to 40% (Dabus)
     lvo_status = np.full(num_patients, False)
-    lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387)
+    lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387) # currently set to 38.7% 
 
     probs = np.array([0.44, 0.22, 0.29, 0.05])
     lastWell_bins = rng.choice(a = [1, 2, 3, 4], p = probs / np.sum(probs, dtype = float), size = num_patients)
@@ -106,6 +111,9 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         - sens_spec_vals: m x 2 array containing LVO diagnosis 
             sensitivity and specificity values
         - thresholds: 1-D array containing the time thresholds to use
+
+    Returns:
+        - metrics: DataFrame to be written to the overall map csv
     '''
 
     ################# Patient and map initialization ##################

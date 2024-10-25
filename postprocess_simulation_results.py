@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import pathlib
 from scipy.spatial import distance
-from scipy.spatial import Voronoi, voronoi_plot_2d, ConvexHull
+from scipy.spatial import Voronoi, voronoi_plot_2d
 
 def triage_outcomes(df):
     '''
@@ -291,12 +291,12 @@ def generate_heatmap(df, title_str = "", col_names = None, differenced = False, 
         plt.close()
     return ax_list
 
-def generate_line_graphs(df, title_str = "", col_names = None, differenced = False, save = False, additional_file_name = '', output_path = None):
+def generate_line_graphs(df, title_str = "", col_names = None, differenced = False, save = False, additional_file_name = '', output_path = None, errorbar = False, alpha = 0.9):
     '''
     Generates line graphs for col_names in df, with a line for each sensitivity level with transport threshold along x-axis
     '''
     df = remove_base_case_and_non_diffs(df, remove_nondiffs = False)
-    df = df.groupby(['sensitivity', 'threshold'], observed = True).mean().reset_index()
+    # df = df.groupby(['sensitivity', 'threshold'], observed = True).mean().reset_index()
     if col_names is None:
         if differenced:
             diff_columns = df.columns.map(lambda x: "diff" in x)
@@ -312,7 +312,10 @@ def generate_line_graphs(df, title_str = "", col_names = None, differenced = Fal
             diff_columns_names = col_names
     ax_list = []
     for col_name in diff_columns_names:
-        ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o')
+        if not errorbar:
+            ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = None)
+        else:
+            ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = lambda x: np.percentile(x, (100 * (1 - alpha)/2, 100 * (1- (1-alpha)/2))))
         ax.set_title(f"{title_str}: {col_name}")
         if save:
             if output_path is None:
@@ -381,7 +384,10 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num
 
         # plt.scatter(grid_points[:,0], grid_points[:,1], c='purple', alpha=0.2, marker = '.', s = 1/80, lw = 1/80)
         
-        plt.pcolormesh(x, y, grid_bools, alpha=np.where(grid_bools, 0.4, 0), cmap = new_cmap)
+        # plt.pcolormesh(x, y, grid_bools, alpha=np.where(grid_bools, 0.4, 0), cmap = new_cmap)
+
+        plt.imshow(grid_bools, cmap = new_cmap, aspect = 'equal', origin = 'lower',
+                   alpha = np.where(grid_bools, 0.4, 0), extent = [0, geoscale, 0, geoscale])
         # plt.scatter(grid_points[:,0], grid_points[:,1], c = 'purple')
     if save:
         output_fig_path = output_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.png'
@@ -409,7 +415,7 @@ def get_map_points_threshold(med_coords, geoscale, drivespeed, threshold):
     # hull = ConvexHull(grid_within_threshold_points)
     return grid_within_threshold_points, grid_within_threshold_bools.reshape(x.shape), x, y
 
-def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None):
+def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None, line_errorbars = False):
     '''
     Takes direct outputted pd.DataFrame (after destination type is added)
 
@@ -453,13 +459,20 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
 
         generate_heatmap(time_df, output_path = output_dir, title_str = f"Map{map_number} Time", col_names = ['ivt_ischemic_mean', 'evt_lvo_mean'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save)
 
-        generate_line_graphs(class_df, output_path = output_dir, title_str = f"Map {map_number} Triage", col_names = ['undertriage','overtriage'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save)
+        generate_line_graphs(class_df, output_path = output_dir, title_str = f"Map {map_number} Triage", col_names = ['undertriage','overtriage'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save, errorbar = line_errorbars)
 
-        generate_line_graphs(mRS_df, output_path = output_dir, title_str = f"Map {map_number} mRS", differenced = heatmap_diff, save = save, additional_file_name = additional_file_name, col_names = ['ischemic_patients', 'lvo_patients'])
+        generate_line_graphs(mRS_df, output_path = output_dir, title_str = f"Map {map_number} mRS", differenced = heatmap_diff, save = save, additional_file_name = additional_file_name, col_names = ['ischemic_patients', 'lvo_patients'], errorbar = line_errorbars)
 
-        generate_line_graphs(time_df, output_path = output_dir, title_str = f"Map{map_number} Time", col_names = ['ivt_ischemic_mean', 'evt_lvo_mean'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save)
+        generate_line_graphs(time_df, output_path = output_dir, title_str = f"Map{map_number} Time", col_names = ['ivt_ischemic_mean', 'evt_lvo_mean'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save, errorbar = line_errorbars)
 
         get_map_plot(sim_results, map_number = map_number, output_path = output_dir, threshold = threshold, additional_file_name=additional_file_name, save = save)
+
+    classification_metrics = ['overtriage','undertriage']
+    time_metrics = ['ivt_ischemic', 'evt_lvo']
+    mRS_metrics = ['ischemic_patients', 'lvo_patients']
+
+    
+    return None
 
 def get_map_output_path(map_number, output_dir = 'output'):
     return pathlib.Path(f'{output_dir}/map_{str(map_number).zfill(3)}')
