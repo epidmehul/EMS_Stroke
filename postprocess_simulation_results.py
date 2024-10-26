@@ -351,8 +351,16 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num
     simulated_coords = rng.uniform(low = 0, high = geoscale, size = (num_points, 2))
     equipoise = np.sum(np.argmin(distance.cdist(simulated_coords, med_coords), axis = 1) != 0) / num_points
     # print(equipoise)
-    map_csv_file = output_path.parent / 'maps.csv'
-    current_map_info = pd.DataFrame({'ID': map_number, 'equipoise': equipoise, 'geoscale': geoscale}, index = [map_number])
+    map_csv_file = output_path.parent.parent / 'maps.csv'
+    current_map_info = pd.DataFrame(
+        {'ID': map_number,
+         'equipoise': equipoise,
+         'geoscale': geoscale,
+         'xPSC': med_coords[1, 0],
+         'yPSC': med_coords[1, 1],
+         'xPSC2': med_coords[2, 0],
+         'yPSC2': med_coords[2, 2]
+        }, index = [map_number])
 
     if map_csv_file.exists():
         current_map_info.to_csv(map_csv_file, header = False, index = False, mode = 'a')
@@ -395,15 +403,15 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num
         plt.savefig(output_fig_path)
         plt.close()
 
-        output_txt_path = output_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.txt'
-        with open(output_txt_path,'w') as f:
-            f.write(f'Map {map_number}: \n\nCoordinates: \n')
-            for i, hosp in enumerate(coord_labels):
-                f.write(f'{hosp}: ({med_coords[i,:]}\n')
-            f.write('\n')
-            f.write(f'Equipoise: {equipoise * 100}%\n')
-            f.write('\n')
-            f.write(f'Drivespeed: {drivespeed}')
+        # output_txt_path = output_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.txt'
+        # with open(output_txt_path,'w') as f:
+        #     f.write(f'Map {map_number}: \n\nCoordinates: \n')
+        #     for i, hosp in enumerate(coord_labels):
+        #         f.write(f'{hosp}: ({med_coords[i,:]}\n')
+        #     f.write('\n')
+        #     f.write(f'Equipoise: {equipoise * 100}%\n')
+        #     f.write('\n')
+        #     f.write(f'Drivespeed: {drivespeed}')
 
 def get_map_points_threshold(med_coords, geoscale, drivespeed, threshold):
     x,y = np.meshgrid(geoscale * np.arange(0, 1, 0.001), geoscale * np.arange(0, 1, 0.001))

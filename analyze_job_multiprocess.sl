@@ -2,9 +2,9 @@
 
 #SBATCH -p general
 #SBATCH -N 1
-#SBATCH -n 10
+#SBATCH -n 11
 #SBATCH --mem=32g
-#SBATCH -t 4:00:00
+#SBATCH -t 2:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J analyze_maps
 #SBATCH --mail-type=end

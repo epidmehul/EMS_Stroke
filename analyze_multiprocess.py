@@ -50,13 +50,14 @@ def analyze_parquet(map_num):
 
 if __name__ == '__main__':
     # pool = mp.Pool(10)
-    map_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/maps.csv')
+    map_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/map_scenario_threshold_results.csv')
     if not map_csv_path.parent.exists():
         map_csv_path.parent.mkdir(parents = True)
+    elif map_csv_path.exists():
+        map_csv_path.unlink()
     with mp.Pool(10) as pool:
-        i = 0
-        for result in pool.imap_unordered(analyze_parquet, map_seeds, chunksize = 100):
+        results = pool.imap_unordered(analyze_parquet, map_seeds, chunksize = 20)
+        for result in results:
             result.to_csv(map_csv_path, header = False, index = False, mode = 'a')
-            i += 1
     
         # pool.map(analyze_parquet, map_seeds)
