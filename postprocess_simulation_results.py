@@ -359,7 +359,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num
          'xPSC': med_coords[1, 0],
          'yPSC': med_coords[1, 1],
          'xPSC2': med_coords[2, 0],
-         'yPSC2': med_coords[2, 2]
+         'yPSC2': med_coords[2, 1]
         }, index = [map_number])
 
     if map_csv_file.exists():
