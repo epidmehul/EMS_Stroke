@@ -471,7 +471,7 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
 
         generate_line_graphs(class_df, output_path = output_dir, title_str = f"Map {map_number} Triage", col_names = ['undertriage','overtriage'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save, errorbar = line_errorbars)
 
-        generate_line_graphs(mRS_df, output_path = output_dir, title_str = f"Map {map_number} mRS", differenced = heatmap_diff, save = save, additional_file_name = additional_file_name, col_names = ['ischemic_patients', 'lvo_patients'], errorbar = line_errorbars)
+        generate_line_graphs(mRS_df, output_path = output_dir, title_str = f"Map {map_number} mRS", differenced = heatmap_diff, save = save, additional_file_name = additional_file_name, col_names = ['ischemic_patients', 'lvo_patients'], errorbar = False)
 
         generate_line_graphs(time_df, output_path = output_dir, title_str = f"Map{map_number} Time", col_names = ['ivt_ischemic_mean', 'evt_lvo_mean'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save, errorbar = line_errorbars)
 
@@ -481,13 +481,22 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
     time_metrics = ['ivt_ischemic_mean', 'evt_lvo_mean','ivt_ischemic_mean_diff','evt_lvo_mean_diff']
     mRS_metrics = ['ischemic_patients', 'lvo_patients','ischemic_patients_diff','lvo_patients_diff']
 
-    retval = class_mean_df.loc[:, classification_metrics].copy()
+    retval = class_df.loc[:, classification_metrics].copy()
     retval = pd.concat(
-        [retval, time_mean_df.loc[:, time_metrics]], axis = 1
+        [retval, time_df.loc[:, time_metrics]], axis = 1
     )
     retval = pd.concat(
-        [retval, mRS_mean_df.loc[:, mRS_metrics]], axis = 1
-    )    
+        [retval, mRS_df.loc[:, mRS_metrics]], axis = 1
+    )
+    retval['map'] = np.full(retval.shape[0], map_number)
+
+    # retval = class_mean_df.loc[:, classification_metrics].copy()
+    # retval = pd.concat(
+    #     [retval, time_mean_df.loc[:, time_metrics]], axis = 1
+    # )
+    # retval = pd.concat(
+    #     [retval, mRS_mean_df.loc[:, mRS_metrics]], axis = 1
+    # )    
     return retval
 
 def get_map_output_path(map_number, output_dir = 'output'):
