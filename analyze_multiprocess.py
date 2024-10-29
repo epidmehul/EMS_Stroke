@@ -50,17 +50,21 @@ def analyze_parquet(map_num):
 
 if __name__ == '__main__':
     # pool = mp.Pool(10)
-    map_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/map_scenario_threshold_seed_results.csv')
-    if not map_csv_path.parent.exists():
-        map_csv_path.parent.mkdir(parents = True)
-    elif map_csv_path.exists():
-        map_csv_path.unlink()
+    data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/map_scenario_threshold_seed_results.csv')
+    if not data_calcs_csv_path.parent.exists():
+        data_calcs_csv_path.parent.mkdir(parents = True)
+    elif data_calcs_csv_path.exists():
+        data_calcs_csv_path.unlink()
+
+    maps_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/maps.csv')
+    if maps_csv_path.exists():
+        maps_csv_path.unlink()
     with mp.Pool(10) as pool:
         results = pool.imap(analyze_parquet, map_seeds, chunksize = 20)
         for result in results:
-            if map_csv_path.exists():
-                result.to_csv(map_csv_path, header = False, index = False, mode = 'a')
+            if data_calcs_csv_path.exists():
+                result.to_csv(data_calcs_csv_path, header = False, index = False, mode = 'a')
             else:
-                result.to_csv(map_csv_path, header = True, index = False, mode = 'w')
+                result.to_csv(data_calcs_csv_path, header = True, index = False, mode = 'w')
     
         # pool.map(analyze_parquet, map_seeds)

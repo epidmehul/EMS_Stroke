@@ -353,7 +353,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
     # print(equipoise)
     map_csv_file = output_path.parent.parent / 'maps.csv'
     current_map_info = pd.DataFrame(
-        {'ID': map_number,
+        {'map': map_number,
          'equipoise': equipoise,
          'geoscale': geoscale,
          'xPSC': med_coords[1, 0],
