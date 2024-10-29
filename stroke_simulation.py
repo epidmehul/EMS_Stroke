@@ -49,7 +49,7 @@ def generate_patient_cohort(num_patients, seed):
     lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387) # currently set to 38.7% 
 
     # probs = np.array([0.44, 0.22, 0.29, 0.05])
-    lastWell_bins = rng.choice(a = [i for i in range(1, len(probs) + 1)], p = probs / np.sum(probs, dtype = float), size = num_patients)
+    # lastWell_bins = rng.choice(a = [i for i in range(1, len(probs) + 1)], p = probs / np.sum(probs, dtype = float), size = num_patients)
 
     # Note uniform distribution from numpy.random takes different arguments
     # than the uniform distribution from scipy.stats
