@@ -15,10 +15,14 @@ args = parser.parse_args()
 # sim_results = read_output('run_0_100.csv')
 
 map_seeds = [i for i in range(1000)]
+output_dir = '/work/users/p/w/pwlin/output/parquet_files'
 
 def run_single_map(map_seed):
-    run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = '/work/users/p/w/pwlin/output/parquet_files')
+    run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir)
 
 if __name__ == '__main__':
+    output_dir_path = pathlib.Path(output_dir)
+    if not output_dir_path.exists():
+        output_dir_path.mkdir(parents = True)
     with mp.Pool(10) as pool:
         pool.map(run_single_map, map_seeds)
