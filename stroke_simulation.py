@@ -32,21 +32,32 @@ def generate_patient_cohort(num_patients, seed):
 
     patient_coords_normalized = rng.random((num_patients, 2))
 
-    # where does the 0.4 come from?
-    stroke = (rng.random(num_patients) < 0.4) 
+    stroke_types = np.array(['none', 'tia', 'hemorrhaging', 'ischemic'])
+    probs = np.array([0.6765, 0.0795, 0.042, 0.202])
+    patient_stroke_diagnoses = rng.choice(stroke_types, size = num_patients, p = probs/np.sum(probs))
 
-    # Around 85-87% of strokes due to ischemic event
-    hemorrhaging = np.full(num_patients, False)
-    ischemic = np.full(num_patients, False)
+    stroke = (patient_stroke_diagnoses == 'none')
+    tia = (patient_stroke_diagnoses == 'tia')
+    hemorrhaging = (patient_stroke_diagnoses == 'hemorrhaging')
+    ischemic = (patient_stroke_diagnoses == 'ischemic')
 
-    hemorrhaging_ischemic_rng = (rng.random(np.sum(stroke)) < 0.13) # indicator for hemorrhaging
-    hemorrhaging[stroke] = hemorrhaging_ischemic_rng
-    ischemic[stroke] = ~hemorrhaging_ischemic_rng
+    lvo_status = np.full(num_patients, False)
+    lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.241)
+    # # where does the 0.4 come from?
+    # stroke = (rng.random(num_patients) < 1 - 0.6765) 
+
+    # # Around 85-87% of strokes due to ischemic event
+    # hemorrhaging = np.full(num_patients, False)
+    # ischemic = np.full(num_patients, False)
+
+    # hemorrhaging_ischemic_rng = (rng.random(np.sum(stroke)) < 0.13) # indicator for hemorrhaging
+    # hemorrhaging[stroke] = hemorrhaging_ischemic_rng
+    # ischemic[stroke] = ~hemorrhaging_ischemic_rng
 
     # Of ischemic stroke patients, 10-46% depending on definition of LVO (Saini)
     # Up to 40% (Dabus)
-    lvo_status = np.full(num_patients, False)
-    lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387) # currently set to 38.7% 
+    # lvo_status = np.full(num_patients, False)
+    # lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387) # currently set to 38.7% 
 
     # probs = np.array([0.44, 0.22, 0.29, 0.05])
     # lastWell_bins = rng.choice(a = [i for i in range(1, len(probs) + 1)], p = probs / np.sum(probs, dtype = float), size = num_patients)
@@ -60,7 +71,7 @@ def generate_patient_cohort(num_patients, seed):
     
     probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
     last_well_distributions = [
-        {'type': rng.uniform, 'kwargs': {'low': 0.1, 'high': 2}},
+        {'type': rng.uniform, 'kwargs': {'low': 1/6, 'high': 2}},
         {'type': rng.uniform, 'kwargs': {'low': 2, 'high': 3.5}},
         {'type': rng.uniform, 'kwargs': {'low': 3.5, 'high': 8}},
         {'type': rng.uniform, 'kwargs': {'low': 8, 'high': 24}},
@@ -84,6 +95,7 @@ def generate_patient_cohort(num_patients, seed):
         'x_coord': patient_coords_normalized[:,0],
         'y_coord': patient_coords_normalized[:,1],
         'stroke': stroke,
+        'tia': tia,
         'hemorrhaging': hemorrhaging,
         'ischemic': ischemic,
         'lvo_status': lvo_status,
@@ -228,6 +240,8 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     hemorrhaging_arr = np.broadcast_to(np.expand_dims(patient_df['hemorrhaging'].values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
+    tia_arr = np.broadcast_to(np.expand_dims(patient_df['tia'].values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+
     IVTtime = lvo_status_arr * (lkw_to_door_arr + door2IVT) + ((~lvo_status_arr) & ischemic_arr) * (lkw_to_door_arr + door2IVT)
 
     EVTtime = lvo_status_arr * ((destination_arr == 'CSC') * (lkw_to_door_arr + door2EVT) +
@@ -237,7 +251,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
             lvo_status_arr * (((IVTtime < ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * (0.2359 + 0.0000002 * IVTtime**2 - 0.0004  * IVTtime)
                           + (((IVTtime >= ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002*EVTtime)) +
                           ((IVTtime < ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.5753 + 0.0000002 * IVTtime**2 + 0.00000004 * EVTtime**2 - 0.0004 * IVTtime - 0.0002*EVTtime - (0.2359 + 0.0000002 * IVTtime**2 - 0.0004 * IVTtime) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002 *EVTtime))
-                        + ((IVTtime >= 270) & (EVTtime >= 360)) * 0.129)
+                        + ((IVTtime >= ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * 0.129)
             + ((~lvo_status_arr) & ischemic_arr) * ((IVTtime < ivt_time_threshold) * (0.6343 - 0.00000005 * IVTtime**2 - 0.0005 * IVTtime) + (IVTtime >= ivt_time_threshold) * 0.4622)
             + (~lvo_status_arr & ~ischemic_arr & hemorrhaging_arr) * 0.24 
             + (~lvo_status_arr & ~ischemic_arr & ~hemorrhaging_arr) * 0.9
@@ -260,6 +274,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'lvo_diagnosis': np.broadcast_to(np.expand_dims(expanded_lvo_diagnosis, axis = 2), (num_patients, num_scenarios, num_thresholds)).flatten(),
         'ischemic': ischemic_arr.flatten(),
         'hemorrhaging': hemorrhaging_arr.flatten(),
+        'tia': tia_arr.flatten(),
         'lkw2door': lkw_to_door_arr.flatten(),
         'time2Hospital': time_to_hospital_arr.flatten(),
         'IVTtime': IVTtime.flatten(),
