@@ -174,16 +174,15 @@ def get_thresholds_sensitivities(df):
 
     Assigns threshold = 0 and sensitivity = 'none' to the base case
     '''
-    thresholds_as_list = df.index.str.split('_').str[-1].tolist()
-    threshold_idx = thresholds_as_list.index('base')
-    thresholds_as_list[threshold_idx] = '0'
+    thresholds_as_arr = df.index.str.split('_').str[-1].values
+    thresholds_as_arr[thresholds_as_arr == 'base'] = '0'
+    # threshold_idx = thresholds_as_list.index('base')
+    # thresholds_as_list[threshold_idx] = '0'
 
-    sensitivities_as_list = df.index.str.split('_').str[0].tolist()
-    sensitivities_idx = sensitivities_as_list.index('base')
-    sensitivities_as_list[sensitivities_idx] = 'base'
+    sensitivities_as_arr = df.index.str.split('_').str[0].values
 
-    df.insert(0, 'threshold', thresholds_as_list)
-    df.insert(1, 'sensitivity', sensitivities_as_list)
+    df.insert(0, 'threshold', thresholds_as_arr)
+    df.insert(1, 'sensitivity', sensitivities_as_arr)
     df['threshold'] = df['threshold'].astype(int)
     df['sensitivity'] = df['sensitivity'].astype(pd.api.types.CategoricalDtype(categories = ['base','high', 'mid', 'low'], ordered = True))
     return df
