@@ -49,7 +49,6 @@ def generate_patient_cohort(num_patients, seed):
     lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.387) # currently set to 38.7% 
 
     # probs = np.array([0.44, 0.22, 0.29, 0.05])
-    probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
     lastWell_bins = rng.choice(a = [i for i in range(1, len(probs) + 1)], p = probs / np.sum(probs, dtype = float), size = num_patients)
 
     # Note uniform distribution from numpy.random takes different arguments
@@ -58,13 +57,26 @@ def generate_patient_cohort(num_patients, seed):
     #             (lastWell_bins == 2) * rng.uniform(3, 6, num_patients) + 
     #             (lastWell_bins == 3) * rng.uniform(6, 24, num_patients) + 
     #             (lastWell_bins == 4) * rng.uniform(24, 48, num_patients) )
-
     
-    last_well = ( (lastWell_bins == 1) * rng.uniform(0.1, 2, num_patients) + 
-                (lastWell_bins == 2) * rng.uniform(2, 3.5, num_patients) + 
-                (lastWell_bins == 3) * rng.uniform(3.5, 8, num_patients) + 
-                (lastWell_bins == 4) * rng.uniform(8, 24, num_patients)  +
-                (lastWell_bins == 5) * rng.uniform(24, 48, num_patients) )
+    probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
+    last_well_distributions = [
+        {'type': rng.uniform, 'kwargs': {'low': 0.1, 'high': 2}},
+        {'type': rng.uniform, 'kwargs': {'low': 2, 'high': 3.5}},
+        {'type': rng.uniform, 'kwargs': {'low': 3.5, 'high': 8}},
+        {'type': rng.uniform, 'kwargs': {'low': 8, 'high': 24}},
+        {'type': rng.uniform, 'kwargs': {'low': 24, 'high': 48}}
+    ]
+    last_well_generated_times = np.zeros((num_patients, len(last_well_distributions)))
+    for i, distr in enumerate(last_well_distributions):
+        last_well_generated_times[:, i] = distr['type'](size = num_patients, **distr['kwargs'])
+    lastWell_bins = rng.choice(a = np.arange(len(last_well_distributions)), p = probs / np.sum(probs, dtype = float), size = num_patients)
+
+    last_well = last_well_generated_times[np.arange(num_patients), lastWell_bins]
+    # last_well = ( (lastWell_bins == 1) * rng.uniform(0.1, 2, num_patients) + 
+    #             (lastWell_bins == 2) * rng.uniform(2, 3.5, num_patients) + 
+    #             (lastWell_bins == 3) * rng.uniform(3.5, 8, num_patients) + 
+    #             (lastWell_bins == 4) * rng.uniform(8, 24, num_patients)  +
+    #             (lastWell_bins == 5) * rng.uniform(24, 48, num_patients) )
 
 
     patient_df = pd.DataFrame({

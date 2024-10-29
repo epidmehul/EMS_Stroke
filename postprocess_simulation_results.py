@@ -328,7 +328,7 @@ def generate_line_graphs(df, title_str = "", col_names = None, differenced = Fal
         plt.close()
     return ax_list
 
-def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num_points = 25000, output_path = None, threshold = None):
+def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', output_path = None, threshold = None):
     '''
     Writes a text file containing the various coordinates and any other statistics about a given map number
 
@@ -347,9 +347,10 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num
     voronoi_colors = ['blue', 'green', 'red']
     voronoi_markers = ['^','o','o']
 
-    rng = np.random.default_rng()
-    simulated_coords = rng.uniform(low = 0, high = geoscale, size = (num_points, 2))
-    equipoise = np.sum(np.argmin(distance.cdist(simulated_coords, med_coords), axis = 1) != 0) / num_points
+    grid_points, grid_bools = get_map_points_threshold(med_coords, geoscale, drivespeed, threshold)
+
+    # simulated_coords = rng.uniform(low = 0, high = geoscale, size = (num_points, 2))
+    equipoise = np.sum(np.argmin(distance.cdist(grid_points, med_coords), axis = 1) != 0) / grid_points.shape[0]
     # print(equipoise)
     map_csv_file = output_path.parent.parent / 'maps.csv'
     current_map_info = pd.DataFrame(
@@ -385,7 +386,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', num
     plt.gca().set_aspect('equal')
     plt.title(f'Map {map_number}')
     if threshold is not None:
-        grid_points, grid_bools, x, y = get_map_points_threshold(med_coords, geoscale, drivespeed, threshold)
+        # grid_points, grid_bools = get_map_points_threshold(med_coords, geoscale, drivespeed, threshold)
 
         new_cmap = colors.ListedColormap(['purple'])
         # for simplex in grid_hull.simplices:
@@ -419,10 +420,12 @@ def get_map_points_threshold(med_coords, geoscale, drivespeed, threshold):
     grid_dists = distance.cdist(grid_points, med_coords)
     grid_closest_med = grid_dists.argmin(axis = 1)
     grid_closest_dists = grid_dists.min(axis = 1)
+    if threshold is None:
+        threshold = 0
     grid_within_threshold_bools = (grid_closest_med != 0) & (grid_dists[:,0] - grid_closest_dists < threshold/60 * drivespeed)
-    grid_within_threshold_points = grid_points[grid_within_threshold_bools, :]
+    # grid_within_threshold_points = grid_points[grid_within_threshold_bools, :]
     # hull = ConvexHull(grid_within_threshold_points)
-    return grid_within_threshold_points, grid_within_threshold_bools.reshape(x.shape), x, y
+    return grid_points, grid_within_threshold_bools.reshape(x.shape)
 
 def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None, line_errorbars = False):
     '''
