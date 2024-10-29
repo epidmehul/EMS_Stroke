@@ -493,6 +493,7 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
     )
     retval['map'] = np.full(retval.shape[0], map_number)
 
+
     # retval = class_mean_df.loc[:, classification_metrics].copy()
     # retval = pd.concat(
     #     [retval, time_mean_df.loc[:, time_metrics]], axis = 1
@@ -500,7 +501,7 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
     # retval = pd.concat(
     #     [retval, mRS_mean_df.loc[:, mRS_metrics]], axis = 1
     # )    
-    return retval
+    return get_thresholds_sensitivities(retval)
 
 def get_map_output_path(map_number, output_dir = 'output'):
     return pathlib.Path(f'{output_dir}/map_{str(map_number).zfill(3)}')
