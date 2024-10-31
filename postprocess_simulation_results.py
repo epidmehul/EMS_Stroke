@@ -450,9 +450,9 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
         if not output_dir.is_dir():
             output_dir.mkdir(parents = True)
 
-        map_csv_path = output_dir.parent.parent / 'maps.csv'
-        if map_csv_path.exists():
-            map_csv_path.unlink()
+        # map_csv_path = output_dir.parent.parent / 'maps.csv'
+        # if map_csv_path.exists():
+        #     map_csv_path.unlink()
 
         output_file = output_dir / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.xlsx'
         
