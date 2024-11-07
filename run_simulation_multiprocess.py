@@ -7,6 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seeds', help = 'number of random seeds', type = int, default = 40)
 parser.add_argument('-p', '--patients', help = 'number of patients', type = int, default = 1000)
+parser.add_argument('-c', '--config', help = 'config file with simulation parameters', type = pathlib.Path, default = None)
 args = parser.parse_args()
 
 # os.chdir('/proj/patellab/Sheps/output')

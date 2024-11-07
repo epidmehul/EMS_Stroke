@@ -3,6 +3,25 @@ import pandas as pd
 from scipy import spatial
 # from sklearn.metrics import confusion_matrix
 import pathlib
+import yaml
+
+
+def read_config(filestr):
+    with open(filestr) as f:
+        config_override = yaml.safe_load(f)
+    params = {
+        'patients_none_all': 0.6765,
+        'patients_tia_all': 0.0795,
+        'patients_hemorrhaging_all': 0.042,
+        'patients_ischemic_all': 0.202,
+        'patients_lvo_ischemic': 0.241,
+        'patients_num_lkw_bins': 5,
+        'simulations_ivt_threshold': 270,
+        'simulations_evt_threshold': 1440
+    }
+    for key in config_override:
+        params[key] = config_override[key]
+    return params
 
 def get_drivespeed(geoscale: float):
     '''
@@ -18,7 +37,7 @@ def get_drivespeed(geoscale: float):
         return 25 + (geoscale - 30)/2
     return 45.0
 
-def generate_patient_cohort(num_patients, seed):
+def generate_patient_cohort(num_patients, seed, config = None):
     '''
     Params:
         - num_patients: Number of patients to be generated
@@ -33,7 +52,13 @@ def generate_patient_cohort(num_patients, seed):
     patient_coords_normalized = rng.random((num_patients, 2))
 
     stroke_types = np.array(['none', 'tia', 'hemorrhaging', 'ischemic'])
-    probs = np.array([0.6765, 0.0795, 0.042, 0.202])
+    try:
+        probs = np.array([config['patients_none_all'],
+                      config['patients_tia_all'],
+                      config['patients_hemorrhaging_all'],
+                      config['patients_ischemic_all']])
+    except:
+        probs = np.array([0.6765, 0.0795, 0.042, 0.202])
     patient_stroke_diagnoses = rng.choice(stroke_types, size = num_patients, p = probs/np.sum(probs))
 
     stroke = (patient_stroke_diagnoses == 'none')
@@ -41,8 +66,17 @@ def generate_patient_cohort(num_patients, seed):
     hemorrhaging = (patient_stroke_diagnoses == 'hemorrhaging')
     ischemic = (patient_stroke_diagnoses == 'ischemic')
 
+    try:
+        lvo_ischemic_proportion = config['patients_lvo_ischemic']
+    except:
+        lvo_ischemic_proportion = 0.241
     lvo_status = np.full(num_patients, False)
-    lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < 0.241)
+    lvo_status[ischemic] = (rng.random(np.sum(ischemic)) < lvo_ischemic_proportion)
+
+    # sensitivity analysis, check 14.1 and 34.1 on 9 manually specified maps
+
+
+
     # # where does the 0.4 come from?
     # stroke = (rng.random(num_patients) < 1 - 0.6765) 
 
@@ -131,7 +165,7 @@ def generate_map(seed, num_psc = 2):
     med_labels = np.array(med_labels)
     return med_labels, med_coords, geoscale
 
-def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([[0.9, 0.6], [0.75, 0.75], [0.6, 0.9]]), thresholds = np.arange(0, 70, 10)):
+def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([[0.9, 0.6], [0.75, 0.75], [0.6, 0.9]]), thresholds = np.arange(0, 70, 10), config = None):
     '''
     Runs a simulation for a patient-map combination across all desired LVO diagnosis test parameters and transport thresholds
 
@@ -150,7 +184,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     '''
 
     ################# Patient and map initialization ##################
-    patient_df = generate_patient_cohort(num_patients, seed = patient_seed)
+    patient_df = generate_patient_cohort(num_patients, seed = patient_seed, config = config)
     med_labels, med_coords, geoscale = generate_map(map_seed, num_psc = 2)
 
     drivespeed = get_drivespeed(geoscale)
@@ -222,17 +256,27 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     lkw_to_door_arr = 60 * np.broadcast_to(np.expand_dims(last_well, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)) + time_in_system_arr
 
     ####################### Outcomes ######################
-    door2IVT = 45
-    door2EVT = 90
-    IVT2out = 45
-    door2EVT2 = 45
+    try:
+        door2IVT = config['door2IVT']
+        door2EVT = config['door2EVT']
+        IVT2out = config['IVT2out']
+        door2EVT2 = config['door2EVT2']
+    except:
+        door2IVT = 45
+        door2EVT = 90
+        IVT2out = 45
+        door2EVT2 = 45
     transdist1 = np.linalg.norm(med_coords[0,:] - med_coords[1,:]) * geoscale
     transtime1 = (transdist1/drivespeed)*60
     transdist2 = np.linalg.norm(med_coords[0,:] - med_coords[2,:]) * geoscale
     transtime2 = (transdist2/drivespeed)*60
 
-    ivt_time_threshold = 4.5 * 60
-    evt_time_threshold = 24 * 60
+    try:
+        ivt_time_threshold = config['simulations_ivt_threshold']
+        evt_time_threshold = config['simulations_evt_threshold']
+    except:
+        ivt_time_threshold = 4.5 * 60
+        evt_time_threshold = 24 * 60
 
     lvo_status_arr = np.broadcast_to(np.expand_dims(lvo_status, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
@@ -289,7 +333,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     })
     return results_df
 
-def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None):
+def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config_dict = None):
     min_map = min(map_seeds)
     max_map = max(map_seeds)
 
@@ -307,7 +351,7 @@ def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, 
     for i in map_seeds:
         map_output_list = []
         for j in range(num_patient_seeds):
-            temp = simulation(num_patients, patient_seed = j, map_seed = i)
+            temp = simulation(num_patients, patient_seed = j, map_seed = i, config_dict = config_dict)
             map_output_list.append(temp)
             # map_df = pd.concat((map_df, temp))
         map_output_df = pd.concat(map_output_list)
