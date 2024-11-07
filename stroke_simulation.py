@@ -333,7 +333,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     })
     return results_df
 
-def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config_dict = None):
+def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config_dict = None, additional_file_name = ''):
     min_map = min(map_seeds)
     max_map = max(map_seeds)
 
@@ -368,7 +368,7 @@ def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, 
                                 index = False,
                                 header = True)
             case 'parquet':
-                output_file = output_dir_path / f'map_{str(i).zfill(3)}.parquet'
+                output_file = output_dir_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{str(i).zfill(3)}.parquet'
                 map_output_df.to_parquet(output_file, index = False)
     return None
 
