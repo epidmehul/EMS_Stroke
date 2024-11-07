@@ -24,6 +24,6 @@ if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)
     if not output_dir_path.exists():
         output_dir_path.mkdir(parents = True)
-    run_map_simulations([711], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config_dict = {'patients_lvo_ischemic': 0.141}, additional_file_name='low_lvo')
+    run_map_simulations([711], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config = {'patients_lvo_ischemic': 0.141}, additional_file_name='low_lvo')
 
-    run_map_simulations([711], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config_dict = {'patients_lvo_ischemic': 0.341}, additional_file_name='high_lvo')
+    run_map_simulations([711], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config = {'patients_lvo_ischemic': 0.341}, additional_file_name='high_lvo')
