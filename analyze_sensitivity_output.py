@@ -27,4 +27,4 @@ for path in map_files:
 
     result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output_sens/results', line_errorbars = True, additional_file_name = sens_descriptor) 
 
-    result.to_csv(data_calcs_csv_path / path.stem, header = True, index = False, mode = 'w')
+    result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
