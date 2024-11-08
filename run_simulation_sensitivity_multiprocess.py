@@ -1,6 +1,5 @@
 from stroke_simulation import *
-# from postprocess_simulation_results import *
-import multiprocessing as mp
+from postprocess_simulation_results import *
 import argparse
 
 parser = argparse.ArgumentParser()
