@@ -24,4 +24,9 @@ for path in map_files:
     if maps_csv_path.exists():
         maps_csv_path.unlink()
 
-    single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output_sens/results', line_errorbars = True, additional_file_name = '_'.join(path.stem.split('_')[:-1])) 
+    result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output_sens/results', line_errorbars = True, additional_file_name = '_'.join(path.stem.split('_')[:-1])) 
+
+    if data_calcs_csv_path.exists():
+        result.to_csv(data_calcs_csv_path, header = False, index = False, mode = 'a')
+    else:
+        result.to_csv(data_calcs_csv_path, header = True, index = False, mode = 'w')
