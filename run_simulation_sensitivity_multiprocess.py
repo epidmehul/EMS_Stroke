@@ -27,4 +27,6 @@ if __name__ == '__main__':
     for map in map_seeds:
         run_map_simulations([map], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config = {'patients_lvo_ischemic': 0.141}, additional_file_name='low_lvo')
 
+        run_map_simulations([map], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config = {'patients_lvo_ischemic': 0.341}, additional_file_name='mid_lvo')
+
         run_map_simulations([map], num_patients = 1000, num_patient_seeds = 40, save_format = 'parquet', output_dir = output_dir, config = {'patients_lvo_ischemic': 0.341}, additional_file_name='high_lvo')
