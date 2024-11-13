@@ -34,25 +34,18 @@ def single_map_aggregation(map_number, input_path):
     Loads in sensitivity analyses and creates visualizations
     '''
     csv_paths = input_path.glob(f'*{map_number}.csv')
+    lvo_df_dict = {}
     for path in csv_paths:
         lvo_prevalance = path.stem.split('_')[0]
-        match lvo_prevalance:
-            case 'low':
-                low_lvo = pd.read_csv(path)
-            case 'mid':
-                mid_lvo = pd.read_csv(path)
-            case 'high':
-                high_lvo = pd.read_csv(path)
-            case _:
-                continue
+        lvo_df_dict[lvo_prevalance] = pd.read_csv(path)
     
-    low_lvo = remove_base_case_and_non_diffs(low_lvo, remove_base = True, remove_nondiffs = False)
+    low_lvo = remove_base_case_and_non_diffs(lvo_df_dict['low'], remove_base = True, remove_nondiffs = False)
     low_lvo['sensitivity'] = low_lvo['sensitivity'].apply(lambda x: x+'_0.141')
 
-    mid_lvo = remove_base_case_and_non_diffs(mid_lvo, remove_base = True, remove_nondiffs = False)
+    mid_lvo = remove_base_case_and_non_diffs(lvo_df_dict['mid'], remove_base = True, remove_nondiffs = False)
     mid_lvo['sensitivity'] = mid_lvo['sensitivity'].apply(lambda x: x+'_0.241')
 
-    high_lvo = remove_base_case_and_non_diffs(high_lvo, remove_base = True, remove_nondiffs = False)
+    high_lvo = remove_base_case_and_non_diffs(lvo_df_dict['high'], remove_base = True, remove_nondiffs = False)
     high_lvo['sensitivity'] = high_lvo['sensitivity'].apply(lambda x: x+'_0.341')
 
     full_data = pd.concat((low_lvo, mid_lvo, high_lvo), axis = 0)
