@@ -52,8 +52,10 @@ def single_map_aggregation(map_number, input_path):
     return full_data
 
 if __name__ == '__main__':
-    input_dir = '/proj/patellab/peter/output_sens/all_numbers'
-    output_dir = '/proj/patellab/peter/output_sens/results'
+    # input_dir = '/proj/patellab/peter/output_sens/all_numbers'
+    input_dir = '/work/users/p/w/pwlin/output_sens/all_numbers'
+    # output_dir = '/proj/patellab/peter/output_sens/results'
+    output_dir = '/work/users/p/w/pwlin/output_sens/results'
     for map in map_nums:
         output_path = pathlib.Path(output_dir) / f'map_{str(map).zfill(3)}/aggregated'
         if not output_path.is_dir():
