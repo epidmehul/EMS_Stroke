@@ -60,7 +60,7 @@ if __name__ == '__main__':
         output_path = pathlib.Path(output_dir) / f'map_{str(map).zfill(3)}/aggregated'
         if not output_path.is_dir():
             output_path.mkdir(parents = True)
-        full_data = single_map_aggregation(map, pathlib.Path('output_sens/all_numbers'))
+        full_data = single_map_aggregation(map, pathlib.Path(input_dir))
 
         col_names = [
             'lvo_patients_diff',
