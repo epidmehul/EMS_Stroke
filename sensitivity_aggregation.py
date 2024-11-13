@@ -38,7 +38,7 @@ def single_map_aggregation(map_number, input_path):
     for path in csv_paths:
         lvo_prevalance = path.stem.split('_')[0]
         lvo_df_dict[lvo_prevalance] = pd.read_csv(path)
-    
+    print(lvo_df_dict.keys())
     low_lvo = remove_base_case_and_non_diffs(lvo_df_dict['low'], remove_base = True, remove_nondiffs = False)
     low_lvo['sensitivity'] = low_lvo['sensitivity'].apply(lambda x: x+'_0.141')
 
