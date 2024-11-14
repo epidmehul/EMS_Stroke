@@ -13,7 +13,8 @@ args = parser.parse_args()
 
 # sim_results = read_output('run_0_100.csv')
 
-map_seeds = [711, 31, 244, 126, 701, 671, 93, 414, 984]
+# map_seeds = [711, 31, 244, 126, 701, 671, 93, 414, 984]
+map_seeds = [703]
 output_dir = '/work/users/p/w/pwlin/output_sens/parquet_files'
 
 def run_single_map(map_seed):
