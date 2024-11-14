@@ -4,7 +4,8 @@ import seaborn as sns
 import pathlib
 from postprocess_simulation_results import *
 
-map_nums = [711, 126, 244, 984, 671, 414, 701, 31, 93]
+# map_nums = [711, 126, 244, 984, 671, 414, 701, 31, 93]
+map_nums = [414, 703]
 
 def plot_all_sensitivity(df, y, sensitivity_levels = None, lvo_levels = None, title_str = '', save = False, output_path = None):    
     if sensitivity_levels is not None or lvo_levels is not None:
