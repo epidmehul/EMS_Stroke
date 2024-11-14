@@ -20,7 +20,7 @@ if maps_csv_path.exists():
 
 
 for path in map_files:
-    if '414' not in path.stem or '703' not in path.stem:
+    if '414' not in path.stem and '703' not in path.stem:
         continue
     df = read_output(path, save_format = 'parquet')
 
