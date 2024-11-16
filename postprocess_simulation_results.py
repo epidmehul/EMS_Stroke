@@ -352,7 +352,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
     # simulated_coords = rng.uniform(low = 0, high = geoscale, size = (num_points, 2))
     equipoise = np.sum(np.argmin(distance.cdist(grid_points, med_coords), axis = 1) != 0) / grid_points.shape[0]
 
-    triangle_area = 0.5 * np.abs(np.linalg.det(np.vstack((med_coords.T, np.ones(med_coords.shape)[0]))))
+    triangle_area = 0.5 * np.abs(np.linalg.det(np.vstack((med_coords.T, np.ones((1, med_coords.shape[0]))))))
     triangle_area_normalized = triangle_area / geoscale**2
 
     max_dist = distance.pdist(med_coords).max()
