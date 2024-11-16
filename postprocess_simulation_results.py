@@ -563,7 +563,7 @@ def read_csv_with_header(file_path, chunksize=1000):
         chunk.columns = header
         yield chunk
 
-def generate_maps_csv(map_num, maps_csv_path):
+def generate_maps_csv(map_num, maps_csv_path, save = True):
     '''
     Function to create maps.csv without having to rerun full analysis code
     '''
@@ -582,4 +582,4 @@ def generate_maps_csv(map_num, maps_csv_path):
             'drivespeed': [drivespeed]
         }
     )
-    get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path)
+    get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save)
