@@ -9,6 +9,6 @@ args = parser.parse_args()
 maps_nums = [31, 93, 126, 244, 414, 671, 701, 703, 711, 984]
 
 if __name__ == '__main__':
-    for map in maps_nums:
+    for map_seed in maps_nums:
         map_specific_path = args.path / 'map_{str(map_number).zfill(3)}'
-        generate_maps_csv(map, map_specific_path)
+        generate_maps_csv(map_seed, map_specific_path)
