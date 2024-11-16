@@ -7,6 +7,7 @@ from matplotlib import colors
 import pathlib
 from scipy.spatial import distance
 from scipy.spatial import Voronoi, voronoi_plot_2d
+from stroke_simulation import *
 
 def triage_outcomes(df):
     '''
@@ -350,11 +351,22 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
 
     # simulated_coords = rng.uniform(low = 0, high = geoscale, size = (num_points, 2))
     equipoise = np.sum(np.argmin(distance.cdist(grid_points, med_coords), axis = 1) != 0) / grid_points.shape[0]
+
+    triangle_area = 0.5 * np.abs(np.linalg.det(np.vstack((med_coords.T, np.ones(med_coords.shape)[0]))))
+    triangle_area_normalized = triangle_area / geoscale**2
+
+    max_dist = distance.pdist(med_coords).max()
+    max_dist_normalized = max_dist / geoscale
+
     # print(equipoise)
     map_csv_file = output_path.parent.parent / 'maps.csv'
     current_map_info = pd.DataFrame(
         {'map': map_number,
          'equipoise': equipoise,
+         'area': triangle_area,
+         'area_normalized': triangle_area_normalized,
+         'sc_max_dist': max_dist,
+         'sc_max_dist_normalized': max_dist_normalized,
          'geoscale': geoscale,
          'xPSC': med_coords[1, 0],
          'yPSC': med_coords[1, 1],
@@ -550,3 +562,23 @@ def read_csv_with_header(file_path, chunksize=1000):
         # Assign the header to the chunk
         chunk.columns = header
         yield chunk
+
+def generate_maps_csv(map_nums, maps_csv_path):
+    '''
+    Function to create maps.csv without having to rerun full analysis code
+    '''
+    
+    _, coords, geoscale = generate_map(map)
+    actual_coords = geoscale * coords
+    drivespeed = get_drivespeed(geoscale)
+    temp_df = pd.DataFrame.from_dict(
+        {
+            'xPSC': actual_coords[1,0],
+            'yPSC': actual_coords[1,1],
+            'xPSC2': actual_coords[2,0],
+            'yPSC2': actual_coords[2,1],
+            'geoscale': geoscale,
+            'drivespeed': drivespeed
+        }
+    )
+    get_map_plot(temp_df, map_number = map, output_path = maps_csv_path)
