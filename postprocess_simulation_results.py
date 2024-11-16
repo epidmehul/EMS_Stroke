@@ -579,6 +579,7 @@ def generate_maps_csv(map_num, maps_csv_path):
             'yPSC2': actual_coords[2,1],
             'geoscale': geoscale,
             'drivespeed': drivespeed
-        }
+        },
+        index = 1
     )
     get_map_plot(temp_df, map_number = map, output_path = maps_csv_path)
