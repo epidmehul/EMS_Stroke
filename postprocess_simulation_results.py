@@ -573,13 +573,12 @@ def generate_maps_csv(map_num, maps_csv_path):
     drivespeed = get_drivespeed(geoscale)
     temp_df = pd.DataFrame.from_dict(
         {
-            'xPSC': actual_coords[1,0],
-            'yPSC': actual_coords[1,1],
-            'xPSC2': actual_coords[2,0],
-            'yPSC2': actual_coords[2,1],
-            'geoscale': geoscale,
-            'drivespeed': drivespeed
-        },
-        index = 1
+            'xPSC': [actual_coords[1,0]],
+            'yPSC': [actual_coords[1,1]],
+            'xPSC2': [actual_coords[2,0]],
+            'yPSC2': [actual_coords[2,1]],
+            'geoscale': [geoscale],
+            'drivespeed': [drivespeed]
+        }
     )
-    get_map_plot(temp_df, map_number = map, output_path = maps_csv_path)
+    get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path)
