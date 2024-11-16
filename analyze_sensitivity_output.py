@@ -7,7 +7,7 @@ import pathlib
 # sim_results = read_output('run_0_100.csv')
 
 parquet_files = pathlib.Path('/work/users/p/w/pwlin/output_sens/parquet_files')
-map_files = parquet_files.glob('*.parquet')
+map_files = [parquet_files.glob('*.parquet')]
 
 data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/output_sens/all_numbers')
 
