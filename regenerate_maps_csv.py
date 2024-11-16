@@ -9,7 +9,7 @@ args = parser.parse_args()
 maps_nums = [31, 93, 126, 244, 414, 671, 701, 703, 711, 984]
 
 if __name__ == '__main__':
-    maps_csv_path = args.path / 'maps.csv'
+    maps_csv_path = args.path.parent / 'maps.csv'
     if maps_csv_path.exists():
         maps_csv_path.unlink()
     for map_seed in maps_nums:
