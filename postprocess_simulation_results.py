@@ -573,6 +573,7 @@ def generate_maps_csv(map_num, maps_csv_path):
     drivespeed = get_drivespeed(geoscale)
     temp_df = pd.DataFrame.from_dict(
         {
+            'map_number': [map_num],
             'xPSC': [actual_coords[1,0]],
             'yPSC': [actual_coords[1,1]],
             'xPSC2': [actual_coords[2,0]],
