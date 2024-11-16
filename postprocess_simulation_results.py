@@ -563,12 +563,12 @@ def read_csv_with_header(file_path, chunksize=1000):
         chunk.columns = header
         yield chunk
 
-def generate_maps_csv(map_nums, maps_csv_path):
+def generate_maps_csv(map_num, maps_csv_path):
     '''
     Function to create maps.csv without having to rerun full analysis code
     '''
     
-    _, coords, geoscale = generate_map(map)
+    _, coords, geoscale = generate_map(map_num)
     actual_coords = geoscale * coords
     drivespeed = get_drivespeed(geoscale)
     temp_df = pd.DataFrame.from_dict(
