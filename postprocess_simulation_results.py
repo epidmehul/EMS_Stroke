@@ -591,4 +591,4 @@ def generate_maps_csv(map_num, maps_csv_path, save = True):
             'drivespeed': [drivespeed]
         }
     )
-    get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save, save_map_csv = False)
+    return get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save, save_map_csv = False)
