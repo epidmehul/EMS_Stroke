@@ -21,7 +21,7 @@ if __name__ == '__main__':
     if maps_csv_path.exists():
         maps_csv_path.unlink()
     with mp.Pool(processes = 5) as pool:
-        results = pool.map(mp_generate_maps)
+        results = pool.map(mp_generate_maps, maps_nums)
     # for map_seed in maps_nums:
     #     map_specific_path = args.path / f'map_{str(map_seed).zfill(3)}'
     #     generate_maps_csv(map_seed, map_specific_path, save = False)
