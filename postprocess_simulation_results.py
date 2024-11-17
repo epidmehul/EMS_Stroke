@@ -358,6 +358,9 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
     max_dist = distance.pdist(med_coords).max()
     max_dist_normalized = max_dist / geoscale
 
+    sc_center = med_coords.mean(axis = 0)
+    sc_sse = np.linalg.norm(med_coords - np.broadcast_to(np.expand_dims(sc_center, axis = 0), med_coords.shape), axis = 1)**2.sum()
+
     # print(equipoise)
     map_csv_file = output_path.parent.parent / 'maps.csv'
     current_map_info = pd.DataFrame(
@@ -367,6 +370,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
          'area_normalized': triangle_area_normalized,
          'sc_max_dist': max_dist,
          'sc_max_dist_normalized': max_dist_normalized,
+         'sc_sse': sc_sse,
          'geoscale': geoscale,
          'xPSC': med_coords[1, 0],
          'yPSC': med_coords[1, 1],
