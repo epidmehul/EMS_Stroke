@@ -328,7 +328,7 @@ def generate_line_graphs(df, title_str = "", col_names = None, differenced = Fal
         plt.close()
     return ax_list
 
-def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', output_path = None, threshold = None):
+def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', output_path = None, threshold = None, save_map_csv = True):
     '''
     Writes a text file containing the various coordinates and any other statistics about a given map number
 
@@ -373,6 +373,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
          'sc_max_dist': max_dist,
          'sc_max_dist_normalized': max_dist_normalized,
          'sc_sse': sc_sse,
+         'sc_sse_normalized': sc_sse_normalized,
          'geoscale': geoscale,
          'xPSC': med_coords[1, 0],
          'yPSC': med_coords[1, 1],
@@ -380,10 +381,11 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
          'yPSC2': med_coords[2, 1]
         }, index = [map_number])
 
-    if map_csv_file.exists():
-        current_map_info.to_csv(map_csv_file, header = False, index = False, mode = 'a')
-    else:
-        current_map_info.to_csv(map_csv_file, header = True, index = False, mode = 'w')
+    if save_map_csv:
+        if map_csv_file.exists():
+            current_map_info.to_csv(map_csv_file, header = False, index = False, mode = 'a')
+        else:
+            current_map_info.to_csv(map_csv_file, header = True, index = False, mode = 'w')
 
     distant_coords = np.array([[-8 * geoscale, -8 * geoscale],
                            [8 * geoscale, 8 * geoscale],
@@ -430,6 +432,7 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
         #     f.write(f'Equipoise: {equipoise * 100}%\n')
         #     f.write('\n')
         #     f.write(f'Drivespeed: {drivespeed}')
+    return current_map_info
 
 def get_map_points_threshold(med_coords, geoscale, drivespeed, threshold):
     x,y = np.meshgrid(geoscale * np.arange(0, 1, 0.001), geoscale * np.arange(0, 1, 0.001))
@@ -588,4 +591,4 @@ def generate_maps_csv(map_num, maps_csv_path, save = True):
             'drivespeed': [drivespeed]
         }
     )
-    get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save)
+    get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save, save_map_csv = False)
