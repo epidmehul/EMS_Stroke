@@ -361,6 +361,8 @@ def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', out
     sc_center = med_coords.mean(axis = 0)
     sc_sse = np.sum((med_coords - np.broadcast_to(np.expand_dims(sc_center, axis = 0), med_coords.shape))**2)
 
+    sc_sse_normalized = sc_sse / geoscale
+
     # print(equipoise)
     map_csv_file = output_path.parent.parent / 'maps.csv'
     current_map_info = pd.DataFrame(
