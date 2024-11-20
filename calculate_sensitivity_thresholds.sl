@@ -2,9 +2,9 @@
 
 #SBATCH -p general
 #SBATCH -N 1
-#SBATCH -n 6
-#SBATCH --mem=8g
-#SBATCH -t 00:30:00
+#SBATCH -n 21
+#SBATCH --mem=24g
+#SBATCH -t 02:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J sens_thresh
 #SBATCH --mail-type=end
@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.2
 source ~/strokes_venv/bin/activate
-python calculate_sensitivity_time_thresholds.py --path /work/users/p/w/pwlin/output_sens/all_numbers
+python calculate_sensitivity_time_thresholds.py --path /work/users/p/w/pwlin/full_output_sens/all_numbers
