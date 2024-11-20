@@ -2,9 +2,9 @@
 
 #SBATCH -p general
 #SBATCH -N 1
-#SBATCH -n 21
-#SBATCH --mem=48g
-#SBATCH -t 6:00:00
+#SBATCH -n 11
+#SBATCH --mem=24g
+#SBATCH -t 08:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J full_sens
 #SBATCH --mail-type=end
