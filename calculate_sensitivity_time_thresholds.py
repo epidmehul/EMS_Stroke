@@ -58,4 +58,5 @@ if __name__ == '__main__':
         results = pool.map(calc_single_map_time_thresholds, map_nums)
     all_thresholds = pd.concat(results, axis = 0)
     all_thresholds.to_csv(args.path.parent / 'optimal_thresholds.csv')
+    all_thresholds.to_excel(args.path.parent / 'optimal_thresholds.xlsx')
 
