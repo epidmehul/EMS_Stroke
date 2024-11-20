@@ -2,11 +2,11 @@
 
 #SBATCH -p general
 #SBATCH -N 1
-#SBATCH -n 1
-#SBATCH --mem=2g
-#SBATCH -t 00:30:00
+#SBATCH -n 21
+#SBATCH --mem=48g
+#SBATCH -t 6:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
-#SBATCH -J sens_maps
+#SBATCH -J full_sens
 #SBATCH --mail-type=end
 #SBATCH --mail-user=pwlin@live.unc.edu
 
