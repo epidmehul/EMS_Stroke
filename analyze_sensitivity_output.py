@@ -37,7 +37,7 @@ def single_map_sensitivitiy_analyses(path):
         pass
 
 if __name__ == '__main__':
-    with mp.Pool(10) as pool:
+    with mp.Pool(20) as pool:
         pool.map(single_map_sensitivitiy_analyses, map_files)
 
 

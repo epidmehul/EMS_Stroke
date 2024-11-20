@@ -46,8 +46,12 @@ def calc_single_map_time_thresholds(map_number):
         }
     retval_df = pd.DataFrame.from_dict(retval)
     for lvo in (0.141, 0.241, 0.341):
-        retval_df[[(lvo, 'scenario'), (lvo, 'value')]] = pd.DataFrame(retval_df[lvo].tolist(), index = retval_df.index)
-        retval_df.drop(lvo, axis = 1, inplace = True)
+        try:
+            retval_df[[(lvo, 'scenario'), (lvo, 'value')]] = pd.DataFrame(retval_df[lvo].tolist(), index = retval_df.index)
+            retval_df.drop(lvo, axis = 1, inplace = True)
+        except:
+            retval_df[[(lvo, 'scenario'), (lvo, 'value')]] = None, None
+            retval_df.drop(lvo, axis = 1, inplace = True)
     retval_df.columns = pd.MultiIndex.from_tuples(retval_df.columns)
     retval_df.index = pd.MultiIndex.from_tuples(zip([map_number for i in range(len(col_names))], retval_df.index))
     return retval_df
