@@ -6,8 +6,10 @@ from postprocess_simulation_results import *
 import multiprocessing as mp
 import argparse
 
-map_nums = [711, 126, 244, 984, 671, 414, 701, 31, 93, 703]
+# map_nums = [711, 126, 244, 984, 671, 414, 701, 31, 93, 703]
 # map_nums = [414, 703]
+
+map_nums = [i for i in range(1000)]
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path', help = 'path to post-analysis csv files', type = pathlib.Path, required = True)
 
