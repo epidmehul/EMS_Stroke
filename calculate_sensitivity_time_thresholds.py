@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 import pathlib
 from postprocess_simulation_results import *
 import multiprocessing as mp
@@ -78,4 +79,26 @@ if __name__ == '__main__':
     all_thresholds = pd.concat(results, axis = 0)
     all_thresholds.to_csv(args.path.parent / 'optimal_thresholds.csv')
     all_thresholds.to_excel(args.path.parent / 'optimal_thresholds.xlsx')
+
+    df = all_thresholds
+    sensitivities = df.xs('sensitivity', axis = 1, level = 1)
+    thresholds = df.xs('threshold', axis = 1, level = 1)
+
+    for col in sensitivities.columns:
+        sensitivities[col] = sensitivities[col].astype(pd.api.types.CategoricalDtype(categories = ['low', 'mid', 'high'], ordered = True)).copy()
+
+    for metric in df.index.unique(level = 1):
+        fig, axes = plt.subplots(nrows = 1, ncols = 2)
+        sensitivities.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).transpose().loc[:,['low','mid','high']].plot.bar(rot = 0, ax = axes[0])
+
+        ax_threshold = thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().transpose().plot.bar(rot = 0, ax = axes[1])
+
+        fig.suptitle(metric)
+        axes[0].set_title('Optimal sensitivity')
+        axes[1].set_title('Optimal thresholds')
+
+        fig.savefig(args.path.parent / f'optimal_{metric}.png')
+        fig.close()
+
+        
 

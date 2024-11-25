@@ -46,11 +46,18 @@ def triage_outcomes(df):
     # print(ACC)
 
     retval = {}
-    retval['correct_triage'] = ACC[1]
-    retval['undertriage'] = FNR[1]
-    retval['overtriage'] = FPR[1]
-    retval['PPV'] = PPV[1]
-    retval['NPV'] = NPV[1]
+    try:
+        retval['correct_triage'] = ACC[1]
+        retval['undertriage'] = FNR[1]
+        retval['overtriage'] = FPR[1]
+        retval['PPV'] = PPV[1]
+        retval['NPV'] = NPV[1]
+    except:
+        retval['correct_triage'] = None
+        retval['undertriage'] = None
+        retval['overtriage'] = None
+        retval['PPV'] = None
+        retval['NPV'] = None
     return retval
 
 def time_results(s):
