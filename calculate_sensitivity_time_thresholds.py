@@ -5,9 +5,11 @@ import pathlib
 from postprocess_simulation_results import *
 import multiprocessing as mp
 import argparse
-
+import warnings
 # map_nums = [711, 126, 244, 984, 671, 414, 701, 31, 93, 703]
 # map_nums = [414, 703]
+
+warnings.filterwarnings("ignore")
 
 map_nums = [i for i in range(1000)]
 parser = argparse.ArgumentParser()
@@ -49,6 +51,7 @@ def calc_single_map_time_thresholds(map_number):
     retval_df = pd.DataFrame.from_dict(retval)
     for lvo in (0.141, 0.241, 0.341):
         try:
+            print(pd.DataFrame(retval_df[lvo].tolist(), index = retval_df.index))
             retval_df[[(lvo, 'scenario'), (lvo, 'value')]] = pd.DataFrame(retval_df[lvo].tolist(), index = retval_df.index)
             retval_df[[(lvo, 'sensitivity'), (lvo, 'threshold')]] = pd.DataFrame(eval(retval_df[(lvo, 'scenario')]).tolist(), index = retval_df.index)
             retval_df.drop(lvo, axis = 1, inplace = True)
