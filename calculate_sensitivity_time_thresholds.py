@@ -98,7 +98,7 @@ if __name__ == '__main__':
         axes[1].set_title('Optimal thresholds')
 
         fig.savefig(args.path.parent / f'optimal_{metric}.png')
-        fig.close()
+        plt.close()
 
         
 
