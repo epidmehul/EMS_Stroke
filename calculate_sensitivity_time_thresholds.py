@@ -53,7 +53,7 @@ def calc_single_map_time_thresholds(map_number):
         try:
             print(pd.DataFrame(retval_df[lvo].tolist(), index = retval_df.index))
             retval_df[[(lvo, 'scenario'), (lvo, 'value')]] = pd.DataFrame(retval_df[lvo].tolist(), index = retval_df.index)
-            retval_df[[(lvo, 'sensitivity'), (lvo, 'threshold')]] = pd.DataFrame(eval(retval_df[(lvo, 'scenario')]).tolist(), index = retval_df.index)
+            retval_df[[(lvo, 'sensitivity'), (lvo, 'threshold')]] = pd.DataFrame(retval_df[(lvo, 'scenario')].tolist(), index = retval_df.index)
             retval_df.drop(lvo, axis = 1, inplace = True)
             retval_df.drop((lvo, 'scenario'), axis = 1, inplace = True)
         except:
