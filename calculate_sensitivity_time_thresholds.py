@@ -105,7 +105,7 @@ if __name__ == '__main__':
         sensitivities.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).transpose().loc[:,['low','mid','high']].plot.bar(rot = 0, ax = axes['A'])
 
         if args.box:
-            thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().plot.box(rot = 0, ax = axes['B'])
+            thresholds.xs(metric, axis = 0, level = 1).plot.box(rot = 0, ax = axes['B'])
         else:
             thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().transpose().plot.bar(rot = 0, ax = axes['B'])
 
