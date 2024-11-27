@@ -24,6 +24,12 @@ col_names = [
             'evt_lvo_mean_diff'
         ]
 
+panel = '''
+ABC
+ABD
+ABE
+'''
+
 def calc_single_map_time_thresholds(map_number):
     csv_paths = args.path.glob(f'*{map_number}.csv')
     retval = {
@@ -83,19 +89,30 @@ if __name__ == '__main__':
     df = all_thresholds
     sensitivities = df.xs('sensitivity', axis = 1, level = 1)
     thresholds = df.xs('threshold', axis = 1, level = 1)
+    values = df.xs('value', axis = 1, level = 1)
 
     for col in sensitivities.columns:
         sensitivities[col] = sensitivities[col].astype(pd.api.types.CategoricalDtype(categories = ['low', 'mid', 'high'], ordered = True)).copy()
 
     for metric in df.index.unique(level = 1):
         fig, axes = plt.subplots(nrows = 1, ncols = 2)
-        sensitivities.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).transpose().loc[:,['low','mid','high']].plot.bar(rot = 0, ax = axes[0])
+        
+        fig, axes = plt.subplot_mosaic(panel, sharex = False, figsize = (20, 10))
 
-        ax_threshold = thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().transpose().plot.bar(rot = 0, ax = axes[1])
+        sensitivities.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).transpose().loc[:,['low','mid','high']].plot.bar(rot = 0, ax = axes['A'])
 
-        fig.suptitle(metric)
-        axes[0].set_title('Optimal sensitivity')
-        axes[1].set_title('Optimal thresholds')
+        thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().transpose().plot.bar(rot = 0, ax = axes['B'])
+
+        metric_values = values.xs(metric, axis = 0, level = 1)
+        
+        metric_values[0.141].hist(ax = axes['C'], color = 'C0')
+        metric_values[0.241].hist(ax = axes['D'], color = 'C1')
+        metric_values[0.341].hist(ax = axes['E'], color = 'C2')
+
+        axes['A'].set_title('Optimal sensitivities')
+        axes['B'].set_title('Optimal thresholds')
+        axes['C'].set_title('Treatment values')
+        fig.suptitle(metric, fontsize = 'x-large')
 
         fig.savefig(args.path.parent / f'optimal_{metric}.png')
         plt.close()
