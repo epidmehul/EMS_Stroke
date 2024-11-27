@@ -530,6 +530,10 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
     # )    
     return get_thresholds_sensitivities(retval)
 
+def single_map_analysis_output_psc(sim_results, **kwargs):
+    sim_results_psc = sim_results.loc[sim_results['closest_destination'] != 'CSC', :]
+    return single_map_analysis_output(sim_results_psc, **kwargs)
+
 def get_map_output_path(map_number, output_dir = 'output'):
     return pathlib.Path(f'{output_dir}/map_{str(map_number).zfill(3)}')
 
