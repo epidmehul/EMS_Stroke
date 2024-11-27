@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path', help =
  'path to post-analysis csv files', type = pathlib.Path, required = True)
 
-parser.add_argument('-b', '--box', help = 'Set to True to make threshold plot a box plot', type = bool, action = 'store_true')
+parser.add_argument('-b', '--box', help = 'Set to make threshold plot a box plot', action = 'store_true')
 
 args = parser.parse_args()
 
