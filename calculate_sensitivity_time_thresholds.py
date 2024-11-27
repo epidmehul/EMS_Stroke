@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
         fig.suptitle(metric, fontsize = 'xx-large')
 
-        fig.savefig(args.path.parent / f'optimal_{metric}.png')
+        fig.savefig(args.path.parent / f'psc_optimal_{metric}.png')
         plt.close()
 
         
