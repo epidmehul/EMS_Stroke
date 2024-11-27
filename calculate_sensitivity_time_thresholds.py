@@ -116,7 +116,13 @@ if __name__ == '__main__':
         axes['C'].sharex(axes['D'])
         axes['E'].sharex(axes['D'])
         
-        fig.suptitle(metric, fontsize = 'x-large')
+        axes['A'].set_xlabel('LVO Prevalance')
+        axes['B'].set_xlabel('LVO Prevalance')
+        axes['C'].set_ylabel('0.141')
+        axes['D'].set_ylabel('0.241')
+        axes['E'].set_ylabel('0.341')
+
+        fig.suptitle(metric, fontsize = 'xx-large')
 
         fig.savefig(args.path.parent / f'optimal_{metric}.png')
         plt.close()
