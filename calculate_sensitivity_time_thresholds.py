@@ -112,6 +112,10 @@ if __name__ == '__main__':
         axes['A'].set_title('Optimal sensitivities')
         axes['B'].set_title('Optimal thresholds')
         axes['C'].set_title('Treatment values')
+
+        axes['C'].sharex(axes['D'])
+        axes['E'].sharex(axes['D'])
+        
         fig.suptitle(metric, fontsize = 'x-large')
 
         fig.savefig(args.path.parent / f'optimal_{metric}.png')
