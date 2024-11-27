@@ -14,7 +14,10 @@ warnings.filterwarnings("ignore")
 
 map_nums = [i for i in range(1000)]
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--path', help = 'path to post-analysis csv files', type = pathlib.Path, required = True)
+parser.add_argument('-p', '--path', help =
+ 'path to post-analysis csv files', type = pathlib.Path, required = True)
+
+parser.add_argument('-b', '--box', help = 'Set to True to make threshold plot a box plot', type = bool, default = False)
 
 args = parser.parse_args()
 
@@ -101,7 +104,10 @@ if __name__ == '__main__':
 
         sensitivities.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).transpose().loc[:,['low','mid','high']].plot.bar(rot = 0, ax = axes['A'])
 
-        thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().transpose().plot.bar(rot = 0, ax = axes['B'])
+        if args.box:
+            thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().plot.box(rot = 0, ax = axes['B'])
+        else:
+            thresholds.xs(metric, axis = 0, level = 1).apply(pd.value_counts).fillna(0).sort_index().transpose().plot.bar(rot = 0, ax = axes['B'])
 
         metric_values = values.xs(metric, axis = 0, level = 1)
         
