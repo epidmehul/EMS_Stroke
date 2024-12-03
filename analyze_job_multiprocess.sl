@@ -2,11 +2,11 @@
 
 #SBATCH -p general
 #SBATCH -N 1
-#SBATCH -n 11
-#SBATCH --mem=32g
-#SBATCH -t 2:00:00
+#SBATCH -n 25
+#SBATCH --mem=50g
+#SBATCH -t 3:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
-#SBATCH -J analyze_maps
+#SBATCH -J reanalyze_maps
 #SBATCH --mail-type=end
 #SBATCH --mail-user=pwlin@live.unc.edu
 
