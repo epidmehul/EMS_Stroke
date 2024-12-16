@@ -13,7 +13,8 @@ warnings.filterwarnings('ignore')
 parquet_files = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/parquet_files')
 map_files = list(parquet_files.glob('*.parquet'))
 
-data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/psc_all_numbers')
+data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/all_numbers')
+psc_data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/psc_all_numbers')
 
 if not data_calcs_csv_path.exists():
     data_calcs_csv_path.mkdir(parents = True)
@@ -32,16 +33,19 @@ def single_map_sensitivitiy_analyses(path):
         # result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = sens_descriptor) 
 
         # result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
+        result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = 'psc_' + sens_descriptor) 
+
+        result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
 
         result = single_map_analysis_output_psc(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = 'psc_' + sens_descriptor) 
 
-        result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
+        result.to_csv(psc_data_calcs_csv_path / ('psc_' + path.stem + '.csv'), header = True, index = False, mode = 'w')
     except:
         print('failure',path)
         pass
 
 if __name__ == '__main__':
-    with mp.Pool(20) as pool:
+    with mp.Pool(25) as pool:
         pool.map(single_map_sensitivitiy_analyses, map_files)
 
 
