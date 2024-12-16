@@ -25,6 +25,7 @@ map_files = [
     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_126.parquet',
     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_900.parquet'
 ]
+map_files = [pathlib.Path(i) for i in map_files]
 
 data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/all_numbers')
 psc_data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/psc_all_numbers')
