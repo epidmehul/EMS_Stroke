@@ -58,7 +58,7 @@ def single_map_sensitivitiy_analyses(path):
     except Exception as e:
         print('-------------------')
         print(e)
-        print(traceback.extract_tb(e.__traceback__)[-1].name)
+        print(traceback.extract_tb(e.__traceback__))
         print(path)
         pass
 
