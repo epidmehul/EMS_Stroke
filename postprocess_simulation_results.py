@@ -15,49 +15,43 @@ def triage_outcomes(df):
     '''
     # Arguments: ground truth, predicted label
     # Resulting metrics: Check index 1 for results for class 1 (which here is going to CSC)
-
-    df = df.loc[df['closest_destination'] != 'CSC', :]
-    cm = confusion_matrix(df['hasLVO'], df['destination_type'] == 'CSC')
-    # print('---------------')
-    # print(cm)
-    # print('----------------')
-    FP = cm.sum(axis=0) - np.diag(cm)  
-    FN = cm.sum(axis=1) - np.diag(cm)
-    TP = np.diag(cm)
-    TN = cm.sum() - (FP + FN + TP)
-
-    # Sensitivity, hit rate, recall, or true positive rate
-    # TPR = TP/(TP+FN)
-    # Specificity or true negative rate
-    # TNR = TN/(TN+FP) 
-    # Precision or positive predictive value
-    PPV = TP/(TP+FP)
-    # Negative predictive value
-    NPV = TN/(TN+FN)
-    # Fall out or false positive rate
-    FPR = FP/(FP+TN)
-    # False negative rate
-    FNR = FN/(TP+FN)
-    # False discovery rate
-    # FDR = FP/(TP+FP)
-
-    # Overall accuracy
-    ACC = (TP+TN)/(TP+FP+FN+TN)
-    # print(ACC)
-
     retval = {}
     try:
-        retval['correct_triage'] = ACC[1]
-        retval['undertriage'] = FNR[1]
-        retval['overtriage'] = FPR[1]
-        retval['PPV'] = PPV[1]
-        retval['NPV'] = NPV[1]
+        df = df.loc[df['closest_destination'] != 'CSC', :]
+        cm = confusion_matrix(df['hasLVO'], df['destination_type'] == 'CSC')
+        # print('---------------')
+        # print(cm)
+        # print('----------------')
+        FP = cm.sum(axis=0) - np.diag(cm)  
+        FN = cm.sum(axis=1) - np.diag(cm)
+        TP = np.diag(cm)
+        TN = cm.sum() - (FP + FN + TP)
+
+        # Sensitivity, hit rate, recall, or true positive rate
+        # TPR = TP/(TP+FN)
+        # Specificity or true negative rate
+        # TNR = TN/(TN+FP) 
+        # Precision or positive predictive value
+        PPV = TP/(TP+FP)
+        # Negative predictive value
+        NPV = TN/(TN+FN)
+        # Fall out or false positive rate
+        FPR = FP/(FP+TN)
+        # False negative rate
+        FNR = FN/(TP+FN)
+        # False discovery rate
+        # FDR = FP/(TP+FP)
+
+        # Overall accuracy
+        ACC = (TP+TN)/(TP+FP+FN+TN)
+        # print(ACC)
+
     except:
-        retval['correct_triage'] = None
-        retval['undertriage'] = None
-        retval['overtriage'] = None
-        retval['PPV'] = None
-        retval['NPV'] = None
+        retval['correct_triage'] = -1
+        retval['undertriage'] = -1
+        retval['overtriage'] = -1
+        retval['PPV'] = -1
+        retval['NPV'] = -1
     return retval
 
 def time_results(s):
