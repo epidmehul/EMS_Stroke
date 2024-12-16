@@ -8,6 +8,7 @@ import pathlib
 from scipy.spatial import distance
 from scipy.spatial import Voronoi, voronoi_plot_2d
 from stroke_simulation import *
+import openpyxl
 
 def triage_outcomes(df):
     '''
@@ -494,14 +495,16 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
 
         output_file = output_dir / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.xlsx'
         
-        with pd.ExcelWriter(output_file) as writer:
-            class_mean_df.to_excel(writer, sheet_name = 'Triage metrics')
-            class_intervals_df.to_excel(writer, sheet_name = 'Triage metric intervals')
-            time_mean_df.to_excel(writer, sheet_name = 'Time metrics')
-            time_intervals_df.to_excel(writer, sheet_name = 'Time metric intervals')
-            mRS_mean_df.to_excel(writer, sheet_name = 'mRS metrics')
-            mRS_intervals_df.to_excel(writer, sheet_name = 'mRS metric intervals')
-            writer.save()
+        try:
+            with pd.ExcelWriter(output_file) as writer:
+                class_mean_df.to_excel(writer, sheet_name = 'Triage metrics')
+                class_intervals_df.to_excel(writer, sheet_name = 'Triage metric intervals')
+                time_mean_df.to_excel(writer, sheet_name = 'Time metrics')
+                time_intervals_df.to_excel(writer, sheet_name = 'Time metric intervals')
+                mRS_mean_df.to_excel(writer, sheet_name = 'mRS metrics')
+                mRS_intervals_df.to_excel(writer, sheet_name = 'mRS metric intervals')
+        except:
+            print(f'{output_file} failed to write excel')
 
         generate_heatmap(class_df, output_path = output_dir, title_str = f"Map {map_number} Triage", col_names = ['undertriage','overtriage'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save)
         # generate_heatmap(class_df, output_path = output_dir, title_str =f"Map {map_number} Triage", col_names = ['undertriage','overtriage'], additional_file_name = additional_file_name, differenced = (not heatmap_diff), save = save)
