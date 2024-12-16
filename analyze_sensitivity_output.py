@@ -53,8 +53,10 @@ def single_map_sensitivitiy_analyses(path):
         result = single_map_analysis_output_psc(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = 'psc_' + sens_descriptor) 
 
         result.to_csv(psc_data_calcs_csv_path / ('psc_' + path.stem + '.csv'), header = True, index = False, mode = 'w')
-    except:
-        print('failure',path)
+    except Exception as e:
+        print('-------------------')
+        print(path)
+        print(e)
         pass
 
 if __name__ == '__main__':
