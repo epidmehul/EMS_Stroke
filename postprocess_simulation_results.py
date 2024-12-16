@@ -51,7 +51,8 @@ def triage_outcomes(df):
         retval['overtriage'] = FPR[1]
         retval['PPV'] = PPV[1]
         retval['NPV'] = NPV[1]
-    except:
+    except Exception as e:
+        print(e)
         retval['correct_triage'] = -1
         retval['undertriage'] = -1
         retval['overtriage'] = -1

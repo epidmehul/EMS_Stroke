@@ -10,8 +10,21 @@ warnings.filterwarnings('ignore')
 
 # sim_results = read_output('run_0_100.csv')
 
-parquet_files = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/parquet_files')
-map_files = list(parquet_files.glob('*.parquet'))
+# parquet_files = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/parquet_files')
+# map_files = list(parquet_files.glob('*.parquet'))
+map_files = [
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_144.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_156.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_701.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_249.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_253.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_343.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_961.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_985.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_669.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_126.parquet',
+    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_900.parquet'
+]
 
 data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/all_numbers')
 psc_data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/psc_all_numbers')
@@ -33,9 +46,9 @@ def single_map_sensitivitiy_analyses(path):
         # result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = sens_descriptor) 
 
         # result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
-        result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = 'psc_' + sens_descriptor) 
+        # result = single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = 'psc_' + sens_descriptor) 
 
-        result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
+        # result.to_csv(data_calcs_csv_path / (path.stem + '.csv'), header = True, index = False, mode = 'w')
 
         result = single_map_analysis_output_psc(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/full_output_sens/results', line_errorbars = True, additional_file_name = 'psc_' + sens_descriptor) 
 
@@ -45,7 +58,7 @@ def single_map_sensitivitiy_analyses(path):
         pass
 
 if __name__ == '__main__':
-    with mp.Pool(25) as pool:
+    with mp.Pool(11) as pool:
         pool.map(single_map_sensitivitiy_analyses, map_files)
 
 
