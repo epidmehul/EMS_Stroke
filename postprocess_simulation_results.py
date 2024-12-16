@@ -53,11 +53,12 @@ def triage_outcomes(df):
         retval['NPV'] = NPV[1]
     except Exception as e:
         print(e)
-        retval['correct_triage'] = -1
-        retval['undertriage'] = -1
-        retval['overtriage'] = -1
-        retval['PPV'] = -1
-        retval['NPV'] = -1
+        print(cm)
+        retval['correct_triage'] = None
+        retval['undertriage'] = None
+        retval['overtriage'] = None
+        retval['PPV'] = None
+        retval['NPV'] = None
     return retval
 
 def time_results(s):
