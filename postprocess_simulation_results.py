@@ -260,12 +260,15 @@ def calculate_intervals(df, width = 0.9):
 
     Also calculates the mean value and returns as retval_0
     '''
-    alpha = (1 - width)/2
-    # df = remove_base_case_and_non_diffs(df)
-    retval = df.groupby(['sensitivity', 'threshold'], observed = True).quantile([alpha, 1 - alpha])
-    retval_0 = df.groupby(['sensitivity', 'threshold'], observed = True).mean()
-    retval.index.set_names(['sensitivity', 'threshold', 'quantile'], inplace = True)
-    retval_1 = retval.reset_index().pivot(columns = "quantile", index = ['sensitivity', 'threshold'])
+    try:
+        alpha = (1 - width)/2
+        # df = remove_base_case_and_non_diffs(df)
+        retval = df.groupby(['sensitivity', 'threshold'], observed = True).quantile([alpha, 1 - alpha])
+        retval_0 = df.groupby(['sensitivity', 'threshold'], observed = True).mean()
+        retval.index.set_names(['sensitivity', 'threshold', 'quantile'], inplace = True)
+        retval_1 = retval.reset_index().pivot(columns = "quantile", index = ['sensitivity', 'threshold'])
+    except:
+        return None, None
     return retval_0, retval_1    
 
 def generate_heatmap(df, title_str = "", col_names = None, differenced = False, save = False, additional_file_name = '', output_path = None):
