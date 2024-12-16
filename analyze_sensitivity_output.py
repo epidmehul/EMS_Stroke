@@ -2,6 +2,7 @@ from postprocess_simulation_results import *
 import pathlib
 import multiprocessing as mp
 import warnings
+import traceback
 
 warnings.filterwarnings('ignore')
 
@@ -56,8 +57,9 @@ def single_map_sensitivitiy_analyses(path):
         result.to_csv(psc_data_calcs_csv_path / ('psc_' + path.stem + '.csv'), header = True, index = False, mode = 'w')
     except Exception as e:
         print('-------------------')
-        print(path)
         print(e)
+        print(traceback.extract_tb(e.__traceback__)[-1].name)
+        print(path)
         pass
 
 if __name__ == '__main__':
