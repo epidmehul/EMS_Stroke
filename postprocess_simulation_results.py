@@ -202,7 +202,10 @@ def add_differences_columns(df):
     '''    
     metric_names = df.columns.drop(['threshold','sensitivity'], errors = 'ignore')
     for name in metric_names:
-        df[name + '_diff'] = df[name] - df.loc['base', name]
+        try:
+            df[name + '_diff'] = df[name] - df.loc['base', name]
+        except:
+            df[name + '_diff'] = df[name]
     return df
 
 def single_map_results(df, map_number = 0, include_seed = False) -> list[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
