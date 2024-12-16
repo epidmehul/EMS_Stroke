@@ -46,6 +46,11 @@ def triage_outcomes(df):
         ACC = (TP+TN)/(TP+FP+FN+TN)
         # print(ACC)
 
+        retval['correct_triage'] = ACC[1]
+        retval['undertriage'] = FNR[1]
+        retval['overtriage'] = FPR[1]
+        retval['PPV'] = PPV[1]
+        retval['NPV'] = NPV[1]
     except:
         retval['correct_triage'] = -1
         retval['undertriage'] = -1
