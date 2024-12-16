@@ -295,6 +295,7 @@ def generate_heatmap(df, title_str = "", col_names = None, differenced = False, 
     # print(diff_columns_names)
     ax_list = []
     for col_name in diff_columns_names:
+        df[col_name] = df[col_name].astype(float)
         ax = sns.heatmap(df.pivot(columns = 'threshold', index = 'sensitivity', values = col_name), annot = True, fmt = '.4f')
         ax.set_title(f"{title_str}: {col_name}")
         if save:
@@ -329,6 +330,7 @@ def generate_line_graphs(df, title_str = "", col_names = None, differenced = Fal
     ax_list = []
     for col_name in diff_columns_names:
         try:
+            df[col_name] = df[col_name].astype(float)
             if not errorbar:
                 ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = None)
             else:
