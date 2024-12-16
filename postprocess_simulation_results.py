@@ -327,19 +327,22 @@ def generate_line_graphs(df, title_str = "", col_names = None, differenced = Fal
             diff_columns_names = col_names
     ax_list = []
     for col_name in diff_columns_names:
-        if not errorbar:
-            ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = None)
-        else:
-            ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = ('pi', 100 * alpha))
-        ax.set_title(f"{title_str}: {col_name}")
-        if save:
-            if output_path is None:
-                raise FileNotFoundError
-            output_fig_path = output_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}{title_str.replace(' ','_')}_{col_name}_line.png'
-            # output_fig_path = pathlib.Path(f"{output_dir}/map_{str(map_number).zfill(3)}/{additional_file_name}_{title_str.replace(' ','_')}_{col_name}.png")
-            ax.get_figure().savefig(output_fig_path)
-        ax_list.append(ax)
-        plt.close()
+        try:
+            if not errorbar:
+                ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = None)
+            else:
+                ax = sns.lineplot(df, x = 'threshold', y=col_name, hue = 'sensitivity', marker = 'o', errorbar = ('pi', 100 * alpha))
+            ax.set_title(f"{title_str}: {col_name}")
+            if save:
+                if output_path is None:
+                    raise FileNotFoundError
+                output_fig_path = output_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}{title_str.replace(' ','_')}_{col_name}_line.png'
+                # output_fig_path = pathlib.Path(f"{output_dir}/map_{str(map_number).zfill(3)}/{additional_file_name}_{title_str.replace(' ','_')}_{col_name}.png")
+                ax.get_figure().savefig(output_fig_path)
+            ax_list.append(ax)
+            plt.close()
+        except:
+            continue
     return ax_list
 
 def get_map_plot(df, map_number = 0, save = True, additional_file_name = '', output_path = None, threshold = None, save_map_csv = True):
