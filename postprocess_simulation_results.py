@@ -495,6 +495,7 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
         output_file = output_dir / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.xlsx'
         
         with pd.ExcelWriter(output_file) as writer:
+            writer.save()
             class_mean_df.to_excel(writer, sheet_name = 'Triage metrics')
             class_intervals_df.to_excel(writer, sheet_name = 'Triage metric intervals')
             time_mean_df.to_excel(writer, sheet_name = 'Time metrics')
