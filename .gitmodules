@@ -1,3 +1,3 @@
 [submodule "dashboard"]
-	path = ./dashboard
-	url = git://github.com/plin97/stroke_dashboard.git
+  path = dashboard
+  url = git://github.com/plin97/stroke_dashboard.git
