@@ -5,3 +5,7 @@ __pycache__/*
 *.ipynb
 */*
 
+!ESTTM_old/*
+!docs/*
+!SLURM/*
+!Scripts/*
