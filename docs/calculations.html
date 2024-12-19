@@ -7,13 +7,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script>
+        var curID = "calcs";
+    </script>
 </head>
 <body>
     <div id="nav-placeholder">
     </div>
     <script type="text/javascript">
+        console.log(curID)
         $(function(){
-          $("#nav-placeholder").load("nav.html");
+          $("#nav-placeholder").load("nav.html", function() {
+            var element = document.getElementById(curID);
+            element.classList.add("active");
+          });
         });
     </script>
 
