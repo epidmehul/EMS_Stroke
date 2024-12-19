@@ -16,17 +16,6 @@
           $("#nav-placeholder").load("nav.html");
         });
     </script>
-    <!-- <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
-        <div class="container-fluid">
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link active" href="calculations.html">Calculations</a></li>
-            <li class="nav-item auto-me"><a class="nav-link" href="https://github.com/epidmehul/EMS_Stroke"><i class="bi bi-github"></i></a></li>
-          </ul>
-         </div>
-        </div>
-      </nav> -->
 
     <div class="container-fluid">
         <p>
@@ -37,18 +26,86 @@
         
         <div class="row">
             <div class="col-lg pt-4 pt-lg-0">
-                <img src="map_0.png" class="float-end">
+                <img src="map_0.png" class="float-end img-float">
                 <p>
-                Each map is a square with a randomly generated side length between 30 and 100 miles. The CSC is set to be in the center of the square, with the locations of two PSCs being generated randomly within the square such that the pairwise distances between the CSC, PSC 1, and PSC 2 are all greater than 1 mile. 
+                Each map is a square with a uniformly randomly generated side length between 30 and 100 miles. The CSC is set to be in the center of the square, with the locations of two PSCs being generated uniformly within the square such that the pairwise distances between the CSC, PSC 1, and PSC 2 are all greater than 1 mile. 
                 </p>
                 <p>
                 Each map also an additional characteristic, called the <i>equipoise</i>, which denotes the proportion of the square's area that is closest to one of the two PSCs. Only patients which fall into this region are eligible for redirection as the other patients would be going to the CSC under the base case.
                 </p>
-            </div>
 
-            </div>
-        <h2>Patients</h2>
+            <h2>Patients</h2>
+            <p>
+                40 different patient cohorts of size 1000 are generated randomly in a square grid of length 1. We then scale their initial locations by the side length of each map and use the resulting coordinates as the initial patient coordinates for each map-cohort combination. We then simulate the effects of EMS redirection to CSCs in all 1000 maps using these 40 patient cohorts.
+            </p>
+            <p>
+                Each patient, once spawned, has a known stroke status, which is set randomly using set probabilities:
+                <ul>
+                    <li>Stroke-free</li>
+                    <li>TIA</li>
+                    <li>Hemorrhaging</li>
+                    <li>Ischemic</li>
+                </ul>
+                Ischemic patients may then also be LVO or non-LVO, which is again set using a set proportion.
+            </p>
+            <p>
+                Lastly, each patient has a "last known well" (LKW) time is generated randomly through a mixture of uniform distributions.
+            </p>
 
-        
+            <h2>Simulation</h2>
+                <p>
+                    For each map-cohort combination, we first calculate the closest hospital for each patient and a LVO diagnosis using the known sensitivity and specificity and the actual LVO status. We also set the "correct" destination to the closest hospital for most patients. The LVO-actual patients whose LKW time was less than 24 hours had their "correct" destinations set to the CSC.
+                </p>
+                <p>
+                    We also set the default destination hospital for all patients to be the closest hospital. We then look at patients who were closest to a PSC, diagnosed with LVO, and had a LKW less than 24 hours and allow them to be redirected to the CSC if the additional travel time is less than a pre-specified threshold. 
+                </p>
+                <p>
+                    After patient cohorts are generated on a map, we then generate random numbers to represent various lengths of time:
+                    <ul>
+                        <li>Time for EMS to arrive</li>
+                        <li>TIme on scene</li>
+                    </ul>
+                    The time to hospital is calculated based on the destination hospital that was calculated earlier. All these lengths of time are then used to calculate the LKW to door length of time.
+                </p>
+                <p>
+                    We then calculate the time until treatment for patients and include the possibility of needing to transfer. We use the LKW to door time and pre-specified times from door to treatment (for both IVT and EVT)
+                </p>
+                <p>
+                    Afterwards, we calculate the mRS using the LVO status, time until IVT or EVT, and other stroke status information. All of this information is then saved for each patient.
+                </p>
+                <p>
+                    In total, we use 6 possible time thresholds and 3 sets of LVO diagnosis sensitivity/specificity, for a total of 18 scenarios. We also include a base scenario where no patient redirection occurs, leading us to a total of 19 scenarios. For ease of programming, we actually run 21 scenarios, with the base scenario being run with all 3 sensitivity/specificity pairs. 
+                </p>
+            <h2>Data Analysis</h2>
+                <p>
+                    The full simulation (40 cohorts of 1000 patients run on 1000 different maps and 21 scenarios) will result in 40 * 1000 * 1000 * 21 rows. 
+                </p>
+                <p>
+                    In postprocessing, we split the data to calculate several outcomes for each map. For each map-cohort-scenario combination, we calculate metrics using the data from the 1000 patients of that cohort. Afterwards we then average across the 40 cohorts to get the results for each map under all the scenarios. Finally, we take differences between the scenarios and the base scenario to see how patient outcomes changed.
+                    <ul>
+                        <li>LVO triage for patients closest to PSCs</li>
+                            <ul>
+                                <li>Overtriage: Non-LVO patients redirected to the CSC within the same cohort</li>
+                                <li>Undertriage: LVO patients sent to PSCs within the same cohort</li>
+                            </ul>
+                    
+                        <li>Time until treatment</li>
+                            <ul>
+                                <li>Time to IVT for ischemic patients: (only for ischemic patients whose time to IVT was less than 4.5 hours) </li>
+                                <li>Time to EVT for LVO patients: (only for LVO patients whose time to EVT was less than 24 hours)</li>
+                            </ul>
+                        <li>mRS</li>
+                            <ul>
+                                <li>Ischemic patients</li>
+                                <li>LVO patients</li>
+                            </ul>
+
+                    </ul>
+                </p>
+                <p>
+                    This process is then repeated but only on patients closest to the PSCs as they are the only ones who could be eligible for redirection to the CSC.
+                </p>
+        </div>
+    </div>
     </div>
 </body>

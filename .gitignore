@@ -4,6 +4,7 @@ __pycache__/*
 *.csv
 *.ipynb
 */*
+*/__pycache__
 
 !ESTTM_old/*
 !docs/*
