@@ -13,6 +13,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <style>
+    .frame {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0 none;
+        box-sizing: border-box;
+      }
+    </style>
 </head>
 <body>
     <div id="nav-placeholder">
@@ -22,16 +34,5 @@
           $("#nav-placeholder").load("nav.html");
         });
     </script>
-
-    <div>
-        <iframe
-        src="https://plin97-stroke-sim-dashboard.hf.space"
-        frameborder="0"
-        width="100%"
-        height="720" 
-        allowfullscreen="true"
-    ></iframe>
-    
-    
-    </div>
+    <iframe src="https://plin97-stroke-sim-dashboard.hf.space" class="frame"></iframe>
 </body>
