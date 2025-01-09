@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Simulation Distributions</title>
+    <meta charset = "utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        var curID = "dists";
+    </script>
+    <style>
+        .table {
+            table-layout: fixed;
+        }
+    </style>
+</head>
+<body>
+    <div id="nav-placeholder">
+    </div>
+    <script type="text/javascript">
+        console.log(curID)
+        $(function(){
+          $("#nav-placeholder").load("nav.html", function() {
+            var element = document.getElementById(curID);
+            element.classList.add("active");
+          });
+        });
+    </script>
+
+    <div class="container-fluid">
+
+        <h2>Simulation parameters</h2>
+        
+        <h4>Patient Characteristics</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Stroke status</td>
+                    <td>Multinomial distribution
+                        $$n = 1\qquad \vec{p} = \begin{cases}
+                        \text{No stroke} & w.p. 0.6765 \\
+                        \text{TIA} & w.p. 0.0795 \\
+                        \text{Hemorrhaging} & w.p. 0.042 \\
+                        \text{Ischemic} & w.p. 0.202
+                        \end{cases}$$
+                    </td>
+                </tr>
+                <tr>
+                    <td>LVO status</td>
+                    <td>Bernoulli distribution
+
+                        $$\text{For ischemic patients, Bernoulli}(0.241)$$
+                    </td>
+                </tr>
+                <tr>
+                    <td>Last known well (LKW time, in hours)</td>
+                    <td>Mixture of uniform distributions
+                        $$LKW \sim \begin{cases}
+                        \text{Uniform}(1/6, 2) & w.p. 0.206 \\
+                        \text{Uniform}(2, 3.5) & w.p. 0.062 \\
+                        \text{Uniform}(3.5, 8) & w.p. 0.09 \\
+                        \text{Uniform}(8, 24) & w.p. 0.559 \\
+                        \text{Uniform}(24, 48) & w.p. 0.083 
+                        \end{cases}$$
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Times</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Time to scene (mins)</td>
+                    <td>Normal distribution
+                        $$N(\mu=16.72, \sigma=7)$$
+                    </td>
+                </tr>
+                <tr>
+                    <td>Time at scene (mins)</td>
+                    <td>Beta distribution
+                        $$\text{Beta}(\alpha=0.291, \beta=6.056)\ \text{with scale}\ 40$$
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</body>
