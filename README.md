@@ -3,11 +3,9 @@ DESCRIPTION
 
 Discrete event simulation model to estimate the impact of EMS stroke triage and transport plans
 
-See model documentation and code for details:
+See model overview, documentation, and dashboard here: https://epidmehul.github.io/EMS_Stroke/index.html
 
-(1) The "base" model does random map and patient generation and computes triage outcomes (ESSTM_documentation.docx, ESSTM_code.ipynb).
-  
-(2) The "extended" model includes treatments, inter-hospital transfers, and patient outcomes (ESSTM_documentation_EXTENDED.docx, ESSTM_code_EXTENDED.ipynb).
+Simulation and post-processing code is in the "Scripts" folder. 
 
 ACKNOWLEDGEMENTS
 
