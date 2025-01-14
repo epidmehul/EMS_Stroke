@@ -1,8 +1,6 @@
 ---
 title: "Optimal Scenario Prediction Using Map Characteristics"
-output:
-  html_document:
-    toc: true
+output: pdf_document
 ---
 
 # Preprocessing
@@ -19,10 +17,35 @@ names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 # Time to EVT for LVO patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
-
 combined_df = thresholds_df %>% left_join(maps_info_df)
 
-full_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 
-summary(full_mod)
+summary(threshold_mod)
+summary(treatment_mod)
+```
+
+# mRS for LVO patients
+```{r}
+thresh_results = thresholds_df %>% filter(var == "mRS_lvo")
+combined_df = thresholds_df %>% left_join(maps_info_df)
+
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+
+summary(threshold_mod)
+summary(treatment_mod)
+```
+
+# mRS for ischemic patients
+```{r}
+thresh_results = thresholds_df %>% filter(var == "mRS_ischemic")
+combined_df = thresholds_df %>% left_join(maps_info_df)
+
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+
+summary(threshold_mod)
+summary(treatment_mod)
 ```
