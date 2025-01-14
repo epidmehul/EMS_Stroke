@@ -11,6 +11,6 @@
 #SBATCH --mail-user=pwlin@live.unc.edu
 
 module purge
-module load R/4.4.0
+module load r/4.4.0
 
 Rscript -e 'rmarkdown::render("~/strokes/Scripts/map_regression.Rmd", output_dir = "/work/users/p/w/pwlin/output/", clean = T)'
