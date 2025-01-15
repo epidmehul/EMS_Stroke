@@ -17,7 +17,7 @@ names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 # Time to EVT for LVO patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
-combined_df = thresholds_df %>% left_join(maps_info_df)
+combined_df = thresh_df %>% left_join(maps_info_df)
 
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
@@ -29,7 +29,7 @@ summary(treatment_mod)
 # mRS for LVO patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "mRS_lvo")
-combined_df = thresholds_df %>% left_join(maps_info_df)
+combined_df = thresh_df %>% left_join(maps_info_df)
 
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
@@ -41,7 +41,7 @@ summary(treatment_mod)
 # mRS for ischemic patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "mRS_ischemic")
-combined_df = thresholds_df %>% left_join(maps_info_df)
+combined_df = thresh_df %>% left_join(maps_info_df)
 
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
