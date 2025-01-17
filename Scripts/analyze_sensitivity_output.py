@@ -11,21 +11,21 @@ warnings.filterwarnings('ignore')
 
 # sim_results = read_output('run_0_100.csv')
 
-# parquet_files = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/parquet_files')
-# map_files = list(parquet_files.glob('*.parquet'))
-map_files = [
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_144.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_156.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_701.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_249.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_253.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_343.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_961.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_985.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_669.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_126.parquet',
-    '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_900.parquet'
-]
+parquet_files = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/parquet_files')
+map_files = list(parquet_files.glob('*.parquet'))
+# map_files = [
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_144.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_156.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_701.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_249.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_253.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_343.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_961.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_985.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_669.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_126.parquet',
+#     '/work/users/p/w/pwlin/full_output_sens/parquet_files/low_lvo_map_900.parquet'
+# ]
 map_files = [pathlib.Path(i) for i in map_files]
 
 data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/full_output_sens/all_numbers')
