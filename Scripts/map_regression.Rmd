@@ -6,12 +6,15 @@ output: pdf_document
 # Preprocessing
 ```{r}
 library(tidyverse)
+library(nnet)
+# library(MASS)
 
 maps_df = read_csv("/work/users/p/w/pwlin/output/maps.csv")
 maps_info_df = maps_df %>% select(map, equipoise, geoscale)
 
 thresholds_df = read_csv("/work/users/p/w/pwlin/full_output_sens/optimal_thresholds.csv", col_select = c(1, 2, 6, 7, 8), skip = 1)
 names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
+thresholds_df$sensitivity = factor(thresholds_df$sensitivity)
 ```
 
 # Time to EVT for LVO patients
@@ -19,9 +22,12 @@ names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
+
+sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 
+summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 ```
@@ -31,9 +37,11 @@ summary(treatment_mod)
 thresh_results = thresholds_df %>% filter(var == "mRS_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
+sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+treatment_mod = glm(value ~ equipoise * geoscale, data = combined_df, family=binomial)
 
+summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 ```
@@ -43,9 +51,11 @@ summary(treatment_mod)
 thresh_results = thresholds_df %>% filter(var == "mRS_ischemic")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
+sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+treatment_mod = glm(value ~ equipoise * geoscale, data = combined_df, family=binomial)
 
+summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 ```
