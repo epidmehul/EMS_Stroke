@@ -4,7 +4,7 @@
 #SBATCH -N 1
 #SBATCH -n 25
 #SBATCH --mem=10g
-#SBATCH -t 01:00:00
+#SBATCH -t 00:10:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J sens_thresh
 #SBATCH --mail-type=end

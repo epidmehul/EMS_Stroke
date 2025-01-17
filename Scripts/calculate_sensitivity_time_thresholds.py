@@ -94,7 +94,7 @@ if __name__ == '__main__':
         results = pool.map(calc_single_map_time_thresholds, map_nums)
     all_thresholds = pd.concat(results, axis = 0)
     all_thresholds.to_csv(args.path.parent / (args.output + '.csv'))
-    all_thresholds.to_excel(args.path.parent / (args.output +'optimal_thresholds.xlsx'))
+    all_thresholds.to_excel(args.path.parent / (args.output +'.xlsx'))
 
     df = all_thresholds
     sensitivities = df.xs('sensitivity', axis = 1, level = 1)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
         fig.suptitle(metric, fontsize = 'xx-large')
 
-        fig.savefig(args.path.parent / f'psc_optimal_{metric}.png')
+        fig.savefig(args.path.parent / f'args.output_{metric}.png')
         plt.close()
 
         

@@ -17,6 +17,35 @@ names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 thresholds_df$sensitivity = factor(thresholds_df$sensitivity)
 ```
 
+# Undertriage
+```{r}
+thresh_results = thresholds_df %>% filter(var == "undertriage")
+combined_df = thresh_results %>% left_join(maps_info_df)
+
+sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = glm(value ~ equipoise * geoscale, data = combined_df, family=binomial)
+
+summary(sensitivity_mod)
+summary(threshold_mod)
+summary(treatment_mod)
+```
+
+# Overtriage
+
+```{r}
+thresh_results = thresholds_df %>% filter(var == "overtriage")
+combined_df = thresh_results %>% left_join(maps_info_df)
+
+sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = glm(value ~ equipoise * geoscale, data = combined_df, family=binomial)
+
+summary(sensitivity_mod)
+summary(threshold_mod)
+summary(treatment_mod)
+```
+
 # Time to EVT for LVO patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
