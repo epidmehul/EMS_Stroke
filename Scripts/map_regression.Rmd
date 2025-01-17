@@ -17,8 +17,8 @@ names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 thresholds_df$sensitivity = factor(thresholds_df$sensitivity)
 
 psc_thresholds_df = read_csv("/work/users/p/w/pwlin/full_output_sens/psc_scenarios.csv", col_select = c(1, 2, 6, 7, 8), skip = 1)
-names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
-thresholds_df$sensitivity = factor(thresholds_df$sensitivity)
+names(psc_thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
+psc_thresholds_df$sensitivity = factor(psc_thresholds_df$sensitivity)
 ```
 
 # Models for all patients
