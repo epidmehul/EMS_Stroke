@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
         fig.suptitle(metric, fontsize = 'xx-large')
 
-        fig.savefig(args.path.parent / f'args.output_{metric}.png')
+        fig.savefig(args.path.parent / f'{args.output}_{metric}.png')
         plt.close()
 
         
