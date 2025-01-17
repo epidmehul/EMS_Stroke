@@ -26,7 +26,9 @@ args = parser.parse_args()
 col_names = [
             'ischemic_patients_diff',
             'lvo_patients_diff',
-            'evt_lvo_mean_diff'
+            'evt_lvo_mean_diff',
+            'undertriage_diff',
+            'overtriage_diff'
         ]
 
 panel = '''
