@@ -59,8 +59,8 @@ def calc_single_map_time_thresholds(map_number):
             'mRS_ischemic': (df_means['ischemic_patients_diff'].idxmax(),df_means['ischemic_patients_diff'].max()),
             'mRS_lvo': (df_means['lvo_patients_diff'].idxmax(), df_means['lvo_patients_diff'].max()), 
             'time_evt_lvo': (df_means['evt_lvo_mean_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min()),
-            'undertriage': (df_means['undertriage_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min()),
-            'overtriage': (df_means['overtriage_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min())
+            'undertriage': (df_means['undertriage_diff'].idxmin(),df_means['undertriage_diff'].min()),
+            'overtriage': (df_means['overtriage_diff'].idxmin(),df_means['overtriage_diff'].min())
         }
     retval_df = pd.DataFrame.from_dict(retval)
     for lvo in (0.141, 0.241, 0.341):
@@ -74,6 +74,7 @@ def calc_single_map_time_thresholds(map_number):
             retval_df.drop((lvo, 'scenario'), axis = 1, inplace = True)
             # retval_df.drop((lvo, 'scenario'), axis = 1, inplace = True)
         except:
+            print(map_number)
             retval_df[[(lvo, 'scenario'), (lvo, 'value')]] = pd.DataFrame([[None, None], [None, None], [None, None]], index = retval_df.index)
             retval_df.drop(lvo, axis = 1, inplace = True)
 
