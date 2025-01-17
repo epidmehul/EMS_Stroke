@@ -90,7 +90,7 @@ def calc_single_map_time_thresholds(map_number):
     
         
 if __name__ == '__main__':
-    with mp.Pool(20) as pool:
+    with mp.Pool(25) as pool:
         results = pool.map(calc_single_map_time_thresholds, map_nums)
     all_thresholds = pd.concat(results, axis = 0)
     all_thresholds.to_csv(args.path.parent / (args.output + '.csv'))
