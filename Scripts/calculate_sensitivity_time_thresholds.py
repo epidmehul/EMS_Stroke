@@ -19,6 +19,8 @@ parser.add_argument('-p', '--path', help =
 
 parser.add_argument('-b', '--box', help = 'Set to make threshold plot a box plot', action = 'store_true')
 
+parser.add_argument('-o', '--output', help = 'Output file name (will be placed in path argument parent directory)')
+
 args = parser.parse_args()
 
 col_names = [
@@ -56,7 +58,9 @@ def calc_single_map_time_thresholds(map_number):
         retval[prevalance] = {
             'mRS_ischemic': (df_means['ischemic_patients_diff'].idxmax(),df_means['ischemic_patients_diff'].max()),
             'mRS_lvo': (df_means['lvo_patients_diff'].idxmax(), df_means['lvo_patients_diff'].max()), 
-            'time_evt_lvo': (df_means['evt_lvo_mean_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min())
+            'time_evt_lvo': (df_means['evt_lvo_mean_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min()),
+            'undertriage': (df_means['undertriage_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min()),
+            'overtriage': (df_means['overtriage_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min())
         }
     retval_df = pd.DataFrame.from_dict(retval)
     for lvo in (0.141, 0.241, 0.341):
@@ -86,8 +90,8 @@ if __name__ == '__main__':
     with mp.Pool(20) as pool:
         results = pool.map(calc_single_map_time_thresholds, map_nums)
     all_thresholds = pd.concat(results, axis = 0)
-    all_thresholds.to_csv(args.path.parent / 'optimal_thresholds.csv')
-    all_thresholds.to_excel(args.path.parent / 'optimal_thresholds.xlsx')
+    all_thresholds.to_csv(args.path.parent / (args.output + '.csv'))
+    all_thresholds.to_excel(args.path.parent / (args.output +'optimal_thresholds.xlsx'))
 
     df = all_thresholds
     sensitivities = df.xs('sensitivity', axis = 1, level = 1)

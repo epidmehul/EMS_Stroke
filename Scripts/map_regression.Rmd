@@ -28,6 +28,8 @@ threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 
 summary(sensitivity_mod)
+2*(1-pnorm(abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)))
+
 summary(threshold_mod)
 summary(treatment_mod)
 ```
