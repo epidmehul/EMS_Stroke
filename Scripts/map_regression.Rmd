@@ -23,7 +23,7 @@ thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
 
-sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
+sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 
@@ -37,11 +37,11 @@ summary(treatment_mod)
 thresh_results = thresholds_df %>% filter(var == "mRS_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
-sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
+#sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
 threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
 treatment_mod = glm(value ~ equipoise * geoscale, data = combined_df, family=binomial)
 
-summary(sensitivity_mod)
+#summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 ```
