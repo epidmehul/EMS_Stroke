@@ -23,6 +23,33 @@ psc_thresholds_df$sensitivity = factor(psc_thresholds_df$sensitivity)
 
 # Models for all patients
 
+## Overtriage
+
+```{r}
+thresh_results = thresholds_df %>% filter(var == "overtriage")
+combined_df = thresh_results %>% left_join(maps_info_df)
+
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+
+summary(treatment_mod)
+
+```
+
+## Undertriage
+
+```{r}
+thresh_results = thresholds_df %>% filter(var == "undertriage")
+combined_df = thresh_results %>% left_join(maps_info_df)
+
+
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+
+summary(threshold_mod)
+summary(treatment_mod)
+```
+
+
 ## Time to EVT for LVO patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
@@ -69,6 +96,32 @@ summary(treatment_mod)
 ```
 
 # Models for PSC patients
+
+## Overtriage
+
+```{r}
+thresh_results = psc_thresholds_df %>% filter(var == "overtriage")
+combined_df = thresh_results %>% left_join(maps_info_df)
+
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+
+summary(treatment_mod)
+
+```
+
+## Undertriage
+
+```{r}
+thresh_results = psc_thresholds_df %>% filter(var == "undertriage")
+combined_df = thresh_results %>% left_join(maps_info_df)
+
+
+threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+
+summary(threshold_mod)
+summary(treatment_mod)
+```
 
 ## Time to EVT for LVO patients
 ```{r}
