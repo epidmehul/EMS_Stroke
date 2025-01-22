@@ -47,10 +47,10 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 
 ```
 
@@ -74,10 +74,10 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
 
 ## mRS for ischemic patients
@@ -100,10 +100,10 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
 
 # Models for PSC patients
@@ -122,7 +122,7 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
 
 ## Undertriage
@@ -145,10 +145,10 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
 
 ## Time to EVT for LVO patients
@@ -174,10 +174,10 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
 
 ## mRS for LVO patients
@@ -200,10 +200,10 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
 
 ## mRS for ischemic patients
@@ -226,8 +226,8 @@ summary(treatment_mod)
 # combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
 pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2)
+        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 ```
