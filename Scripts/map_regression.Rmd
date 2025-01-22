@@ -40,14 +40,17 @@ summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 1:2, verInd = 3)
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 
 ```
 
@@ -64,11 +67,17 @@ treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+
+pairs(combined_df %>% select(geoscale, equipoise, threshold),
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
 
 ## mRS for ischemic patients
@@ -84,11 +93,17 @@ summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+
+pairs(combined_df %>% select(geoscale, equipoise, threshold),
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
 
 # Models for PSC patients
@@ -103,9 +118,11 @@ treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
 
 ## Undertriage
@@ -121,11 +138,17 @@ treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+
+pairs(combined_df %>% select(geoscale, equipoise, threshold),
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
 
 ## Time to EVT for LVO patients
@@ -144,11 +167,17 @@ summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+
+pairs(combined_df %>% select(geoscale, equipoise, threshold),
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
 
 ## mRS for LVO patients
@@ -164,11 +193,17 @@ treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+
+pairs(combined_df %>% select(geoscale, equipoise, threshold),
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
 
 ## mRS for ischemic patients
@@ -184,9 +219,15 @@ summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 
-combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
 
-combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
+# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
+
+pairs(combined_df %>% select(geoscale, equipoise, threshold),
+        horInd = 3, verInd = 1:2)
+
+pairs(combined_df %>% select(geoscale, equipoise, value),
+        horInd = 3, verInd = 1:2)
 ```
