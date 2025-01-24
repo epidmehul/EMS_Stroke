@@ -16,88 +16,28 @@ maps_info_df = maps_df %>% select(map, equipoise, geoscale) %>%
 thresholds_df = read_csv("/work/users/p/w/pwlin/full_output_sens/all_scenarios.csv", col_select = c(1, 2, 6, 7, 8), skip = 1)
 names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 thresholds_df$sensitivity = factor(thresholds_df$sensitivity)
+thresholds_df = thresholds_df %>% mutate(value = ifelse(str_detect(var, "mRS"), 1000 * value, value))
 
 psc_thresholds_df = read_csv("/work/users/p/w/pwlin/full_output_sens/psc_scenarios.csv", col_select = c(1, 2, 6, 7, 8), skip = 1)
 names(psc_thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
 psc_thresholds_df$sensitivity = factor(psc_thresholds_df$sensitivity)
+psc_thresholds_df = psc_thresholds_df %>% mutate(value = ifelse(str_detect(var, "mRS"), 1000 * value, value))
 ```
 
 # Models for all patients
-
-## Time to EVT for LVO patients
-```{r}
-thresh_results = thresholds_df %>% filter(var == "time_evt_lvo")
-combined_df = thresh_results %>% left_join(maps_info_df)
-
-
-sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
-
-summary(sensitivity_mod)
-2*(1-pnorm(abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)))
-
-summary(threshold_mod)
-summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
-
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
-
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
-
-```
-
-## mRS for LVO patients
-```{r}
-thresh_results = thresholds_df %>% filter(var == "mRS_lvo")
-combined_df = thresh_results %>% left_join(maps_info_df)
-
-#sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
-
-#summary(sensitivity_mod)
-summary(threshold_mod)
-summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
-
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
-
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
-```
 
 ## mRS for ischemic patients
 ```{r}
 thresh_results = thresholds_df %>% filter(var == "mRS_ischemic")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
-sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = glm(value ~ equipoise * geoscale, data = combined_df)
+sensitivity_mod = multinom(sensitivity ~ equipoise + geoscale, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
+treatment_mod = glm(value ~ equipoise + geoscale, data = combined_df)
 
 summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
@@ -108,70 +48,21 @@ pairs(combined_df %>% select(geoscale, equipoise, value),
 
 # Models for PSC patients
 
-## Overtriage
-
-```{r}
-thresh_results = psc_thresholds_df %>% filter(var == "overtriage")
-combined_df = thresh_results %>% left_join(maps_info_df)
-
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
-
-summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
-
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
-```
-
-## Undertriage
-
-```{r}
-thresh_results = psc_thresholds_df %>% filter(var == "undertriage")
-combined_df = thresh_results %>% left_join(maps_info_df)
-
-
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
-
-summary(threshold_mod)
-summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
-
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
-
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
-```
-
 ## Time to EVT for LVO patients
 ```{r}
 thresh_results = psc_thresholds_df %>% filter(var == "time_evt_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
 
-sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+sensitivity_mod = glm(sensitivity ~ equipoise + geoscale, data = combined_df, family=binomial)
+threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise + geoscale, data = combined_df)
 
 summary(sensitivity_mod)
-2*(1-pnorm(abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)))
+abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)))
 
 summary(threshold_mod)
 summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
@@ -186,44 +77,12 @@ thresh_results = psc_thresholds_df %>% filter(var == "mRS_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
 #sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
+treatment_mod = lm(value ~ equipoise + geoscale, data = combined_df)
 
 #summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
-
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
-
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
-```
-
-## mRS for ischemic patients
-```{r}
-thresh_results = psc_thresholds_df %>% filter(var == "mRS_ischemic")
-combined_df = thresh_results %>% left_join(maps_info_df)
-
-sensitivity_mod = multinom(sensitivity ~ equipoise * geoscale, data = combined_df)
-threshold_mod = lm(threshold ~ equipoise * geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise * geoscale, data = combined_df)
-
-summary(sensitivity_mod)
-summary(threshold_mod)
-summary(treatment_mod)
-
-# combined_df %>% ggplot(aes(x = equipoise, y = threshold)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = threshold)) + geom_point()
-
-# combined_df %>% ggplot(aes(x = equipoise, y = value)) + geom_point()
-# combined_df %>% ggplot(aes(x = geoscale, y = value)) + geom_point()
 
 pairs(combined_df %>% select(geoscale, equipoise, threshold),
         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
