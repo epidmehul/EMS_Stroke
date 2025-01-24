@@ -59,7 +59,7 @@ threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
 treatment_mod = lm(value ~ equipoise + geoscale, data = combined_df)
 
 summary(sensitivity_mod)
-abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)))
+abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)
 
 summary(threshold_mod)
 summary(treatment_mod)
