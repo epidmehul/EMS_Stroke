@@ -11,7 +11,8 @@ library(nnet)
 
 maps_df = read_csv("/work/users/p/w/pwlin/output/maps.csv")
 maps_info_df = maps_df %>% select(map, equipoise, geoscale, sc_max_dist_normalized) %>%
-                            mutate(equipoise = 100*equipoise)
+                            mutate(equipoise = 100*equipoise) %>%
+                            mutate(sc_max_dist_normalized = 100*sc_max_dist_normalized)
 
 thresholds_df = read_csv("/work/users/p/w/pwlin/full_output_sens/all_scenarios.csv", col_select = c(1, 2, 6, 7, 8), skip = 1)
 names(thresholds_df) = c("map", "var", "value", "sensitivity", "threshold")
