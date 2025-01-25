@@ -28,7 +28,12 @@ col_names = [
             'lvo_patients_diff',
             'evt_lvo_mean_diff',
             'undertriage_diff',
-            'overtriage_diff'
+            'overtriage_diff',
+            'ischemic_patients',
+            'lvo_patients',
+            'evt_lvo_mean',
+            'undertriage',
+            'overtriage'
         ]
 
 panel = '''
@@ -54,7 +59,7 @@ def calc_single_map_time_thresholds(map_number):
             case 'high':
                 prevalance = 0.341
         df = pd.read_csv(path)
-        df = remove_base_case_and_non_diffs(df, remove_base = True, remove_nondiffs = True)
+        df = remove_base_case_and_non_diffs(df, remove_base = True, remove_nondiffs = False)
         df_means = df.groupby(['sensitivity', 'threshold']).mean()
 
         retval[prevalance] = {
@@ -62,7 +67,12 @@ def calc_single_map_time_thresholds(map_number):
             'mRS_lvo': (df_means['lvo_patients_diff'].idxmax(), df_means['lvo_patients_diff'].max()), 
             'time_evt_lvo': (df_means['evt_lvo_mean_diff'].idxmin(),df_means['evt_lvo_mean_diff'].min()),
             'undertriage': (df_means['undertriage_diff'].idxmin(),df_means['undertriage_diff'].min()),
-            'overtriage': (df_means['overtriage_diff'].idxmin(),df_means['overtriage_diff'].min())
+            'overtriage': (df_means['overtriage_diff'].idxmin(),df_means['overtriage_diff'].min()),
+            'mRS_ischemic_raw': (df_means['ischemic_patients'].idxmax(),df_means['ischemic_patients'].max()),
+            'mRS_lvo_raw': (df_means['lvo_patients'].idxmax(), df_means['lvo_patients'].max()), 
+            'time_evt_lvo_raw': (df_means['evt_lvo_mean'].idxmin(),df_means['evt_lvo_mean'].min()),
+            'undertriage_raw': (df_means['undertriage'].idxmin(),df_means['undertriage'].min()),
+            'overtriage_raw': (df_means['overtriage'].idxmin(),df_means['overtriage'].min())
         }
     retval_df = pd.DataFrame.from_dict(retval)
     for lvo in (0.141, 0.241, 0.341):

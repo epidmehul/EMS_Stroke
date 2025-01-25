@@ -10,7 +10,7 @@ library(nnet)
 # library(MASS)
 
 maps_df = read_csv("/work/users/p/w/pwlin/output/maps.csv")
-maps_info_df = maps_df %>% select(map, equipoise, geoscale) %>%
+maps_info_df = maps_df %>% select(map, equipoise, geoscale, sc_max_dist_normalized) %>%
                             mutate(equipoise = 100*equipoise)
 
 thresholds_df = read_csv("/work/users/p/w/pwlin/full_output_sens/all_scenarios.csv", col_select = c(1, 2, 6, 7, 8), skip = 1)
@@ -31,19 +31,22 @@ psc_thresholds_df = psc_thresholds_df %>% mutate(value = ifelse(str_detect(var, 
 thresh_results = thresholds_df %>% filter(var == "mRS_ischemic")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
-sensitivity_mod = multinom(sensitivity ~ equipoise + geoscale, data = combined_df)
-threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
-treatment_mod = glm(value ~ equipoise + geoscale, data = combined_df)
+sensitivity_mod = multinom(sensitivity ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
+treatment_mod = lm(value ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
 
 summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
+# pairs(combined_df %>% select(geoscale, equipoise, threshold),
+#         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
+# pairs(combined_df %>% select(geoscale, equipoise, value),
+#         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
+
+plot(threshold_mod, which = c(1,3))
+plot(treatment_mod, which = c(1,3))
 ```
 
 # Models for PSC patients
@@ -54,9 +57,9 @@ thresh_results = psc_thresholds_df %>% filter(var == "time_evt_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
 
-sensitivity_mod = glm(sensitivity ~ equipoise + geoscale, data = combined_df, family=binomial)
-threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise + geoscale, data = combined_df)
+sensitivity_mod = glm(sensitivity ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df, family=binomial)
+threshold_mod = lm(threshold ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
+treatment_mod = lm(value ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
 
 summary(sensitivity_mod)
 abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.errors)
@@ -64,11 +67,14 @@ abs(summary(sensitivity_mod)$coefficients/summary(sensitivity_mod)$standard.erro
 summary(threshold_mod)
 summary(treatment_mod)
 
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
+# pairs(combined_df %>% select(geoscale, equipoise, threshold),
+#         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
+# pairs(combined_df %>% select(geoscale, equipoise, value),
+#         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
+
+plot(threshold_mod, which = c(1,3))
+plot(treatment_mod, which = c(1,3))
 ```
 
 ## mRS for LVO patients
@@ -77,16 +83,19 @@ thresh_results = psc_thresholds_df %>% filter(var == "mRS_lvo")
 combined_df = thresh_results %>% left_join(maps_info_df)
 
 #sensitivity_mod = glm(sensitivity ~ equipoise * geoscale, data = combined_df, family=binomial)
-threshold_mod = lm(threshold ~ equipoise + geoscale, data = combined_df)
-treatment_mod = lm(value ~ equipoise + geoscale, data = combined_df)
+threshold_mod = lm(threshold ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
+treatment_mod = lm(value ~ equipoise + geoscale + sc_max_dist_normalized, data = combined_df)
 
 #summary(sensitivity_mod)
 summary(threshold_mod)
 summary(treatment_mod)
 
-pairs(combined_df %>% select(geoscale, equipoise, threshold),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
+# pairs(combined_df %>% select(geoscale, equipoise, threshold),
+#         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "threshold"))
 
-pairs(combined_df %>% select(geoscale, equipoise, value),
-        horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
+# pairs(combined_df %>% select(geoscale, equipoise, value),
+#         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
+
+plot(threshold_mod, which = c(1,3))
+plot(treatment_mod, which = c(1,3))
 ```
