@@ -46,8 +46,8 @@ summary(treatment_mod)
 # pairs(combined_df %>% select(geoscale, equipoise, value),
 #         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 
-plot(threshold_mod, which = c(1,3))
-plot(treatment_mod, which = c(1,3))
+plot(threshold_mod, which = c(1,2))
+plot(treatment_mod, which = c(1,2))
 ```
 
 # Models for PSC patients
@@ -74,8 +74,8 @@ summary(treatment_mod)
 # pairs(combined_df %>% select(geoscale, equipoise, value),
 #         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 
-plot(threshold_mod, which = c(1,3))
-plot(treatment_mod, which = c(1,3))
+plot(threshold_mod, which = c(1,2))
+plot(treatment_mod, which = c(1,2))
 ```
 
 ## mRS for LVO patients
@@ -97,6 +97,6 @@ summary(treatment_mod)
 # pairs(combined_df %>% select(geoscale, equipoise, value),
 #         horInd = 3, verInd = 1:2, labels = c("geoscale", "equipoise", "treatment"))
 
-plot(threshold_mod, which = c(1,3))
-plot(treatment_mod, which = c(1,3))
+plot(threshold_mod, which = c(1,2))
+plot(treatment_mod, which = c(1,2))
 ```
