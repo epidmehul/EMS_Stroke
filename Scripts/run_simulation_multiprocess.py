@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seeds', help = 'number of random seeds', type = int, default = 40)
 parser.add_argument('-p', '--patients', help = 'number of patients', type = int, default = 1000)
 parser.add_argument('-c', '--config', help = 'config file with simulation parameters', type = pathlib.Path, default = None)
+parser.add_argument('-d', '--data', help = 'data file containing patient information on hexes and LKW times', type = pathlib.Path, default = None)
 args = parser.parse_args()
 
 # os.chdir('/proj/patellab/Sheps/output')
@@ -18,8 +19,15 @@ args = parser.parse_args()
 map_seeds = [i for i in range(1000)]
 output_dir = '/work/users/p/w/pwlin/output/parquet_files'
 
+try:
+    config_dict = read_config(args.config)
+    if config_dict['hex_info'] is not None:
+        map_seeds = [0]
+except:
+    config_dict = None
+
 def run_single_map(map_seed):
-    run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir)
+    run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir, config = config_dict)
 
 if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)

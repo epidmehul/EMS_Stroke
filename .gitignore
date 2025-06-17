@@ -10,3 +10,4 @@ __pycache__/*
 !SLURM/*
 !Scripts/*
 Scripts/__pycache__/*
+!config_files/*

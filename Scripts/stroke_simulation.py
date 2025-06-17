@@ -1,13 +1,55 @@
 import numpy as np
 import pandas as pd
 from scipy import spatial
+from scipy.special import logit, expit
 # from sklearn.metrics import confusion_matrix
 import pathlib
 import yaml
 
+def data_to_config(patient_filestr, times_filestr):
+    '''
+    Reads in a data file containing patient level LKW and hex locations
 
-def read_config(filestr):
-    with open(filestr) as f:
+    Outputs config dictionary to be merged with a config dict from a YAML file
+    '''
+    # Patient level data -- LKW and hex frequencies
+    try:
+        data = pd.read_csv(patient_filestr)
+        hex_config = dict(data.groupby(data['Hex']).size())
+        data['lkw_bins'] = pd.cut(data['LKW'], 
+            bins = [0, 1/60, 1/6, 2, 3.5, 8, 24, 48, 72])
+        patient_config = {}
+        lkw_info = data.groupby('lkw_bins').size()
+        for bin in lkw_info.index:
+            patient_config[bin] = {
+                'prob': lkw_info.loc[bin],
+                'dist': 'rng.uniform',
+                'kwargs': {'low': bin.left, 'high': bin.right}
+            }
+        patient_retval = {'hexes': hex_config,
+            'patient_lkw_bins': patient_config}
+    except:
+        patient_retval = None
+
+    # Times
+    try:
+        times_data = pd.read_csv(times_filestr)
+        num_hosps = len(times_data.columns) - 1
+        hex_hosp_times = times_data[:-num_hosps].set_index(times_data.columns[0])
+        hosp_hosp_times = times_data[-num_hosps:].set_index(times_data.columns[0])
+    except:
+        hex_hosp_times = None
+        hosp_hosp_times = None
+
+    return patient_retval, hex_hosp_times, hosp_hosp_times
+
+def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr = None):
+    '''
+    Reads in a config dictionary from a YAML file
+
+    Merges two dictionaries together, with values kept from YAML file if applicable
+    '''
+    with open(yaml_filestr) as f:
         config_override = yaml.safe_load(f)
     params = {
         'patients_none_all': 0.6765,
@@ -17,11 +59,19 @@ def read_config(filestr):
         'patients_lvo_ischemic': 0.241,
         'patients_num_lkw_bins': 5,
         'simulations_ivt_threshold': 270,
-        'simulations_evt_threshold': 1440
+        'simulations_evt_threshold': 1440,
+        'patient_lkw_bins': None,
+        'hexes': None,
+        'simulations_ivt_threshold': 270,
+        'simulations_evt_threshold': 1440,
+        'simulations_ivt_probability': 0.55,
+        'simulations_evt_probability': 0.85
     }
-    for key in config_override:
-        params[key] = config_override[key]
-    return params
+    data_config, transport_times, transfer_times = data_to_config(patient_data_filestr, times_filestr)
+    retval = params | config_override | data_config
+    retval['transport_times'] = transport_times
+    retval['transfer_times'] = transfer_times
+    return retval
 
 def get_drivespeed(geoscale: float):
     '''
@@ -49,8 +99,17 @@ def generate_patient_cohort(num_patients, seed, config = None):
     '''
     rng = np.random.default_rng(seed)
 
-    patient_coords_normalized = rng.random((num_patients, 2))
+    ## Patient spawn locations
+    if config is None:
+        patient_hexes = None
+        patient_coords_normalized = rng.random((num_patients, 2))
+    else:
+        hex_names = list(config['hexes'].keys())
+        hex_probs = np.array(list(config['hexes'].values()))
+        patient_hexes = rng.choice(hex_names, p = hex_probs/hex_probs.sum(), replace = True, size = num_patients)
+        patient_coords_normalized = np.full((num_patients, 2), None)
 
+    ## Actual stroke status generation
     stroke_types = np.array(['none', 'tia', 'hemorrhaging', 'ischemic'])
     try:
         probs = np.array([config['patients_none_all'],
@@ -103,20 +162,45 @@ def generate_patient_cohort(num_patients, seed, config = None):
     #             (lastWell_bins == 3) * rng.uniform(6, 24, num_patients) + 
     #             (lastWell_bins == 4) * rng.uniform(24, 48, num_patients) )
     
-    probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
-    last_well_distributions = [
+    # probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
+    # last_well_distributions = [
+    #     {'type': rng.uniform, 'kwargs': {'low': 1/6, 'high': 2}},
+    #     {'type': rng.uniform, 'kwargs': {'low': 2, 'high': 3.5}},
+    #     {'type': rng.uniform, 'kwargs': {'low': 3.5, 'high': 8}},
+    #     {'type': rng.uniform, 'kwargs': {'low': 8, 'high': 24}},
+    #     {'type': rng.uniform, 'kwargs': {'low': 24, 'high': 48}}
+    # ]
+
+    ## LKW time generation
+    try:
+        lkw_bins = config['patients_lkw_bins']
+        last_well_distributions = []
+        probs = []
+        for bin in lkw_bins:
+            probs.append(lkw_bins[bin]['prob'])
+            last_well_distributions.append({'type': eval(lkw_bins[bin]['dist']),
+                                            'kwargs': lkw_bins[bin]['kwargs']
+                                            })
+    except:
+        probs = np.array([0.206, 0.062, 0.09, 0.559, 0.083])
+        last_well_distributions = [
         {'type': rng.uniform, 'kwargs': {'low': 1/6, 'high': 2}},
         {'type': rng.uniform, 'kwargs': {'low': 2, 'high': 3.5}},
         {'type': rng.uniform, 'kwargs': {'low': 3.5, 'high': 8}},
         {'type': rng.uniform, 'kwargs': {'low': 8, 'high': 24}},
         {'type': rng.uniform, 'kwargs': {'low': 24, 'high': 48}}
-    ]
+        ]
+
+
     last_well_generated_times = np.zeros((num_patients, len(last_well_distributions)))
     for i, distr in enumerate(last_well_distributions):
         last_well_generated_times[:, i] = distr['type'](size = num_patients, **distr['kwargs'])
     lastWell_bins = rng.choice(a = np.arange(len(last_well_distributions)), p = probs / np.sum(probs, dtype = float), size = num_patients)
 
     last_well = last_well_generated_times[np.arange(num_patients), lastWell_bins]
+
+    # last_well = rng.lognormal(mean = -0.725238324950042, sigma = np.sqrt(3.70290891530286), size = num_patients)
+    
     # last_well = ( (lastWell_bins == 1) * rng.uniform(0.1, 2, num_patients) + 
     #             (lastWell_bins == 2) * rng.uniform(2, 3.5, num_patients) + 
     #             (lastWell_bins == 3) * rng.uniform(3.5, 8, num_patients) + 
@@ -128,6 +212,7 @@ def generate_patient_cohort(num_patients, seed, config = None):
         'ID': np.arange(1, num_patients + 1),
         'x_coord': patient_coords_normalized[:,0],
         'y_coord': patient_coords_normalized[:,1],
+        'hex': patient_hexes,
         'stroke': stroke,
         'tia': tia,
         'hemorrhaging': hemorrhaging,
@@ -139,7 +224,7 @@ def generate_patient_cohort(num_patients, seed, config = None):
 
     return patient_df
 
-def generate_map(seed, num_psc = 2):
+def generate_map(seed, num_psc = 2, config = None):
     '''
     Params:
         - seed: Random seed to initialize the generator
@@ -150,20 +235,33 @@ def generate_map(seed, num_psc = 2):
             Row 0 is hard-coded as (0.5, 0.5) due to being CSC location
         - geoscale: 
     '''
-    rng = np.random.default_rng(seed)
-    geoscale = rng.uniform(30, 100)
-    csc = np.array([0.5, 0.5])
-    while True:
-        psc_coords = rng.random((num_psc, 2))
-        med_coords = np.vstack((csc, psc_coords))
-        coord_dists = spatial.distance.pdist(med_coords)
+    if config is None:
+        rng = np.random.default_rng(seed)
+        geoscale = rng.uniform(30, 100)
+        csc = np.array([0.5, 0.5])
+        while True:
+            psc_coords = rng.random((num_psc, 2))
+            med_coords = np.vstack((csc, psc_coords))
+            coord_dists = spatial.distance.pdist(med_coords)
 
-        if np.all(geoscale * coord_dists > 1):
-            break
-    med_labels = [f'PSC{i}' for i in range(1, num_psc + 1)]
-    med_labels.insert(0, 'CSC')
-    med_labels = np.array(med_labels)
-    return med_labels, med_coords, geoscale
+            if np.all(geoscale * coord_dists > 1):
+                break
+        med_labels = [f'PSC{i}' for i in range(1, num_psc + 1)]
+        med_labels.insert(0, 'CSC')
+        med_labels = np.array(med_labels)
+        return med_labels, med_coords, geoscale
+    else:
+        try:
+            hospital_dict = config['hosp_coords']
+            med_labels = []
+            med_coords = np.zeros((0, 2))
+            for key in hospital_dict:
+                med_labels.append(hospital_dict[key]['type'])
+                med_coords = np.vstack((med_coords, np.array(hospital_dict[key]['coords'])))
+            return med_labels, med_coords, np.max(med_coords)
+        except:
+            return generate_map(seed, num_psc = 2, config = None)
+        
 
 def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([[0.9, 0.6], [0.75, 0.75], [0.6, 0.9]]), thresholds = np.arange(0, 70, 10), config = None):
     '''
@@ -185,17 +283,24 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     ################# Patient and map initialization ##################
     patient_df = generate_patient_cohort(num_patients, seed = patient_seed, config = config)
-    med_labels, med_coords, geoscale = generate_map(map_seed, num_psc = 2)
+    med_labels, med_coords, geoscale = generate_map(map_seed, num_psc = 2, config = config)
 
     drivespeed = get_drivespeed(geoscale)
 
-    patient_coords = patient_df[['x_coord', 'y_coord']].values
-    patient_med_dists = geoscale * spatial.distance.cdist(patient_coords, med_coords)
-    patient_med_times = patient_med_dists / drivespeed * 60
-
-    closest_med_ind = np.argmin(patient_med_times, axis = 1)
-    closest_med = med_labels[closest_med_ind]
-    closest_med_times = np.min(patient_med_times, axis = 1)
+    if config is None:
+        patient_coords = patient_df[['x_coord', 'y_coord']].values
+        patient_med_dists = geoscale * spatial.distance.cdist(patient_coords, med_coords)
+        patient_med_times = patient_med_dists / drivespeed * 60
+        closest_med_ind = np.argmin(patient_med_times, axis = 1)
+        closest_med = med_labels[closest_med_ind]
+        closest_med_times = np.min(patient_med_times, axis = 1)
+    else:
+        patient_med_times = patient_df[['ID','hex']].set_index('hex').join(config['transport_times']).set_index('ID')
+        closest_med_times = patient_med_times.min(axis = 1).values
+        closest_med = patient_med_times.idxmin(axis = 1).values
+        is_closest_csc = patient_med_times.idxmin(axis = 1).str.contains('CSC')
+        csc_transport_times = patient_med_times.filter(regex = 'CSC', axis = 1)
+        # patient_med_times = 
 
     last_well = patient_df['last_well'].values
 
@@ -216,11 +321,14 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     expanded_lvo_diagnosis = (expanded_lvo_status & (expanded_diagnosis_rng < expanded_sensitivity)) | (~expanded_lvo_status & (expanded_diagnosis_rng > expanded_specificity))
 
     ##################### Destination logic #############################
-
-    correct_destination = closest_med.copy()
-    correct_destination_ind = closest_med_ind.copy()
-    correct_destination[lvo_status & (last_well <= 24)] = 'CSC'
-    correct_destination_ind[lvo_status & (last_well <= 24)] = 0
+    correct_destination = closest_med.copy()    
+    if config is None:
+        correct_destination_ind = closest_med_ind.copy()
+        correct_destination[lvo_status & (last_well <= 24)] = 'CSC'
+        correct_destination_ind[lvo_status & (last_well <= 24)] = 0
+    else:
+        csc_correct_ind = lvo_status & (last_well <= 24)
+        correct_destination[csc_correct_ind] = csc_transport_times.iloc[csc_correct_ind].idxmin(axis = 1)
 
     destination_arr = np.broadcast_to(np.expand_dims(closest_med, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
@@ -229,10 +337,17 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     eligibility_arr = np.broadcast_to(np.expand_dims(eligible_patients, axis = 2), (num_patients, num_scenarios, num_thresholds))
     thresholds_arr = np.broadcast_to(thresholds, (num_patients, num_scenarios, num_thresholds))
-    additional_transport_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0] - closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    
+    if config is None:
+        additional_transport_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0] - closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
-    redirected_patients = eligibility_arr & (additional_transport_arr <= thresholds_arr)
-    destination_arr[redirected_patients] = 'CSC'
+        redirected_patients = eligibility_arr & (additional_transport_arr <= thresholds_arr)
+        destination_arr[redirected_patients] = 'CSC'
+    else:
+        additional_transport_arr = np.broadcast_to(np.expand_dims(csc_transport_times.min(axis = 1).values - closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+
+        redirected_patients = eligibility_arr & (additional_transport_arr <= thresholds_arr)
+        destination_arr[redirected_patients] = csc_transport_times.iloc[redirected_patients].idxmin(axis = 1).values
 
     ##################### Time variables ############################
     # Time to scene
@@ -241,14 +356,22 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     # Time at scene
     time_at_scene = 40 * rng.beta(2.91, 6.056, size = num_patients)
+    # time_at_scene = 40 * rng.gamma(shape = 4.9146291403, scale = 1/0.2563312894, size = num_patients)
+
     time_at_scene_arr = np.broadcast_to(np.expand_dims(time_at_scene, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
     # Time from scene to hospital
     time_to_hospital_arr = np.broadcast_to(np.expand_dims(closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
-    patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0], axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    if config is None:
+        patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0], axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
-    time_to_hospital_arr[redirected_patients] = patient_csc_times_arr[redirected_patients]
+        time_to_hospital_arr[redirected_patients] = patient_csc_times_arr[redirected_patients]
+    else:
+
+        patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times.filter(regex = 'CSC', axis = 1).min(axis = 1).values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+
+        time_to_hospital_arr[redirected_patients] = patient_csc_times_arr[redirected_patients]
 
     # Time aggregation
     time_in_system_arr = time_to_scene_arr + time_at_scene_arr + time_to_hospital_arr
@@ -274,9 +397,15 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     try:
         ivt_time_threshold = config['simulations_ivt_threshold']
         evt_time_threshold = config['simulations_evt_threshold']
+        ivt_probability = config['simulations_ivt_probability']
+        evt_probability = config['simulations_evt_probability']
+        early_repurfusion_probability = config['simulations_early_repurfusion_probability']
     except:
         ivt_time_threshold = 4.5 * 60
         evt_time_threshold = 24 * 60
+        ivt_probability = 0.55
+        evt_probability = 0.85
+        early_repurfusion_probability = 0.11
 
     lvo_status_arr = np.broadcast_to(np.expand_dims(lvo_status, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
@@ -286,20 +415,69 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     tia_arr = np.broadcast_to(np.expand_dims(patient_df['tia'].values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
-    IVTtime = lvo_status_arr * (lkw_to_door_arr + door2IVT) + ((~lvo_status_arr) & ischemic_arr) * (lkw_to_door_arr + door2IVT)
+    if config is None:
+        IVTtime = lvo_status_arr * (lkw_to_door_arr + door2IVT) + ((~lvo_status_arr) & ischemic_arr) * (lkw_to_door_arr + door2IVT)
 
-    EVTtime = lvo_status_arr * ((destination_arr == 'CSC') * (lkw_to_door_arr + door2EVT) +
-                               (destination_arr == 'PSC1') * (IVTtime + IVT2out + transtime1 + door2EVT2) +
-                               (destination_arr == 'PSC2') * (IVTtime + IVT2out + transtime2 + door2EVT2))
-    PrOut = (
-            lvo_status_arr * (((IVTtime < ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * (0.2359 + 0.0000002 * IVTtime**2 - 0.0004  * IVTtime)
-                          + (((IVTtime >= ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002*EVTtime)) +
-                          ((IVTtime < ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.5753 + 0.0000002 * IVTtime**2 + 0.00000004 * EVTtime**2 - 0.0004 * IVTtime - 0.0002*EVTtime - (0.2359 + 0.0000002 * IVTtime**2 - 0.0004 * IVTtime) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002 *EVTtime))
-                        + ((IVTtime >= ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * 0.129)
-            + ((~lvo_status_arr) & ischemic_arr) * ((IVTtime < ivt_time_threshold) * (0.6343 - 0.00000005 * IVTtime**2 - 0.0005 * IVTtime) + (IVTtime >= ivt_time_threshold) * 0.4622)
-            + (~lvo_status_arr & ~ischemic_arr & hemorrhaging_arr) * 0.24 
-            + (~lvo_status_arr & ~ischemic_arr & ~hemorrhaging_arr) * 0.9
+        EVTtime = lvo_status_arr * ((destination_arr == 'CSC') * (lkw_to_door_arr + door2EVT) +
+                                (destination_arr == 'PSC1') * (IVTtime + IVT2out + transtime1 + door2EVT2) +
+                                (destination_arr == 'PSC2') * (IVTtime + IVT2out + transtime2 + door2EVT2))
+    else:
+        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[CP]SC').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
+
+        csc_transfer_times = config['transfer_times'].filter(regex = 'CSC', axis = 1).min(axis = 1)
+        transtime = csc_transfer_times[destination_arr.flatten()].values.reshape((num_patients, num_scenarios, num_thresholds))
+
+        EVTtime = lvo_status_arr * (
+                            ((pd.Series(destination_arr.flatten()).str.contains('CSC').values).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2EVT))
+                            + ((pd.Series(destination_arr.flatten()).str.contains('PSC').values)).reshape((num_patients, num_scenarios, num_thresholds)) * 
+                            (lkw_to_door_arr + door2IVT + IVT2out + transtime + door2EVT2)
+        )
+        
+    ### Randomizing whether or not a patient receives IVT
+    try:
+        IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability)
+        IVTrepurfusion = lvo_status_arr & IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
+
+        EVTtreatment = lvo_status_arr & (EVTtime < evt_time_threshold) & (rng.random(EVTtime.shape) < evt_probability)
+    except:
+        IVTtreatment = np.ones_like(lvo_status_arr)
+        IVTrepurfusion = np.zeros_like(lvo_status_arr)
+        EVTtreatment = np.ones_like(lvo_status_arr)
+
+
+    ### Updating risk equations for mRS 0-2
+    lvo_base_prob_mRS_02 = 0.05 + 0.08 + 0.14
+    no_lvo_base_prob_mRS_02 = 0.13 + 0.19 + 0.12 
+    lvo_base_logit_mRS_02 = logit(lvo_base_prob_mRS_02)
+    no_lvo_base_logit_mRS_02 = logit(no_lvo_base_prob_mRS_02)
+
+    LogitOut = (lvo_status_arr * (IVTrepurfusion * (1.35 - 0.0026 * IVTtime + lvo_base_logit_mRS_02)
+                      + (~IVTrepurfusion & EVTtreatment) * (1.35 - 0.0026 * EVTtime + lvo_base_logit_mRS_02)
+                      + (~IVTrepurfusion & ~EVTtreatment) * lvo_base_logit_mRS_02
+                      )
+    + (~lvo_status_arr & ischemic_arr) * (IVTtreatment * (0.56 - 0.0019 * IVTtime + no_lvo_base_logit_mRS_02)
+                           + (~IVTtreatment) * no_lvo_base_logit_mRS_02)
+    + (~lvo_status_arr & ~ischemic_arr & hemorrhaging_arr) * logit(0.375)
+    + (~lvo_status_arr & ~ischemic_arr & ~hemorrhaging_arr) * logit(0.9)
     )
+
+    PrOut = expit(LogitOut)
+    ###
+
+
+    # PrOut = (
+    #         lvo_status_arr * (((IVTtime < ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * (0.2359 + 0.0000002 * IVTtime**2 - 0.0004  * IVTtime)
+    #                       + (((IVTtime >= ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002*EVTtime)) +
+    #                       ((IVTtime < ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.5753 + 0.0000002 * IVTtime**2 + 0.00000004 * EVTtime**2 - 0.0004 * IVTtime - 0.0002*EVTtime - (0.2359 + 0.0000002 * IVTtime**2 - 0.0004 * IVTtime) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002 *EVTtime))
+    #                     + ((IVTtime >= ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * 0.129)
+    #         + ((~lvo_status_arr) & ischemic_arr) * ((IVTtime < ivt_time_threshold) * (0.6343 - 0.00000005 * IVTtime**2 - 0.0005 * IVTtime) + (IVTtime >= ivt_time_threshold) * 0.4622)
+    #         + (~lvo_status_arr & ~ischemic_arr & hemorrhaging_arr) * 0.24 
+    #         + (~lvo_status_arr & ~ischemic_arr & ~hemorrhaging_arr) * 0.9
+    # )
+
+    ## Risk equation updates
+    ## stroke mimics - keep at 90% for now but will probably change
+    ## hemorrhaging - change to 0.375 for now
 
     ############### Data reorganization #################
     results_df = pd.DataFrame({
@@ -323,6 +501,9 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'time2Hospital': time_to_hospital_arr.flatten(),
         'IVTtime': IVTtime.flatten(),
         'EVTtime': EVTtime.flatten(),
+        'IVTtreatment': IVTtreatment.flatten(),
+        'EVTtreatment': EVTtreatment.flatten(),
+        'EarlyRepurfusion': IVTrepurfusion.flatten(),
         'PrOut': PrOut.flatten(),
         'xPSC': geoscale * np.repeat(med_coords[1,0], num_patients * num_scenarios * num_thresholds),
         'yPSC': geoscale * np.repeat(med_coords[1,1], num_patients * num_scenarios * num_thresholds),
@@ -334,8 +515,17 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     return results_df
 
 def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
+    config_found = False
+    try:
+        if config['hosp_coords'] is not None:
+            map_seeds = [0]
+            config_found = True
+    except:
+        pass
+    
     min_map = min(map_seeds)
     max_map = max(map_seeds)
+    
 
     if output_dir is None:
         output_dir = 'output'
