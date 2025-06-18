@@ -467,7 +467,7 @@ def get_map_points_threshold(med_coords, geoscale, drivespeed, threshold):
     # hull = ConvexHull(grid_within_threshold_points)
     return grid_points, grid_within_threshold_bools.reshape(x.shape)
 
-def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None, line_errorbars = False):
+def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None, line_errorbars = False, generated_map = True):
     '''
     Takes direct outputted pd.DataFrame (after destination type is added)
 
@@ -521,7 +521,8 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
 
         generate_line_graphs(time_df, output_path = output_dir, title_str = f"Map{map_number} Time", col_names = ['ivt_ischemic_mean', 'evt_lvo_mean'], additional_file_name = additional_file_name, differenced = heatmap_diff, save = save, errorbar = line_errorbars)
 
-        get_map_plot(sim_results, map_number = map_number, output_path = output_dir, threshold = threshold, additional_file_name=additional_file_name, save = save)
+        if generated_map:
+            get_map_plot(sim_results, map_number = map_number, output_path = output_dir, threshold = threshold, additional_file_name=additional_file_name, save = save)
 
     classification_metrics = ['overtriage','undertriage','overtriage_diff','undertriage_diff']
     time_metrics = ['ivt_ischemic_mean', 'evt_lvo_mean','ivt_ischemic_mean_diff','evt_lvo_mean_diff']

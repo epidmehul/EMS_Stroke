@@ -7,6 +7,7 @@ import pathlib
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seeds', help = 'number of random seeds', type = int, default = 40)
 parser.add_argument('-p', '--patients', help = 'number of patients', type = int, default = 1000)
+parser.add_argument('-c', '--num_cores', help = 'number of cores for mp.Pool', type = int, default = 1)
 args = parser.parse_args()
 
 # os.chdir('/proj/patellab/Sheps/output')
@@ -15,6 +16,7 @@ args = parser.parse_args()
 # sim_results = read_output('run_0_100.csv')
 
 current_dir = pathlib.Path('/work/users/p/w/pwlin/output/parquet_files')
+current_dir = pathlib.Path('/work/users/p/w/pwlin/output2/parquet_files')
 
 # file_names = [
 #     'run_0_100.csv',
@@ -29,7 +31,8 @@ current_dir = pathlib.Path('/work/users/p/w/pwlin/output/parquet_files')
 #     'run_900_1000.csv'
 # ]
 
-map_seeds = [i for i in range(1000)]
+# map_seeds = [i for i in range(1000)]
+map_seeds = [0]
 
 # def analyze_output_file(filepath):
 #     i = int(filepath.split('_')[1])
@@ -46,7 +49,7 @@ map_seeds = [i for i in range(1000)]
 def analyze_parquet(map_num):
     file_name = f'map_{str(map_num).zfill(3)}.parquet'
     df = read_output(pathlib.Path(current_dir) / file_name, save_format = 'parquet')
-    return single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output/results', line_errorbars = True) 
+    return single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output2/results', line_errorbars = True, generated_map = False) 
 
 def psc_analyze_parquet(map_num):
     file_name = f'map_{str(map_num).zfill(3)}.parquet'
@@ -64,18 +67,18 @@ if __name__ == '__main__':
     elif data_calcs_csv_path.exists():
         data_calcs_csv_path.unlink()
 
-    if not psc_calcs_csv_path.parent.exists():
-        psc_calcs_csv_path.parent.mkdir(parents = True)
-    elif psc_calcs_csv_path.exists():
-        psc_calcs_csv_path.unlink()
+    # if not psc_calcs_csv_path.parent.exists():
+    #     psc_calcs_csv_path.parent.mkdir(parents = True)
+    # elif psc_calcs_csv_path.exists():
+    #     psc_calcs_csv_path.unlink()
 
     maps_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/maps.csv')
     if maps_csv_path.exists():
         maps_csv_path.unlink()
-    with mp.Pool(25) as pool:
+    with mp.Pool(1) as pool:
         results = pool.map(analyze_parquet, map_seeds)
-        psc_results = pool.map(psc_analyze_parquet, map_seeds)
+        # psc_results = pool.map(psc_analyze_parquet, map_seeds)
     pd.concat(results, axis = 0).to_csv(data_calcs_csv_path, header = True, index = False, mode = 'w')
-    pd.concat(psc_results, axis = 0).to_csv(psc_calcs_csv_path, header = True, index = False, mode = 'w')
+    # pd.concat(psc_results, axis = 0).to_csv(psc_calcs_csv_path, header = True, index = False, mode = 'w')
     
         # pool.map(analyze_parquet, map_seeds)
