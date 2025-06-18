@@ -517,7 +517,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
     config_found = False
     try:
-        if config['hosp_coords'] is not None:
+        if config['transport_times'] is not None:
             map_seeds = [0]
             config_found = True
     except:
@@ -545,6 +545,54 @@ def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, 
             map_output_list.append(temp)
             # map_df = pd.concat((map_df, temp))
         map_output_df = pd.concat(map_output_list)
+        match save_format:
+            case 'csv':
+                if output_file.exists():
+                    map_output_df.to_csv(output_file, 
+                            mode = 'a',
+                            index = False,
+                            header = False)
+                else:
+                    map_output_df.to_csv(output_file,
+                                mode = 'w',
+                                index = False,
+                                header = True)
+            case 'parquet':
+                output_file = output_dir_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{str(i).zfill(3)}.parquet'
+                map_output_df.to_parquet(output_file, index = False)
+    return None
+
+def run_patient_simulations(map_seeds = [0], num_patients = 1000, patient_seeds = [0], save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
+    config_found = False
+    try:
+        if config['transport_times'] is not None:
+            map_seeds = [0]
+            config_found = True
+    except:
+        pass
+    
+    min_map = min(map_seeds)
+    max_map = max(map_seeds)
+    
+
+    if output_dir is None:
+        output_dir = 'output'
+    output_dir_path = pathlib.Path(output_dir)
+    if not output_dir_path.is_dir():
+        output_dir_path.mkdir(parents = True)
+    match save_format:
+        case 'csv':
+            output_file = output_dir_path / f'maps_{min_map}_{max_map}.csv'
+            if output_file.exists():
+                output_file.unlink()  
+    
+    for i in patient_seeds:
+        patient_output_list = []
+        for j in range(map_seeds):
+            temp = simulation(num_patients, patient_seed = i, map_seed = j, config = config)
+            patient_output_list.append(temp)
+            # map_df = pd.concat((map_df, temp))
+        map_output_df = pd.concat(patient_output_list)
         match save_format:
             case 'csv':
                 if output_file.exists():

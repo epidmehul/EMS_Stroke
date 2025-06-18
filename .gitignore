@@ -11,3 +11,4 @@ __pycache__/*
 !Scripts/*
 Scripts/__pycache__/*
 !config_files/*
+!input_data/*
