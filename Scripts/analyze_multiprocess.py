@@ -7,7 +7,7 @@ import pathlib
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--seeds', help = 'number of random seeds', type = int, default = 40)
 parser.add_argument('-p', '--patients', help = 'number of patients', type = int, default = 1000)
-parser.add_argument('-c', '--num_cores', help = 'number of cores for mp.Pool', type = int, default = 1)
+parser.add_argument('-c', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 1)
 args = parser.parse_args()
 
 # os.chdir('/proj/patellab/Sheps/output')
