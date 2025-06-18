@@ -75,7 +75,7 @@ if __name__ == '__main__':
     maps_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/maps.csv')
     if maps_csv_path.exists():
         maps_csv_path.unlink()
-    with mp.Pool(1) as pool:
+    with mp.Pool(args.n_cores) as pool:
         results = pool.map(analyze_parquet, map_seeds)
         # psc_results = pool.map(psc_analyze_parquet, map_seeds)
     pd.concat(results, axis = 0).to_csv(data_calcs_csv_path, header = True, index = False, mode = 'w')
