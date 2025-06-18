@@ -3,8 +3,8 @@
 #SBATCH -p general
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH --mem=8g
-#SBATCH -t 0:10:00
+#SBATCH --mem=1g
+#SBATCH -t 0:03:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J run_maps
 #SBATCH --mail-type=end
