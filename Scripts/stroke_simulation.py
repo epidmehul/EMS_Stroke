@@ -15,8 +15,8 @@ def data_to_config(patient_filestr, times_filestr):
     # Patient level data -- LKW and hex frequencies
     try:
         data = pd.read_csv(patient_filestr)
-        hex_config = dict(data.groupby(data['Hex']).size())
-        data['lkw_bins'] = pd.cut(data['LKW'], 
+        hex_config = dict(data.groupby(data['Location']).size())
+        data['lkw_bins'] = pd.cut(data['Duration_hrs'], 
             bins = [0, 1/60, 1/6, 2, 3.5, 8, 24, 48, 72])
         patient_config = {}
         lkw_info = data.groupby('lkw_bins').size()
@@ -65,7 +65,10 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'simulations_ivt_threshold': 270,
         'simulations_evt_threshold': 1440,
         'simulations_ivt_probability': 0.55,
-        'simulations_evt_probability': 0.85
+        'simulations_evt_probability': 0.85,
+        'csc_prefix': 'X',
+        'psc_prefix': 'Y',
+        'nsc_prefix': 'Z'
     }
     data_config, transport_times, transfer_times = data_to_config(patient_data_filestr, times_filestr)
     retval = params | config_override | data_config
@@ -298,8 +301,8 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         patient_med_times = patient_df[['ID','hex']].set_index('hex').join(config['transport_times']).set_index('ID')
         closest_med_times = patient_med_times.min(axis = 1).values
         closest_med = patient_med_times.idxmin(axis = 1).values
-        is_closest_csc = patient_med_times.idxmin(axis = 1).str.contains('CSC')
-        csc_transport_times = patient_med_times.filter(regex = 'CSC', axis = 1)
+        is_closest_csc = patient_med_times.idxmin(axis = 1).str.contains(config['csc_prefix'])
+        csc_transport_times = patient_med_times.filter(regex = config['csc_prefix'], axis = 1)
         # patient_med_times = 
 
     last_well = patient_df['last_well'].values
@@ -422,20 +425,20 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
                                 (destination_arr == 'PSC1') * (IVTtime + IVT2out + transtime1 + door2EVT2) +
                                 (destination_arr == 'PSC2') * (IVTtime + IVT2out + transtime2 + door2EVT2))
     else:
-        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[CP]SC').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
+        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
 
         csc_transfer_times = config['transfer_times'].filter(regex = 'CSC', axis = 1).min(axis = 1)
         transtime = csc_transfer_times[destination_arr.flatten()].values.reshape((num_patients, num_scenarios, num_thresholds))
 
         EVTtime = lvo_status_arr * (
-                            ((pd.Series(destination_arr.flatten()).str.contains('CSC').values).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2EVT))
-                            + ((pd.Series(destination_arr.flatten()).str.contains('PSC').values)).reshape((num_patients, num_scenarios, num_thresholds)) * 
+                            ((pd.Series(destination_arr.flatten()).str.contains(config['csc_prefix']).values).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2EVT))
+                            + ((pd.Series(destination_arr.flatten()).str.contains(config['psc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * 
                             (lkw_to_door_arr + door2IVT + IVT2out + transtime + door2EVT2)
         )
         
     ### Randomizing whether or not a patient receives IVT
     try:
-        IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(regex = '[CP]SC', axis = 1).reshape((num_patients, num_scenarios, num_thresholds))
+        IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(regex = '[' + config['csc_prefix'] + config['psc_prefix'] + ']', axis = 1).reshape((num_patients, num_scenarios, num_thresholds))
         IVTrepurfusion = lvo_status_arr & IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
 
         EVTtreatment = lvo_status_arr & (EVTtime < evt_time_threshold) & (rng.random(EVTtime.shape) < evt_probability)
