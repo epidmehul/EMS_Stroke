@@ -66,6 +66,7 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'simulations_evt_threshold': 1440,
         'simulations_ivt_probability': 0.55,
         'simulations_evt_probability': 0.85,
+        'simulations_early_repurfusion': 0.11,
         'csc_prefix': 'X',
         'psc_prefix': 'Y',
         'nsc_prefix': 'Z'
@@ -372,7 +373,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         time_to_hospital_arr[redirected_patients] = patient_csc_times_arr[redirected_patients]
     else:
 
-        patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times.filter(regex = 'CSC', axis = 1).min(axis = 1).values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+        patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times.filter(regex = config['csc_prefix'], axis = 1).min(axis = 1).values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
         time_to_hospital_arr[redirected_patients] = patient_csc_times_arr[redirected_patients]
 
@@ -425,9 +426,9 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
                                 (destination_arr == 'PSC1') * (IVTtime + IVT2out + transtime1 + door2EVT2) +
                                 (destination_arr == 'PSC2') * (IVTtime + IVT2out + transtime2 + door2EVT2))
     else:
-        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
+        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
 
-        csc_transfer_times = config['transfer_times'].filter(regex = 'CSC', axis = 1).min(axis = 1)
+        csc_transfer_times = config['transfer_times'].filter(regex = config['csc_prefix'], axis = 1).min(axis = 1)
         transtime = csc_transfer_times[destination_arr.flatten()].values.reshape((num_patients, num_scenarios, num_thresholds))
 
         EVTtime = lvo_status_arr * (
@@ -438,7 +439,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         
     ### Randomizing whether or not a patient receives IVT
     try:
-        IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(regex = '[' + config['csc_prefix'] + config['psc_prefix'] + ']', axis = 1).reshape((num_patients, num_scenarios, num_thresholds))
+        IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(regex = '[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']', axis = 1).reshape((num_patients, num_scenarios, num_thresholds))
         IVTrepurfusion = lvo_status_arr & IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
 
         EVTtreatment = lvo_status_arr & (EVTtime < evt_time_threshold) & (rng.random(EVTtime.shape) < evt_probability)
