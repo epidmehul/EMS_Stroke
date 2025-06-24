@@ -495,6 +495,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'closest_destination': np.broadcast_to(np.expand_dims(closest_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
         'x_coord': np.repeat(patient_df['x_coord'].values, num_scenarios * num_thresholds),
         'y_coord': np.repeat(patient_df['y_coord'].values, num_scenarios * num_thresholds),
+        'hex': np.repeat(patient_df['hex'].values, num_scenarios * num_thresholds),
         'map_number': np.full(num_patients * num_scenarios * num_thresholds, map_seed),
         'hasLVO': lvo_status_arr.flatten(),
         'lvo_diagnosis': np.broadcast_to(np.expand_dims(expanded_lvo_diagnosis, axis = 2), (num_patients, num_scenarios, num_thresholds)).flatten(),

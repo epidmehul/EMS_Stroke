@@ -93,7 +93,7 @@ def all_time_results(df):
     # Ischemic patients
     prehospital = time_results(df.loc[df['ischemic'], 'lkw2door'])
     ems_transport = time_results(df.loc[df['ischemic'],'time2Hospital'])
-    ivt = time_results(df.loc[(df['ischemic']) & (df['IVTtime'] <= 270),'IVTtime'])
+    ivt = time_results(df.loc[(df['ischemic']) & (df['IVTtime'] <= 270) & (df['IVTtreatment']),'IVTtime'])
     evt = time_results(df.loc[df['ischemic'],'EVTtime'])
     for key in ['mean', 'std', 'median', 'iqr', 'min', 'max']:
         retval['prehospital_ischemic_' + key] = prehospital[key]
@@ -104,8 +104,8 @@ def all_time_results(df):
     # LVO patients
     prehospital = time_results(df.loc[df['hasLVO'], 'lkw2door'])
     ems_transport = time_results(df.loc[df['hasLVO'],'time2Hospital'])
-    ivt = time_results(df.loc[df['hasLVO'],'IVTtime'])
-    evt = time_results(df.loc[(df['hasLVO']) & (df['EVTtime'] <= 24 * 60),'EVTtime'])
+    ivt = time_results(df.loc[df['hasLVO'] & df['IVTtreatment'] & (df['IVTtime'] <= 270),'IVTtime'])
+    evt = time_results(df.loc[(df['hasLVO']) & (df['EVTtime'] <= 24 * 60) & (df['EVTtreatment']),'EVTtime'])
     for key in ['mean', 'std', 'median', 'iqr', 'min', 'max']:
         retval['prehospital_lvo_' + key] = prehospital[key]
         retval['ems_transport_lvo_' + key] = ems_transport[key]
