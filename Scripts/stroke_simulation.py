@@ -302,8 +302,10 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         patient_med_times = patient_df[['ID','hex']].set_index('hex').join(config['transport_times']).set_index('ID')
         closest_med_times = patient_med_times.min(axis = 1).values
         closest_med = patient_med_times.idxmin(axis = 1).values
-        is_closest_csc = patient_med_times.idxmin(axis = 1).str.contains(config['csc_prefix'])
+        # is_closest_csc = patient_med_times.idxmin(axis = 1).str.contains(config['csc_prefix'])
         csc_transport_times = patient_med_times.filter(regex = config['csc_prefix'], axis = 1)
+        if len(csc_transport_times) == 1:
+            csc_transport_times = np.expand_dims(csc_transport_times, axis = 1)
         # patient_med_times = 
 
     last_well = patient_df['last_well'].values
