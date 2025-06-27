@@ -1,0 +1,66 @@
+patients_none_all: 0.6765
+patients_tia_all: 0.0795
+patients_hemorrhaging_all: 0.042
+patients_ischemic_all: 0.202
+patients_lvo_ischemic: 0.241
+
+# patients_num_lkw_bins: 5
+patients_lkw_bins:
+  0:  
+    prob: 0.0015
+    dist: rng.uniform
+    kwargs:
+      low: 0
+      high: 0.0167
+  1:
+    prob: 0.0275
+    dist: rng.uniform
+    kwargs:
+      low: 0.0167
+      high: 0.1667
+  2:
+    prob: 0.6059
+    dist: rng.uniform
+    kwargs:
+      low: 0.1667
+      high: 2
+  3:
+    prob: 2.5165
+    dist: rng.uniform
+    kwargs:
+      low: 2
+      high: 3.5
+  4:
+    prob: 0.0601
+    dist: rng.uniform
+    kwargs:
+      low: 3.5
+      high: 8
+  5:
+    prob: 0.1508
+    dist: rng.uniform
+    kwargs:
+      low: 8
+      high: 24
+  6:
+    prob: 0.0776
+    dist: rng.uniform
+    kwargs:
+      low: 24
+      high: 48
+  7:
+    prob: 0.0514
+    dist: rng.uniform
+    kwargs:
+      low: 48
+      high: 72
+
+simulations_ivt_threshold: 270
+simulations_evt_threshold: 360
+simulations_evt_threshold2: 1440
+simulations_ivt_probability: 0.55
+simulations_evt_probability: 0.85
+
+csc_prefix: 'CSC'
+psc_prefix: 'PSC'
+nsc_prefix: 'NSC'

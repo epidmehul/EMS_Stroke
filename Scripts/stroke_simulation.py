@@ -15,8 +15,8 @@ def data_to_config(patient_filestr, times_filestr):
     # Patient level data -- LKW and hex frequencies
     try:
         data = pd.read_csv(patient_filestr)
-        hex_config = dict(data.groupby(data['Location']).size())
-        data['lkw_bins'] = pd.cut(data['Duration_hrs'], 
+        hex_config = dict(data.groupby(data['hex']).size())
+        data['lkw_bins'] = pd.cut(data['last_well'], 
             bins = [0, 1/60, 1/6, 2, 3.5, 8, 24, 48, 72])
         patient_config = {}
         lkw_info = data.groupby('lkw_bins').size()
