@@ -1,6 +1,5 @@
 from stroke_simulation import *
 from postprocess_simulation_results import *
-import os
 import multiprocessing as mp
 import argparse
 import pathlib
