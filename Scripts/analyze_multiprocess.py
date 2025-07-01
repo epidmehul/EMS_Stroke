@@ -60,8 +60,8 @@ def psc_analyze_parquet(map_num):
 
 if __name__ == '__main__':
     # pool = mp.Pool(10)
-    data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/all_results.csv')
-    psc_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/psc_results.csv')
+    data_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/output2/all_results.csv')
+    psc_calcs_csv_path = pathlib.Path('/work/users/p/w/pwlin/output2/psc_results.csv')
     if not data_calcs_csv_path.parent.exists():
         data_calcs_csv_path.parent.mkdir(parents = True)
     elif data_calcs_csv_path.exists():
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # elif psc_calcs_csv_path.exists():
     #     psc_calcs_csv_path.unlink()
 
-    maps_csv_path = pathlib.Path('/work/users/p/w/pwlin/output/maps.csv')
+    maps_csv_path = pathlib.Path('/work/users/p/w/pwlin/output2/maps.csv')
     if maps_csv_path.exists():
         maps_csv_path.unlink()
     with mp.Pool(args.n_cores) as pool:

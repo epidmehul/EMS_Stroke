@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.2
 source ~/strokes_venv/bin/activate
-python ../Scripts/run_simulation_multiprocess.py -s 40 -p 1000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv
+python ../Scripts/run_simulation_multiprocess.py -s 100 -p 1000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv
