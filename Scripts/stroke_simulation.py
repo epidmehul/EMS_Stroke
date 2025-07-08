@@ -570,14 +570,6 @@ def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, 
     return None
 
 def run_patient_simulations(map_seeds = [0], num_patients = 1000, patient_seeds = [0], save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
-    config_found = False
-    try:
-        if config['transport_times'] is not None:
-            map_seeds = [0]
-            config_found = True
-    except:
-        pass
-    
     min_map = min(map_seeds)
     max_map = max(map_seeds)
     
