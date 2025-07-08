@@ -18,7 +18,7 @@ map_seeds = [args.map_seed]
 
 num_cores = args.n_cores
 
-map_seeds = [i for i in range(1000)]
+# map_seeds = [i for i in range(1000)]
 patient_seeds = [i for i in range(args.seeds)]
 output_dir = '/work/users/p/w/pwlin/output2/parquet_files'
 
