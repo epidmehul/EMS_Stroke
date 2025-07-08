@@ -11,9 +11,10 @@ parser.add_argument('-c', '--config', help = 'config file with simulation parame
 parser.add_argument('-d', '--data', help = 'data file containing patient information on hexes and LKW times', type = pathlib.Path, default = None)
 parser.add_argument('-t', '--times', help = 'data file containing travel times from hexes and hospitals to hospitals', type = pathlib.Path, default = None)
 parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
+parser.add_argument('-m', '--map_seed', help = 'map number to save results under', type = int, default = 0)
 args = parser.parse_args()
 
-map_seeds = [0]
+map_seeds = [args.map_seed]
 
 num_cores = args.n_cores
 
@@ -23,8 +24,6 @@ output_dir = '/work/users/p/w/pwlin/output2/parquet_files'
 
 try:
     config_dict = read_config(args.config, args.data, args.times)
-    if config_dict['hexes'] is not None:
-        map_seeds = [0]
 except:
     config_dict = None
 
