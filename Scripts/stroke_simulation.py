@@ -522,13 +522,6 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     return results_df
 
 def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
-    config_found = False
-    try:
-        if config['transport_times'] is not None:
-            map_seeds = [0]
-            config_found = True
-    except:
-        pass
     
     min_map = min(map_seeds)
     max_map = max(map_seeds)
