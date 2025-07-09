@@ -35,6 +35,13 @@ def analyze_parquet(cohort_option):
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
     return single_map_analysis_output(df, map_number = map_num, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output2/results', line_errorbars = True, generated_map = False) 
 
+def run_analyze(cohort_option):
+    map_seed, num_cohorts, num_patients = cohort_option
+    run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
+    file_name = f'map_{str(map_seed).zfill(3)}.parquet'
+    df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
+    return single_map_analysis_output(df, map_number = map_seed, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output2/results', line_errorbars = True, generated_map = False) 
+
 if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)
     data_calcs_csv_path = pathlib.Path(output_dir_path.parent / 'all_results.csv')
@@ -43,6 +50,5 @@ if __name__ == '__main__':
     if not data_calcs_csv_path.parent.exists():
         data_calcs_csv_path.parent.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
-        pool.map(run_map_combo, cohort_list)
-        pool.map(analyze_parquet, cohort_list)
+        pool.map(run_analyze, cohort_list)
         
