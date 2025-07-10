@@ -3,7 +3,7 @@
 #SBATCH -p general
 #SBATCH -N 1
 #SBATCH -n 5
-#SBATCH --mem=96g
+#SBATCH --mem=112g
 #SBATCH -t 4:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J run_analyze_combo
