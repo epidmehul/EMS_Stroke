@@ -65,6 +65,8 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     _, intervals = calculate_intervals(pd.concat(time_df_list), width = args.width)
 
     output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
+    if not output_dir.exists():
+        output_dir.mkdir(parents = True)
     output_file = output_dir / f'map_{map_number}.xlsx'
     try:
         with pd.ExcelWriter(output_file) as writer:
