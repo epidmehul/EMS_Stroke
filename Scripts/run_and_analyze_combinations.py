@@ -10,6 +10,7 @@ parser.add_argument('-d', '--data', help = 'data file containing patient informa
 parser.add_argument('-t', '--times', help = 'data file containing travel times from hexes and hospitals to hospitals', type = pathlib.Path, default = None)
 parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
 parser.add_argument('-f', '--cohort_file', help = 'file containing the cohort configurations and map seed number', type = pathlib.Path)
+parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.9)
 args = parser.parse_args()
 
 num_cores = args.n_cores
@@ -43,6 +44,42 @@ def run_analyze(cohort_option):
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
     return single_map_analysis_output(df, map_number = map_seed, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output2/results', line_errorbars = True, generated_map = False) 
 
+def get_time_ci(df, map_number, output_dir_str = None,):
+    seeds = df['seed'].unique()
+    time_df_list = []
+    for seed in seeds:
+        time_outcomes = {}
+        df_dicts = map_df_to_dict(df, None, seed)
+        time_outcomes['base'] = all_time_results(df_dicts['base'])
+        for i in ('high', 'mid', 'low'):
+            for thresh in range(10, 70, 10):
+                small_df = df_dicts[i + '_sens_' +str(thresh)]
+                ivt = small_df.loc[(small_df['ischemic'] & small_df['IVTtime'] <= 270 & small_df['IVTtreatment']), 'IVTtime']
+                evt = small_df.loc[(small_df['hasLVO'] & small_df['EVTtime'] <= 24 * 60 & small_df['EVTtreatment']), 'EVTtime']
+                time_outcomes[i + '_sens_' + str(thresh)] = {
+                    'ivt_ischemic_mean': ivt.mean(),
+                    'evt_lvo_mean': evt.mean()
+                }
+        time_df = pd.DataFrame.from_dict(time_outcomes).transpose()
+        time_df_list.append(add_differences_columns(get_thresholds_sensitivities(time_df)))
+    _, intervals = calculate_intervals(pd.concat(time_df_list), width = args.width)
+
+    output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
+    output_file = output_dir / f'map_{map_number}.xlsx'
+    try:
+        with pd.ExcelWriter(output_file) as writer:
+            intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    except:
+        print(f'{output_file} failed to write excel')
+    return intervals
+
+def run_analyze_time_ci_widths(cohort_option):
+    map_seed, num_cohorts, num_patients = cohort_option
+    run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
+    file_name = f'map_{str(map_seed).zfill(3)}.parquet'
+    df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
+    return get_time_ci(df, map_number = map_seed, output_dir_str = '/work/users/p/w/pwlin/output2/results') 
+
 if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)
     data_calcs_csv_path = pathlib.Path(output_dir_path.parent / 'all_results.csv')
@@ -51,5 +88,5 @@ if __name__ == '__main__':
     if not data_calcs_csv_path.parent.exists():
         data_calcs_csv_path.parent.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
-        pool.map(run_analyze, cohort_list)
+        pool.map(run_analyze_time_ci_widths, cohort_list)
         
