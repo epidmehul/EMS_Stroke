@@ -3,6 +3,7 @@ __pycache__/*
 .ipynb_checkpoints/*
 *.csv
 *.ipynb
+*.parquet
 */*
 
 !ESTTM_old/*

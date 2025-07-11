@@ -51,6 +51,15 @@ def get_time_ci(df, map_number, output_dir_str = None,):
         time_outcomes = {}
         df_dicts = map_df_to_dict(df, None, seed)
         time_outcomes['base'] = all_time_results(df_dicts['base'])
+
+        small_df = df_dicts['base']
+        ivt = small_df.loc[(small_df['ischemic'] & small_df['IVTtime'] <= 270 & small_df['IVTtreatment']), 'IVTtime']
+        evt = small_df.loc[(small_df['hasLVO'] & small_df['EVTtime'] <= 24 * 60 & small_df['EVTtreatment']), 'EVTtime']
+        time_outcomes['base'] = {
+            'ivt_ischemic_mean': ivt.mean(),
+            'evt_lvo_mean': evt.mean()
+        }
+
         for i in ('high', 'mid', 'low'):
             for thresh in range(10, 70, 10):
                 small_df = df_dicts[i + '_sens_' +str(thresh)]
@@ -63,24 +72,35 @@ def get_time_ci(df, map_number, output_dir_str = None,):
         time_df = pd.DataFrame.from_dict(time_outcomes).transpose()
         time_df_list.append(add_differences_columns(get_thresholds_sensitivities(time_df)))
     _, intervals = calculate_intervals(pd.concat(time_df_list), width = args.width)
+    upper_ci = intervals.loc[:,pd.IndexSlice[:, 1-(1-args.width)/2]]
+    lower_ci = intervals.loc[:,pd.IndexSlice[:, (1-args.width)/2]]
 
-    output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
-    if not output_dir.exists():
-        output_dir.mkdir(parents = True)
-    output_file = output_dir / f'map_{map_number}.xlsx'
-    try:
-        with pd.ExcelWriter(output_file) as writer:
-            intervals.to_excel(writer, sheet_name = 'Time metric intervals')
-    except:
-        print(f'{output_file} failed to write excel')
-    return intervals
+    upper_ci.columns = upper_ci.columns.droplevel(1)
+    lower_ci.columns = lower_ci.columns.droplevel(1)
+    ci_widths = (upper_ci - lower_ci).mean(axis = 0)
+
+    # output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
+    # if not output_dir.exists():
+    #     output_dir.mkdir(parents = True)
+    # output_file = output_dir / f'map_{map_number}.xlsx'
+    # try:
+    #     with pd.ExcelWriter(output_file) as writer:
+    #         intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    # except:
+    #     print(f'{output_file} failed to write excel')
+    return ci_widths
 
 def run_analyze_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
     run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
     file_name = f'map_{str(map_seed).zfill(3)}.parquet'
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
-    return get_time_ci(df, map_number = map_seed, output_dir_str = '/work/users/p/w/pwlin/output2/results') 
+    ci_width =  get_time_ci(df, map_number = map_seed, output_dir_str = '/work/users/p/w/pwlin/output2/results') 
+
+    ci_width['map'] = map_seed
+    ci_width['num_cohorts'] = num_cohorts
+    ci_width['num_patients'] = num_patients
+    return pd.DataFrame(ci_widths.reindex(index = ['x1', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()
 
 if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)
@@ -90,5 +110,6 @@ if __name__ == '__main__':
     if not data_calcs_csv_path.parent.exists():
         data_calcs_csv_path.parent.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
-        pool.map(run_analyze_time_ci_widths, cohort_list)
+        ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
+    pd.concat(ci_widths).set_index('map').to_csv(output_dir_path.parent / 'avg_ci_widths.csv')
         
