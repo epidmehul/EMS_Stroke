@@ -107,6 +107,7 @@ if __name__ == '__main__':
     if not output_dir_path.exists():
         output_dir_path.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
-        ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
-    pd.concat(ci_widths).to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
+        pool.map(run_analyze, cohort_list)
+        # ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
+    # pd.concat(ci_widths).to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
         
