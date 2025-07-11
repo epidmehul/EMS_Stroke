@@ -100,7 +100,7 @@ def run_analyze_time_ci_widths(cohort_option):
     ci_width['map'] = map_seed
     ci_width['num_cohorts'] = num_cohorts
     ci_width['num_patients'] = num_patients
-    return pd.DataFrame(ci_widths.reindex(index = ['x1', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()
+    return pd.DataFrame(ci_width.reindex(index = ['x1', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()
 
 if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)
