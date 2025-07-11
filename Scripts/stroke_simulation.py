@@ -440,15 +440,16 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         )
         
     ### Randomizing whether or not a patient receives IVT
-    try:
-        IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(regex = '[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']', axis = 1).reshape((num_patients, num_scenarios, num_thresholds))
-        IVTrepurfusion = lvo_status_arr & IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
+    # try:
+    IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(regex = '[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']', axis = 1).reshape((num_patients, num_scenarios, num_thresholds))
 
-        EVTtreatment = lvo_status_arr & (EVTtime < evt_time_threshold) & (rng.random(EVTtime.shape) < evt_probability)
-    except:
-        IVTtreatment = np.ones_like(lvo_status_arr)
-        IVTrepurfusion = np.zeros_like(lvo_status_arr)
-        EVTtreatment = np.ones_like(lvo_status_arr)
+    IVTrepurfusion = ischemic_arr & IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
+
+    EVTtreatment = lvo_status_arr & (EVTtime < evt_time_threshold) & (rng.random(EVTtime.shape) < evt_probability) & ~IVTrepurfusion
+    # except:
+    #     IVTtreatment = np.ones_like(lvo_status_arr)
+    #     IVTrepurfusion = np.zeros_like(lvo_status_arr)
+    #     EVTtreatment = np.ones_like(lvo_status_arr)
 
 
     ### Updating risk equations for mRS 0-2
