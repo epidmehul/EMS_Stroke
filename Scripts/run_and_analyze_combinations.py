@@ -104,11 +104,8 @@ def run_analyze_time_ci_widths(cohort_option):
 
 if __name__ == '__main__':
     output_dir_path = pathlib.Path(output_dir)
-    data_calcs_csv_path = pathlib.Path(output_dir_path.parent / 'all_results.csv')
     if not output_dir_path.exists():
         output_dir_path.mkdir(parents = True)
-    if not data_calcs_csv_path.parent.exists():
-        data_calcs_csv_path.parent.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
         ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
     pd.concat(ci_widths).set_index('map').to_csv(output_dir_path.parent / 'avg_ci_widths.csv')
