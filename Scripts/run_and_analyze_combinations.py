@@ -79,15 +79,15 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     lower_ci.columns = lower_ci.columns.droplevel(1)
     ci_widths = (upper_ci - lower_ci).mean(axis = 0)
 
-    output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
-    if not output_dir.exists():
-        output_dir.mkdir(parents = True)
-    output_file = output_dir / f'map_{map_number}.xlsx'
-    try:
-        with pd.ExcelWriter(output_file) as writer:
-            intervals.to_excel(writer, sheet_name = 'Time metric intervals')
-    except:
-        print(f'{output_file} failed to write excel')
+    # output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
+    # if not output_dir.exists():
+    #     output_dir.mkdir(parents = True)
+    # output_file = output_dir / f'map_{map_number}.xlsx'
+    # try:
+    #     with pd.ExcelWriter(output_file) as writer:
+    #         intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    # except:
+    #     print(f'{output_file} failed to write excel')
     return ci_widths
 
 def run_analyze_time_ci_widths(cohort_option):

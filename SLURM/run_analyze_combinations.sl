@@ -3,7 +3,7 @@
 #SBATCH -N 1
 #SBATCH -n 5
 #SBATCH --mem=100g
-#SBATCH -t 1:00:00
+#SBATCH -t 2:00:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J run_analyze_combo
 #SBATCH --mail-type=end
