@@ -108,6 +108,17 @@ if __name__ == '__main__':
         output_dir_path.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
         pool.map(run_analyze, cohort_list)
+    ivt_widths = []
+    evt_widths = []
+    for i in range(len(cohort_list)):
+        map_number = cohort_list[i][0]
+        temp_data = pd.read_excel(output_dir_path.parent / 'results' / f'map_{str(map_number).zfill(3)}' / f'map_{map_number}.xlsx', 
+                                  sheet_name = 'Time metric intervals')
+        ivt_widths.append(temp_data.loc[:,['ivt_ischemic_mean', 0.95]] - temp_data.loc[:,['ivt_ischemic_mean', 0.05]])
+        evt_widths.append(temp_data.loc[:,['evt_lvo_mean', 0.95]] - temp_data.loc[:,['evt_lvo_mean', 0.05]])
+    cohort_runs['ivt_widths'] = ivt_widths
+    cohort_runs['evt_widths'] = evt_widths
+    cohort_runs.to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
         # ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
     # pd.concat(ci_widths).to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
         
