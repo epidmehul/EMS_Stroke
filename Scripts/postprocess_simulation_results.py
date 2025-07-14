@@ -7,6 +7,7 @@ from matplotlib import colors
 import pathlib
 from scipy.spatial import distance
 from scipy.spatial import Voronoi, voronoi_plot_2d
+from scipy import stats
 from stroke_simulation import *
 import openpyxl
 
@@ -272,6 +273,20 @@ def calculate_intervals(df, width = 0.9):
         return None, None
     return retval_0, retval_1    
 
+def calculate_intervals_theoretical(df, width = 0.9):
+    try:
+        alpha = (1-width) / 2
+        grouped_df = df.groupby(['sensitivity','threshold'], observed = True)
+        k = grouped_df.count()
+        means = grouped_df.mean()
+        var = grouped_df.var()
+        ci_lower = means - stats.t.ppf(1 - alpha, df = k - 1) * np.sqrt(var / k)
+        ci_upper = means + stats.t.ppf(1 - alpha, df = k - 1) * np.sqrt(var / k)
+        return means, pd.DataFrame({alpha: ci_lower, 1-alpha: ci_upper})
+    except:
+        return None, None
+        
+
 def generate_heatmap(df, title_str = "", col_names = None, differenced = False, save = False, additional_file_name = '', output_path = None):
     '''
     Generate the heatmap visualization of the differences when averaged across random seeds
@@ -467,7 +482,7 @@ def get_map_points_threshold(med_coords, geoscale, drivespeed, threshold):
     # hull = ConvexHull(grid_within_threshold_points)
     return grid_points, grid_within_threshold_bools.reshape(x.shape)
 
-def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None, line_errorbars = False, generated_map = True):
+def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True, save = True, output_dir_str = None, additional_file_name = '', threshold = None, line_errorbars = False, generated_map = True, theoretical_ci = False):
     '''
     Takes direct outputted pd.DataFrame (after destination type is added)
 
@@ -480,9 +495,14 @@ def single_map_analysis_output(sim_results, map_number = 0, heatmap_diff = True,
     # print('map_number',map_number)
     class_df, time_df, mRS_df = single_map_results(sim_results, map_number = map_number)
 
-    class_mean_df, class_intervals_df = calculate_intervals(class_df)
-    time_mean_df, time_intervals_df = calculate_intervals(time_df)
-    mRS_mean_df, mRS_intervals_df = calculate_intervals(mRS_df)
+    if not theoretical_ci:
+        class_mean_df, class_intervals_df = calculate_intervals(class_df)
+        time_mean_df, time_intervals_df = calculate_intervals(time_df)
+        mRS_mean_df, mRS_intervals_df = calculate_intervals(mRS_df)
+    else:
+        class_mean_df, class_intervals_df = calculate_intervals_theoretical(class_df)
+        time_mean_df, time_intervals_df = calculate_intervals_theoretical(time_df)
+        mRS_mean_df, mRS_intervals_df = calculate_intervals_theoretical(mRS_df)
 
     if save:
         if output_dir_str is None:

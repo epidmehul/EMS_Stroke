@@ -42,7 +42,7 @@ def run_analyze(cohort_option):
     run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
     file_name = f'map_{str(map_seed).zfill(3)}.parquet'
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
-    return single_map_analysis_output(df, map_number = map_seed, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output2/results', line_errorbars = True, generated_map = False) 
+    return single_map_analysis_output(df, map_number = map_seed, heatmap_diff = True, save = True, output_dir_str = '/work/users/p/w/pwlin/output2/results', line_errorbars = True, generated_map = False, theoretical_ci = True) 
 
 def get_time_ci(df, map_number, output_dir_str = None,):
     seeds = df['seed'].unique()
