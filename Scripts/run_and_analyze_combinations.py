@@ -109,15 +109,30 @@ if __name__ == '__main__':
     with mp.Pool(num_cores) as pool:
         pool.map(run_analyze, cohort_list)
     ivt_widths = []
+    ivt_diff_widths = []
     evt_widths = []
+    evt_diff_widths = []
     for i in range(len(cohort_list)):
         map_number = cohort_list[i][0]
         temp_data = pd.read_excel(output_dir_path.parent / 'results' / f'map_{str(map_number).zfill(3)}' / f'map_{map_number}.xlsx', 
-                                  sheet_name = 'Time metric intervals')
-        ivt_widths.append(temp_data.loc[:,['ivt_ischemic_mean', '0.95']] - temp_data.loc[:,['ivt_ischemic_mean', '0.05']])
-        evt_widths.append(temp_data.loc[:,['evt_lvo_mean', '0.95']] - temp_data.loc[:,['evt_lvo_mean', '0.05']])
+                                  sheet_name = 'Time metric intervals',
+                                  header = [0, 1],
+                                  index_col = [0, 1])
+        ivt_ci = temp_data['ivt_ischemic_mean'].values
+        ivt_diff_ci = temp_data['ivt_ischemic_mean_diff'].values
+        evt_ci = temp_data['evt_lvo_mean'].values
+        evt_diff_ci = temp_data['evt_lvo_mean_diff'].values
+
+        ivt_widths.append((ivt_ci[:, 1] - ivt_ci[:, 0]).mean())
+        ivt_diff_widths.append((ivt_diff_ci[:, 1] - ivt_diff_ci[:, 0]).mean())
+        evt_widths.append((evt_ci[:, 1] - evt_ci[:, 0]).mean())
+        evt_diff_widths.append((evt_diff_ci[:, 1] - evt_diff_ci[:, 0]).mean())
+        # ivt_widths.append(temp_data.loc[:,['ivt_ischemic_mean', '0.95']] - temp_data.loc[:,['ivt_ischemic_mean', '0.05']])
+        # evt_widths.append(temp_data.loc[:,['evt_lvo_mean', '0.95']] - temp_data.loc[:,['evt_lvo_mean', '0.05']])
     cohort_runs['ivt_widths'] = ivt_widths
+    cohort_runs['ivt_diff_widths'] = ivt_diff_widths
     cohort_runs['evt_widths'] = evt_widths
+    cohort_runs['evt_diff_widths'] = evt_diff_widths
     cohort_runs.to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
         # ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
     # pd.concat(ci_widths).to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)

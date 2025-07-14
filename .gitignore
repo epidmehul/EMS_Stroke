@@ -4,6 +4,7 @@ __pycache__/*
 *.csv
 *.ipynb
 *.parquet
+*.xlsx
 */*
 
 !ESTTM_old/*
