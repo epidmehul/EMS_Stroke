@@ -3,6 +3,7 @@ from postprocess_simulation_results import *
 import multiprocessing as mp
 import argparse
 import pathlib
+from scipy import stats
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config', help = 'config file with simulation parameters', type = pathlib.Path, default = None)
@@ -50,11 +51,10 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     for seed in seeds:
         time_outcomes = {}
         df_dicts = map_df_to_dict(df, None, seed)
-        time_outcomes['base'] = all_time_results(df_dicts['base'])
 
         small_df = df_dicts['base']
         ivt = small_df.loc[(small_df['ischemic'] & small_df['IVTtime'] <= 270 & small_df['IVTtreatment']), 'IVTtime']
-        evt = small_df.loc[(small_df['hasLVO'] & small_df['EVTtime'] <= 24 * 60 & small_df['EVTtreatment']), 'EVTtime']
+        evt = small_df.loc[(small_df['hasLVO']) & (small_df['EVTtime'] <= 24 * 60) & (small_df['EVTtreatment']),'EVTtime']
         time_outcomes['base'] = {
             'ivt_ischemic_mean': ivt.mean(),
             'evt_lvo_mean': evt.mean()
@@ -64,20 +64,23 @@ def get_time_ci(df, map_number, output_dir_str = None,):
             for thresh in range(10, 70, 10):
                 small_df = df_dicts[i + '_sens_' +str(thresh)]
                 ivt = small_df.loc[(small_df['ischemic'] & small_df['IVTtime'] <= 270 & small_df['IVTtreatment']), 'IVTtime']
-                evt = small_df.loc[(small_df['hasLVO'] & small_df['EVTtime'] <= 24 * 60 & small_df['EVTtreatment']), 'EVTtime']
+                evt = small_df.loc[(small_df['hasLVO']) & (small_df['EVTtime'] <= 24 * 60) & (small_df['EVTtreatment']),'EVTtime']
                 time_outcomes[i + '_sens_' + str(thresh)] = {
                     'ivt_ischemic_mean': ivt.mean(),
                     'evt_lvo_mean': evt.mean()
                 }
         time_df = pd.DataFrame.from_dict(time_outcomes).transpose()
         time_df_list.append(add_differences_columns(get_thresholds_sensitivities(time_df)))
-    _, intervals = calculate_intervals(pd.concat(time_df_list), width = args.width)
-    upper_ci = intervals.loc[:,pd.IndexSlice[:, 1-(1-args.width)/2]]
-    lower_ci = intervals.loc[:,pd.IndexSlice[:, (1-args.width)/2]]
+    full_time_df = pd.concat(time_df_list)
+    vars = full_time_df.groupby(['sensitivity','threshold']).var()
+    half_widths = (stats.t.ppf(1 - (1-args.width)/2, df = seeds.shape[0] - 1) * np.sqrt(vars / (seeds.shape[0]))).mean()
+    
+    # upper_ci = intervals.loc[:,pd.IndexSlice[:, 1-(1-args.width)/2]]
+    # lower_ci = intervals.loc[:,pd.IndexSlice[:, (1-args.width)/2]]
 
-    upper_ci.columns = upper_ci.columns.droplevel(1)
-    lower_ci.columns = lower_ci.columns.droplevel(1)
-    ci_widths = (upper_ci - lower_ci).mean(axis = 0)
+    # upper_ci.columns = upper_ci.columns.droplevel(1)
+    # lower_ci.columns = lower_ci.columns.droplevel(1)
+    # ci_widths = (upper_ci - lower_ci).mean(axis = 0)
 
     # output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
     # if not output_dir.exists():
@@ -88,7 +91,7 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     #         intervals.to_excel(writer, sheet_name = 'Time metric intervals')
     # except:
     #     print(f'{output_file} failed to write excel')
-    return ci_widths
+    return half_widths
 
 def run_analyze_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
@@ -107,33 +110,34 @@ if __name__ == '__main__':
     if not output_dir_path.exists():
         output_dir_path.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
-        pool.map(run_analyze, cohort_list)
-    ivt_widths = []
-    ivt_diff_widths = []
-    evt_widths = []
-    evt_diff_widths = []
-    for i in range(len(cohort_list)):
-        map_number = cohort_list[i][0]
-        temp_data = pd.read_excel(output_dir_path.parent / 'results' / f'map_{str(map_number).zfill(3)}' / f'map_{map_number}.xlsx', 
-                                  sheet_name = 'Time metric intervals',
-                                  header = [0, 1],
-                                  index_col = [0, 1])
-        ivt_ci = temp_data['ivt_ischemic_mean'].values
-        ivt_diff_ci = temp_data['ivt_ischemic_mean_diff'].values
-        evt_ci = temp_data['evt_lvo_mean'].values
-        evt_diff_ci = temp_data['evt_lvo_mean_diff'].values
+        results = pool.map(run_analyze_time_ci_widths, cohort_list)
+    pd.concat(results).to_csv(output_dir_path.parent / 'avg_ci_half_widths.csv', index = False)
+    # ivt_widths = []
+    # ivt_diff_widths = []
+    # evt_widths = []
+    # evt_diff_widths = []
+    # for i in range(len(cohort_list)):
+    #     map_number = cohort_list[i][0]
+    #     temp_data = pd.read_excel(output_dir_path.parent / 'results' / f'map_{str(map_number).zfill(3)}' / f'map_{map_number}.xlsx', 
+    #                               sheet_name = 'Time metric intervals',
+    #                               header = [0, 1],
+    #                               index_col = [0, 1])
+    #     ivt_ci = temp_data['ivt_ischemic_mean'].values
+    #     ivt_diff_ci = temp_data['ivt_ischemic_mean_diff'].values
+    #     evt_ci = temp_data['evt_lvo_mean'].values
+    #     evt_diff_ci = temp_data['evt_lvo_mean_diff'].values
 
-        ivt_widths.append((ivt_ci[:, 1] - ivt_ci[:, 0]).mean())
-        ivt_diff_widths.append((ivt_diff_ci[:, 1] - ivt_diff_ci[:, 0]).mean())
-        evt_widths.append((evt_ci[:, 1] - evt_ci[:, 0]).mean())
-        evt_diff_widths.append((evt_diff_ci[:, 1] - evt_diff_ci[:, 0]).mean())
-        # ivt_widths.append(temp_data.loc[:,['ivt_ischemic_mean', '0.95']] - temp_data.loc[:,['ivt_ischemic_mean', '0.05']])
-        # evt_widths.append(temp_data.loc[:,['evt_lvo_mean', '0.95']] - temp_data.loc[:,['evt_lvo_mean', '0.05']])
-    cohort_runs['ivt_widths'] = ivt_widths
-    cohort_runs['ivt_diff_widths'] = ivt_diff_widths
-    cohort_runs['evt_widths'] = evt_widths
-    cohort_runs['evt_diff_widths'] = evt_diff_widths
-    cohort_runs.to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
+    #     ivt_widths.append((ivt_ci[:, 1] - ivt_ci[:, 0]).mean())
+    #     ivt_diff_widths.append((ivt_diff_ci[:, 1] - ivt_diff_ci[:, 0]).mean())
+    #     evt_widths.append((evt_ci[:, 1] - evt_ci[:, 0]).mean())
+    #     evt_diff_widths.append((evt_diff_ci[:, 1] - evt_diff_ci[:, 0]).mean())
+    #     # ivt_widths.append(temp_data.loc[:,['ivt_ischemic_mean', '0.95']] - temp_data.loc[:,['ivt_ischemic_mean', '0.05']])
+    #     # evt_widths.append(temp_data.loc[:,['evt_lvo_mean', '0.95']] - temp_data.loc[:,['evt_lvo_mean', '0.05']])
+    # cohort_runs['ivt_widths'] = ivt_widths
+    # cohort_runs['ivt_diff_widths'] = ivt_diff_widths
+    # cohort_runs['evt_widths'] = evt_widths
+    # cohort_runs['evt_diff_widths'] = evt_diff_widths
+    # cohort_runs.to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
         # ci_widths = pool.map(run_analyze_time_ci_widths, cohort_list)
     # pd.concat(ci_widths).to_csv(output_dir_path.parent / 'avg_ci_widths.csv', index = False)
         
