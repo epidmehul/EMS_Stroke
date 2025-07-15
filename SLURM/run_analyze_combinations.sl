@@ -10,6 +10,6 @@
 #SBATCH --mail-user=pwlin@live.unc.edu
 
 module purge
-module load python/3.12.2
+module load python/3.12.4
 source ~/strokes_venv/bin/activate
 python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -f ../config_files/cohort_nums.csv
