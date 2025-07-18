@@ -72,8 +72,10 @@ def get_time_ci(df, map_number, output_dir_str = None,):
         time_df = pd.DataFrame.from_dict(time_outcomes).transpose()
         time_df_list.append(add_differences_columns(get_thresholds_sensitivities(time_df)))
     full_time_df = pd.concat(time_df_list)
+    means = full_time_df.groupby(['sensitivity', 'threshold']).mean()
     vars = full_time_df.groupby(['sensitivity','threshold']).var()
-    half_widths = (stats.t.ppf(1 - (1-args.width)/2, df = seeds.shape[0] - 1) * np.sqrt(vars / (seeds.shape[0]))).mean()
+    half_widths = (stats.t.ppf(1 - (1-args.width)/2, df = seeds.shape[0] - 1) * np.sqrt(vars / (seeds.shape[0])))
+    half_widths_avg = half_widths.mean()
     
     # upper_ci = intervals.loc[:,pd.IndexSlice[:, 1-(1-args.width)/2]]
     # lower_ci = intervals.loc[:,pd.IndexSlice[:, (1-args.width)/2]]
@@ -81,17 +83,20 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     # upper_ci.columns = upper_ci.columns.droplevel(1)
     # lower_ci.columns = lower_ci.columns.droplevel(1)
     # ci_widths = (upper_ci - lower_ci).mean(axis = 0)
+    try:
+        lower_ci = means - half_widths
+        upper_ci = means + half_widths
+        intervals = pd.concat((lower_ci, upper_ci), axis = 1)
 
-    # output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
-    # if not output_dir.exists():
-    #     output_dir.mkdir(parents = True)
-    # output_file = output_dir / f'map_{map_number}.xlsx'
-    # try:
-    #     with pd.ExcelWriter(output_file) as writer:
-    #         intervals.to_excel(writer, sheet_name = 'Time metric intervals')
-    # except:
-    #     print(f'{output_file} failed to write excel')
-    return half_widths
+        output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
+        if not output_dir.exists():
+            output_dir.mkdir(parents = True)
+        output_file = output_dir / f'map_{map_number}.xlsx'
+        with pd.ExcelWriter(output_file) as writer:
+            intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    except:
+        print('failed calculating or saving actual interval')
+    return half_widths_avg
 
 def run_analyze_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
