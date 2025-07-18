@@ -86,6 +86,9 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     try:
         lower_ci = means - half_widths
         upper_ci = means + half_widths
+
+        lower_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[(1- args.width)/2]])
+        upper_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[1 - (1- args.width)/2]])
         intervals = pd.concat((lower_ci, upper_ci), axis = 1)
 
         output_dir = pathlib.Path(f"{output_dir_str}/map_{str(map_number).zfill(3)}")
