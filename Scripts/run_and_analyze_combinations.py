@@ -72,8 +72,8 @@ def get_time_ci(df, map_number, output_dir_str = None,):
         time_df = pd.DataFrame.from_dict(time_outcomes).transpose()
         time_df_list.append(add_differences_columns(get_thresholds_sensitivities(time_df)))
     full_time_df = pd.concat(time_df_list)
-    means = full_time_df.groupby(['sensitivity', 'threshold']).mean()
-    vars = full_time_df.groupby(['sensitivity','threshold']).var()
+    means = full_time_df.groupby(['sensitivity', 'threshold'], observed = True).mean()
+    vars = full_time_df.groupby(['sensitivity','threshold'], observed = True).var()
     half_widths = (stats.t.ppf(1 - (1-args.width)/2, df = seeds.shape[0] - 1) * np.sqrt(vars / (seeds.shape[0])))
     half_widths_avg = half_widths.mean()
     
