@@ -12,6 +12,7 @@ parser.add_argument('-t', '--times', help = 'data file containing travel times f
 parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
 parser.add_argument('-f', '--cohort_file', help = 'file containing the cohort configurations and map seed number', type = pathlib.Path)
 parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.9)
+parser.add_argument('-o', '--output', help = 'output directory for simulation and analysis', type = pathlib.Path, default = '/work/users/p/w/pwlin/output2/parquet_files')
 args = parser.parse_args()
 
 num_cores = args.n_cores
@@ -20,7 +21,7 @@ cohort_list = list(cohort_runs.itertuples(index = False, name = None))
 
 # map_seeds = [i for i in range(1000)]
 # patient_seeds = [i for i in range(args.seeds)]
-output_dir = '/work/users/p/w/pwlin/output2/parquet_files'
+
 
 try:
     config_dict = read_config(args.config, args.data, args.times)
@@ -105,7 +106,7 @@ def run_analyze_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
     run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
     file_name = f'map_{str(map_seed).zfill(3)}.parquet'
-    df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet')
+    df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet', config = config_dict)
     ci_width =  get_time_ci(df, map_number = map_seed, output_dir_str = '/work/users/p/w/pwlin/output2/results') 
 
     ci_width['map'] = map_seed
@@ -114,6 +115,7 @@ def run_analyze_time_ci_widths(cohort_option):
     return pd.DataFrame(ci_width.reindex(index = ['map', 'num_cohorts', 'num_patients', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()
 
 if __name__ == '__main__':
+    output_dir = args.output
     output_dir_path = pathlib.Path(output_dir)
     if not output_dir_path.exists():
         output_dir_path.mkdir(parents = True)

@@ -625,3 +625,43 @@ def create_map_csv(filepath, map_seeds, num_points = 1000000):
 
 def read_csv_results(filepath):
     pass
+
+def map_to_config(map_seed, filepath, export = True):
+    '''
+    Exports the map from map_seed into a travel times config file
+
+    Splits the map into a 5 x 5 square grid and finds travel times from the centers to the CSC, PSC1, and PSC2 and the transfer times from the PSCs to the CSC
+    '''
+    names, coords, dist = generate_map(map_seed)
+    x_arr, y_arr = np.meshgrid(np.arange(0.1,1,0.2), np.arange(0.9,0,-0.2))
+    square_centers = np.stack((x_arr.flatten(), y_arr.flatten()), axis = 1)
+    dist_df = pd.DataFrame(np.concat((spatial.distance.cdist(square_centers, coords), spatial.distance.cdist(coords, coords)), axis = 0) * dist)
+
+    dist_df = dist_df.rename({0: 'CSC', 1: 'PSC1', 2: 'PSC2'}, axis = 1)
+
+    converter = lambda i: chr(ord('A')+i//5)+str(i % 5 + 1)
+    dist_df2 = dist_df.rename(converter, axis = 0).rename({'F1': 'CSC', 'F2': 'PSC1', 'F3': 'PSC2'}, axis = 0).reset_index()
+    if export:
+        dist_df2.to_csv(filepath, index = False)
+    return dist_df2
+
+def patients_to_config(patient_seed, filepath, export = True):
+    patients_0 = generate_patient_cohort(1000,patient_seed)
+    patients_0['hex'] = pd.cut(patients_0['y_coord'], bins = 5, labels = ['E','D','C','B','A']).values.astype(str) + pd.cut(patients_0['x_coord'], bins = 5, labels = ['1','2','3','4','5']).values.astype(str)
+    if export:
+        patients_0[['ID','hex','last_well']].to_csv(filepath, index = False)
+    return patients_0[['ID','hex','last_well']]
+
+def patient_map_to_config_files(patient_seed, map_seed, patient_filepath = None, map_filepath = None):
+    '''
+    Takes the randomly generated patient and map cohorts and creates the relevant config files to generate similar patient cohorts
+    '''
+    if patient_filepath is None:
+        patients_to_config(patient_seed, '', export = False)
+    else:
+        patients_to_config(patient_seed, patient_filepath)
+    if map_filepath is None:
+        map_to_config(map_seed, '', export = False)
+    else:
+        map_to_config(map_seed, map_filepath)
+    

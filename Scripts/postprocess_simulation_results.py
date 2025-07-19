@@ -574,14 +574,21 @@ def single_map_analysis_output_psc(sim_results, **kwargs):
 def get_map_output_path(map_number, output_dir = 'output'):
     return pathlib.Path(f'{output_dir}/map_{str(map_number).zfill(3)}')
 
-def read_output(filestr, save_format = 'csv'):
+def read_output(filestr, save_format = 'csv', config = None):
     match save_format:
         case 'csv':
             sim_results = pd.read_csv(filestr)
         case 'parquet':
             sim_results = pd.read_parquet(filestr)
     try: # Requires numpy 2
-        sim_results['destination_type'] = np.where(np.strings.find(sim_results['destination'].values.astype(np.dtypes.StringDType), 'CSC') >= 0, 'CSC', 'PSC')
+        if config is None:
+            sim_results['destination_type'] = np.where(np.strings.find(sim_results['destination'].values.astype(np.dtypes.StringDType), 'CSC') >= 0, 'CSC', 'PSC')
+        else:
+            sim_results['destination_type'] = np.repeat([''], repeats = sim_results.shape[0])
+
+            sim_results['destination_type'][sim_results['destination'].str.contains(config['csc_prefix'])] = 'CSC'
+            sim_results['destination_type'][sim_results['destination'].str.contains(config['psc_prefix'])] = 'PSC'
+            sim_results['destination_type'][sim_results['destination'].str.contains(config['nsc_prefix'])] = 'NSC'
     except:
         def destination_type_func(row):
             if 'PSC' in row['destination']:
