@@ -12,4 +12,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patient_0.csv -t ../input_data/map_1.csv -f ../config_files/cohort_nums.csv -o /work/p/w/pwlin/output_map1/parquet_files
+python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patient_0.csv -t ../input_data/map_1.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map1/parquet_files
