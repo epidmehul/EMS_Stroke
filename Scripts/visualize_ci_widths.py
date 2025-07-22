@@ -21,6 +21,7 @@ widths_plot = sns.relplot(data = long_pivot_ci_widths,
             y = 'avg_half_width',
             hue = 'num_patients',
             col = 'time_metric',
-            kind = 'line')
+            kind = 'line',
+            marker = 'o')
 
 widths_plot.savefig(args.file.parent / 'avg_ci_widths.png')
