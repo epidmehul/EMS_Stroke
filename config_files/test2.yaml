@@ -60,6 +60,7 @@ simulations_evt_threshold: 360
 simulations_evt_threshold2: 1440
 simulations_ivt_probability: 0.55
 simulations_evt_probability: 0.85
+simulations_early_repurfusion_probability: 0.11
 
 csc_prefix: 'CSC'
 psc_prefix: 'PSC'
