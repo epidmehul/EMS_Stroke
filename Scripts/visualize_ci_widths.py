@@ -11,7 +11,7 @@ ci_widths = pd.read_csv(args.file)
 ci_widths = ci_widths.iloc[:-5, :].drop('map', axis = 1)
 
 long_pivot_ci_widths = pd.melt(ci_widths,
-                               id_vars = ['num_cohorts', 'cohort_size'],
+                               id_vars = ['num_cohorts', 'num_patients'],
                                value_vars = ['ivt_ischemic_mean', 'evt_lvo_mean'],
                                var_name = 'time_metric',
                                value_name = 'avg_half_width')
@@ -19,7 +19,7 @@ long_pivot_ci_widths = pd.melt(ci_widths,
 widths_plot = sns.relplot(data = long_pivot_ci_widths,
             x = 'num_cohorts',
             y = 'avg_half_width',
-            hue = 'cohort_size',
+            hue = 'num_patients',
             col = 'time_metric',
             kind = 'line')
 

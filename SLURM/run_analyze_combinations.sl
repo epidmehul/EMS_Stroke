@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH -N 1
-#SBATCH -n 5
-#SBATCH --mem=128g
-#SBATCH -t 6:00:00
+#SBATCH -n 1
+#SBATCH --mem=4g
+#SBATCH -t 00:10:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J run_analyze_combo
 #SBATCH --mail-type=end
@@ -20,15 +20,15 @@ source ~/strokes_venv/bin/activate
 
 # python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_2.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map2/parquet_files
 
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_3.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map3/parquet_files
+# python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_3.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map3/parquet_files
 
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_4.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map4/parquet_files
+# python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_4.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map4/parquet_files
 
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_5.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map5/parquet_files
+# python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_5.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map5/parquet_files
 
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_6.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map6/parquet_files
+# python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_6.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map6/parquet_files
 
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_7.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map7/parquet_files
+# python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_7.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map7/parquet_files
 
 python ../Scripts/visualize_ci_widths.py -f /work/users/p/w/pwlin/output_map0/avg_ci_half_widths.csv
 python ../Scripts/visualize_ci_widths.py -f /work/users/p/w/pwlin/output_map1/avg_ci_half_widths.csv
