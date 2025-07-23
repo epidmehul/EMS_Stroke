@@ -107,7 +107,7 @@ def run_analyze_time_ci_widths(cohort_option):
     run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
     file_name = f'map_{str(map_seed).zfill(3)}.parquet'
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet', config = config_dict)
-    ci_width =  get_time_ci(df, map_number = map_seed, output_dir_str = f'/work/users/p/w/pwlin/output_map{map_seed}') 
+    ci_width =  get_time_ci(df, map_number = map_seed, output_dir_str = args.output.parent) 
 
     ci_width['map'] = map_seed
     ci_width['num_cohorts'] = num_cohorts
