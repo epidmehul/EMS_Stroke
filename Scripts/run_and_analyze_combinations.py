@@ -88,8 +88,14 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     lower_ci = means - half_widths
     upper_ci = means + half_widths
 
-    lower_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[(1- args.width)/2]])
-    upper_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[1 - (1- args.width)/2]])
+    # lower_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[(1- args.width)/2]])
+    # upper_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[1 - (1- args.width)/2]])
+
+    lower_ci = lower_ci.T.set_index(np.repeat((1 - args.width)/ 2, lower_ci.shape[1]), append=True).T
+    upper_ci = upper_ci.T.set_index(np.repeat((1 - args.width)/ 2, upper_ci.shape[1]), append=True).T
+
+    
+
     intervals = pd.concat((lower_ci, upper_ci), axis = 1)
 
     output_dir = pathlib.Path(output_dir_str)
