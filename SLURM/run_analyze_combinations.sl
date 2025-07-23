@@ -18,7 +18,7 @@ source ~/strokes_venv/bin/activate
 
 # python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_0.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map0/parquet_files
 
-python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_1.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map1/parquet_files
+# python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_1.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map1/parquet_files
 
 # python ../Scripts/run_and_analyze_combinations.py -n 5 -c ../config_files/test2.yaml -d ../input_data/patients_0.csv -t ../input_data/map_2.csv -f ../config_files/cohort_nums.csv -o /work/users/p/w/pwlin/output_map2/parquet_files
 

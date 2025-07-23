@@ -84,24 +84,24 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     # upper_ci.columns = upper_ci.columns.droplevel(1)
     # lower_ci.columns = lower_ci.columns.droplevel(1)
     # ci_widths = (upper_ci - lower_ci).mean(axis = 0)
-    try:
-        lower_ci = means - half_widths
-        upper_ci = means + half_widths
+    # try:
+    lower_ci = means - half_widths
+    upper_ci = means + half_widths
 
-        lower_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[(1- args.width)/2]])
-        upper_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[1 - (1- args.width)/2]])
-        intervals = pd.concat((lower_ci, upper_ci), axis = 1)
+    lower_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[(1- args.width)/2]])
+    upper_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[1 - (1- args.width)/2]])
+    intervals = pd.concat((lower_ci, upper_ci), axis = 1)
 
-        output_dir = pathlib.Path(output_dir_str)
-        if not output_dir.exists():
-            output_dir.mkdir(parents = True)
-        # output_file = output_dir / f'map_{map_number}.xlsx'
-        # with pd.ExcelWriter(output_file) as writer:
-        #     intervals.to_excel(writer, sheet_name = 'Time metric intervals')
-        intervals.to_csv(output_dir / 'time_ci.csv', index = False)
-    except:
-        print('failed calculating or saving actual interval')
-    return half_widths_avg
+    output_dir = pathlib.Path(output_dir_str)
+    if not output_dir.exists():
+        output_dir.mkdir(parents = True)
+    # output_file = output_dir / f'map_{map_number}.xlsx'
+    # with pd.ExcelWriter(output_file) as writer:
+    #     intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    intervals.to_csv(output_dir / 'time_ci.csv', index = False)
+    # except:
+    #     print('failed calculating or saving actual interval')
+    # return half_widths_avg
 
 def run_analyze_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
