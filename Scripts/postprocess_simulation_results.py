@@ -277,7 +277,7 @@ def calculate_intervals_theoretical(df, width = 0.9):
     try:
         alpha = (1-width) / 2
         grouped_df = df.groupby(['sensitivity','threshold'], observed = True)
-        k = grouped_df.count()
+        k = np.unique(grouped_df.count().values)[0]
         means = grouped_df.mean()
         var = grouped_df.var()
         ci_lower = means - stats.t.ppf(1 - alpha, df = k - 1) * np.sqrt(var / k)
