@@ -90,9 +90,11 @@ def get_time_ci(df, map_number, output_dir_str = None,):
 
     # lower_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[(1- args.width)/2]])
     # upper_ci.columns = pd.MultiIndex.from_product(lower_ci.columns.levels + [[1 - (1- args.width)/2]])
+    lower_ci.columns = pd.MultiIndex.from_arrays([lower_ci.columns.tolist(), np.repeat((1 - args.width) / 2, lower_ci.shape[1])])
+    upper_ci.columns = pd.MultiIndex.from_arrays([upper_ci.columns.tolist(), np.repeat(1 - (1 - args.width) / 2, lower_ci.shape[1])])
 
-    lower_ci = lower_ci.T.set_index(np.repeat((1 - args.width)/ 2, lower_ci.shape[1]), append=True).T
-    upper_ci = upper_ci.T.set_index(np.repeat((1 - args.width)/ 2, upper_ci.shape[1]), append=True).T
+    # lower_ci = lower_ci.T.set_index(np.repeat((1 - args.width)/ 2, lower_ci.shape[1]), append=True).T
+    # upper_ci = upper_ci.T.set_index(np.repeat((1 - args.width)/ 2, upper_ci.shape[1]), append=True).T
 
     
 
