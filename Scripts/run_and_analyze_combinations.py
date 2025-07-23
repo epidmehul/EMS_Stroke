@@ -103,13 +103,13 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     output_dir = pathlib.Path(output_dir_str)
     if not output_dir.exists():
         output_dir.mkdir(parents = True)
-    # output_file = output_dir / f'map_{map_number}.xlsx'
-    # with pd.ExcelWriter(output_file) as writer:
-    #     intervals.to_excel(writer, sheet_name = 'Time metric intervals')
-    intervals.to_csv(output_dir / 'time_ci.csv', index = False)
+    output_file = output_dir / f'map_{map_number}.xlsx'
+    with pd.ExcelWriter(output_file) as writer:
+        intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    # intervals.to_csv(output_dir / 'time_ci.csv', index = False)
     # except:
     #     print('failed calculating or saving actual interval')
-    # return half_widths_avg
+    return half_widths_avg
 
 def run_analyze_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
