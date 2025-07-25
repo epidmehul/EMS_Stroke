@@ -125,7 +125,7 @@ def run_analyze_time_ci_widths(cohort_option):
 
 def run_calc_time_ci_widths(cohort_option):
     map_seed, num_cohorts, num_patients = cohort_option
-    run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
+    # run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
     file_name = f'map_{str(map_seed).zfill(3)}.parquet'
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet', config = config_dict)
     ivt_df = df.loc[df['IVTtreatment'], ['seed','scenario','IVTtime']].groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
@@ -135,7 +135,7 @@ def run_calc_time_ci_widths(cohort_option):
     margin_errors['map'] = map_seed
     margin_errors['num_cohorts'] = num_cohorts
     margin_errors['num_patients'] = num_patients
-    return pd.DataFrame(margin_errors.reindex(index = ['map', 'num_cohorts', 'num_patients', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()                                                 
+    return pd.DataFrame(margin_errors.reindex(index = ['map', 'num_cohorts', 'num_patients', 'ivt_ischemic_mean', 'evt_lvo_mean'])).transpose()                                                 
 
 if __name__ == '__main__':
     output_dir = args.output
