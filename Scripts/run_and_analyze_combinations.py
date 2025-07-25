@@ -103,10 +103,10 @@ def get_time_ci(df, map_number, output_dir_str = None,):
     output_dir = pathlib.Path(output_dir_str)
     if not output_dir.exists():
         output_dir.mkdir(parents = True)
-    output_file = output_dir / f'map_{map_number}.xlsx'
-    with pd.ExcelWriter(output_file) as writer:
-        intervals.to_excel(writer, sheet_name = 'Time metric intervals')
-    # intervals.to_csv(output_dir / 'time_ci.csv', index = False)
+    # output_file = output_dir / f'map_{map_number}.xlsx'
+    # with pd.ExcelWriter(output_file) as writer:
+    #     intervals.to_excel(writer, sheet_name = 'Time metric intervals')
+    intervals.to_csv(output_dir / 'time_ci.csv', index = True)
     # except:
     #     print('failed calculating or saving actual interval')
     return half_widths_avg
@@ -123,13 +123,27 @@ def run_analyze_time_ci_widths(cohort_option):
     ci_width['num_patients'] = num_patients
     return pd.DataFrame(ci_width.reindex(index = ['map', 'num_cohorts', 'num_patients', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()
 
+def run_calc_time_ci_widths(cohort_option):
+    map_seed, num_cohorts, num_patients = cohort_option
+    run_map_simulations([map_seed], num_patients = num_patients, num_patient_seeds = num_cohorts, save_format = 'parquet', output_dir = output_dir, config = config_dict)
+    file_name = f'map_{str(map_seed).zfill(3)}.parquet'
+    df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet', config = config_dict)
+    ivt_df = df.loc[df['IVTtreatment'], ['seed','scenario','IVTtime']].groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
+    evt_df = df.loc[df['EVTtreatment'], ['seed','scenario','EVTtime']].groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
+    margin_errors = stats.t.ppf(.975, df = num_cohorts - 1) * pd.concat((ivt_df.groupby('scenario').var(), evt_df.groupby('scenario').var()), axis = 1) / num_cohorts
+
+    margin_errors['map'] = map_seed
+    margin_errors['num_cohorts'] = num_cohorts
+    margin_errors['num_patients'] = num_patients
+    return pd.DataFrame(margin_errors.reindex(index = ['map', 'num_cohorts', 'num_patients', 'ivt_ischemic_mean', 'ivt_ischemic_mean_diff', 'evt_lvo_mean', 'evt_lvo_mean_diff'])).transpose()                                                 
+
 if __name__ == '__main__':
     output_dir = args.output
     output_dir_path = pathlib.Path(output_dir)
     if not output_dir_path.exists():
         output_dir_path.mkdir(parents = True)
     with mp.Pool(num_cores) as pool:
-        results = pool.map(run_analyze_time_ci_widths, cohort_list)
+        results = pool.map(run_calc_time_ci_widths, cohort_list)
     pd.concat(results).to_csv(output_dir_path.parent / 'avg_ci_half_widths.csv', index = False)
     # ivt_widths = []
     # ivt_diff_widths = []
