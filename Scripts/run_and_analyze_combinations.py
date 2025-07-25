@@ -135,7 +135,7 @@ def run_calc_time_ci_widths(cohort_option):
     margin_errors['map'] = map_seed
     margin_errors['num_cohorts'] = num_cohorts
     margin_errors['num_patients'] = num_patients
-    return pd.DataFrame(margin_errors.reindex(index = ['map', 'num_cohorts', 'num_patients', 'ivt_ischemic_mean', 'evt_lvo_mean'])).transpose()                                                 
+    return pd.DataFrame(margin_errors.reindex(index = ['map', 'num_cohorts', 'num_patients', 'IVTtime', 'EVTtime'])).transpose()                                                 
 
 if __name__ == '__main__':
     output_dir = args.output
