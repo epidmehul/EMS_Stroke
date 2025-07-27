@@ -647,3 +647,71 @@ def generate_maps_csv(map_num, maps_csv_path, save = True):
         }
     )
     return get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save, save_map_csv = False)
+
+############################
+
+def time_metrics(df, alpha = .05):
+    '''
+    Returns the IVT and EVT measures and confidence intervals
+    '''
+    ivt_times = df.loc[df['IVTtreatment'], ['seed', 'scenario', 'IVTtime']]
+    evt_times = df.loc[df['EVTtreatment'], ['seed', 'scenario', 'EVTtime']]
+    ivt_avg_times = ivt_times.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
+    evt_avg_times = evt_times.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
+    ivt_avg_mean = ivt_avg_times.groupby('scenario').mean()
+    evt_avg_mean = evt_avg_times.groupby('scenario').mean()
+    ivt_avg_var = ivt_avg_times.groupby('scenario').var()
+    evt_avg_var = evt_avg_times.groupby('scenario').var()
+    k = np.unique(df['seed'].values).shape[0]
+    t_coef = 1 - (1 - alpha) / 2
+    ivt_lower = ivt_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ivt_avg_var / k)
+    ivt_upper = ivt_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ivt_avg_var / k)
+    evt_lower = evt_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(evt_avg_var / k)
+    evt_upper = evt_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(evt_avg_var / k)
+    time_ci = pd.concat((ivt_avg_mean, ivt_lower, ivt_upper, evt_avg_mean, evt_lower, evt_upper), axis = 1)
+    return time_ci
+
+def mRS_metrics(df, alpha = .05):
+    '''
+    Returns the mRS measures and confidence intervals
+    '''
+    mRS_ischemic = df.loc[df['ischemic'], ['seed', 'scenario', 'PrOut']]
+    mRS_lvo = df.loc[df['hasLVO'], ['seed', 'scenario', 'PrOut']]
+    mRS_ischemic_avg = mRS_ischemic.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
+    mRS_lvo_avg = mRS_lvo.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
+    ischemic_avg_mean = mRS_ischemic_avg.groupby('scenario').mean()
+    lvo_avg_mean = mRS_lvo_avg.groupby('scenario').mean()
+    ischemic_avg_var = mRS_ischemic_avg.groupby('scenario').var()
+    lvo_avg_var = mRS_lvo_avg.groupby('scenario').var()
+    k = np.unique(df['seed'].values).shape[0]
+    t_coef = 1 - (1 - alpha) / 2
+    ischemic_lower = ischemic_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ischemic_avg_var / k)
+    ischemic_upper = ischemic_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ischemic_avg_var / k)
+    lvo_lower = lvo_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(lvo_avg_var / k)
+    lvo_upper = lvo_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(lvo_avg_var / k)
+    mRS_ci = pd.concat((ischemic_avg_mean, ischemic_lower, ischemic_upper, lvo_avg_mean, lvo_lower, lvo_upper), axis = 1)
+    return mRS_ci
+
+def group_cohort_data(df):
+    '''
+    Takes original data and groups it by cohort/scenario
+
+    Removes duplicate base cases
+    '''
+    df = df.loc[~df['scenario'].isin([8, 15]), :]
+    df['diagnostic'] = df['sensitivity'].astype(str) + ', ' + df['specificity'].astype(str)
+    df.loc[df['threshold'] == 0, 'diagnostic'] = 'base'
+
+    ivt_times = df.loc[df['IVTtreatment'], ['seed', 'diagnostic', 'IVTtime']]
+    evt_times = df.loc[df['EVTtreatment'], ['seed', 'diagnostic', 'EVTtime']]
+    mRS_ischemic = df.loc[df['ischemic'], ['seed', 'diagnostic', 'PrOut']].rename({'PrOut': 'mRS_ischemic'}, axis = 1)
+    mRS_lvo = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'PrOut']].rename({'PrOut': 'mRS_lvo'}, axis = 1)
+
+    ivt_cohort_times = ivt_times.groupby(['seed', 'diagnostic'], observed = True).mean()
+    evt_cohort_times = evt_times.groupby(['seed', 'diagnostic'], observed = True).mean()
+    mRS_ischemic_cohort = mRS_ischemic.groupby(['seed', 'diagnostic'], observed = True).mean()
+    mRS_lvo_cohort = mRS_lvo.groupby(['seed', 'diagnostic'], observed = True).mean()
+
+    cohort_avgs = pd.concat((ivt_cohort_times, evt_cohort_times,
+                             mRS_ischemic_cohort, mRS_lvo_cohort), axis = 1)
+    return cohort_avgs
