@@ -78,7 +78,7 @@ def group_all_data(filepath, psc_only = False):
 
 if __name__ == '__main__':
     with mp.Pool(num_cores) as pool:
-        results = pool.starmap(group_all_data, list(zip(parquet_list), [False] * len(parquet_list)))
-        psc_results = pool.starmap(group_all_data, list(zip(parquet_list), [True] * len(parquet_list)))
+        results = pool.starmap(group_all_data, list(zip(parquet_list, [False] * len(parquet_list))))
+        psc_results = pool.starmap(group_all_data, list(zip(parquet_list, [True] * len(parquet_list))))
     pd.concat(results).to_csv(args.output / 'all_cohort_avgs.csv')
     pd.concat(psc_results).to_csv(args.output / 'psc_cohort_avgs.csv')
