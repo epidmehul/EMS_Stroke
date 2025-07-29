@@ -130,7 +130,7 @@ def run_calc_time_ci_widths(cohort_option):
     df = read_output(pathlib.Path(output_dir) / file_name, save_format = 'parquet', config = config_dict)
     ivt_df = df.loc[df['IVTtreatment'], ['seed','scenario','IVTtime']].groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
     evt_df = df.loc[df['EVTtreatment'], ['seed','scenario','EVTtime']].groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
-    margin_errors = (stats.t.ppf(.975, df = num_cohorts - 1) * pd.concat((ivt_df.groupby('scenario').var(), evt_df.groupby('scenario').var()), axis = 1) / num_cohorts).mean()
+    margin_errors = (stats.t.ppf(.975, df = num_cohorts - 1) * np.sqrt(pd.concat((ivt_df.groupby('scenario').var(), evt_df.groupby('scenario').var()), axis = 1) / num_cohorts)).mean()
 
     margin_errors['map'] = map_seed
     margin_errors['num_cohorts'] = num_cohorts
