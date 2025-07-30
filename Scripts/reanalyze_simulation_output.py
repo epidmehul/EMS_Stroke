@@ -100,7 +100,7 @@ def group_all_data(filepath, psc_only = False):
     upper.rename(lambda x: x+'_upper', inplace = True, axis = 1)
     intervals = means.join((lower, upper), validate = '1:1')
     intervals = intervals.sort_index(axis = 1)
-    intervals.drop(list(df.filter(regex = 'count')), axis = 1, inplace = True)
+    intervals.drop(list(intervals.filter(regex = 'count')), axis = 1, inplace = True)
     intervals['map'] = map_number
     return joined_avgs.reset_index(['diagnostic', 'threshold']), intervals.reset_index()
 
