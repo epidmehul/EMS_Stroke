@@ -665,9 +665,11 @@ def preprocess_data(df, config = None):
     df.loc[df['threshold'] == 0, 'diagnostic'] = 'base'
     df['destination_type'] = df['destination'].copy()
     try:
-        df.loc[df['destination'].str.contains]
-    df.loc[df['destination'].str.contains('PSC'), 'destination_type'] = 'PSC'
-
+        df.loc[df['destination'].str.contains(config['csc_prefix']), 'destination_type'] = 'CSC'
+        df.loc[df['destination'].str.contains(config['psc_prefix']), 'destination_type'] = 'PSC'
+        df.loc[df['destination'].str.contains(config['nsc_prefix']), 'destination_type'] = 'NSC'
+    except:
+        df.loc[df['destination'].str.contains('PSC'), 'destination_type'] = 'PSC'
     pass
 
 def group_all_data(df, psc_only = False):
