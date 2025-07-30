@@ -96,6 +96,6 @@ if __name__ == '__main__':
     grouped_avgs, intervals = zip(*results)
     psc_grouped_avgs, psc_intervals= zip(*results)
     pd.concat(grouped_avgs).to_csv(args.output / 'all_cohort_avgs.csv')
-    pd.concat(intervals).to_csv(args.output / 'map_scenario_intervals.csv')
+    pd.concat(intervals).to_csv(args.output / 'map_scenario_intervals.csv', index = False)
     pd.concat(psc_grouped_avgs).to_csv(args.output / 'psc_cohort_avgs.csv')
-    pd.concat(psc_intervals).to_csv(args.output / 'psc_map_scenario_intervals.csv')
+    pd.concat(psc_intervals).to_csv(args.output / 'psc_map_scenario_intervals.csv', index = False)
