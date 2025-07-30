@@ -64,6 +64,8 @@ def group_all_data(filepath, psc_only = False):
             mRS_ischemic_cohort_avg, mRS_lvo_cohort_avg),
         validate = '1:1'
     )
+    grouped_avgs['ischemic_ivt_prop'] = grouped_avgs['ischemic_ivt_count'] / grouped_avgs['ischemic_count']
+    grouped_avgs['lvo_evt_prop'] = grouped_avgs['lvo_evt_count'] / grouped_avgs['lvo_count']
     #################
 
     grouped_avgs_diff = grouped_avgs.copy()
@@ -76,14 +78,13 @@ def group_all_data(filepath, psc_only = False):
     joined_avgs['map'] = map_number
 
     k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
-    joined_avgs['ischemic_ivt_prop'] = joined_avgs['ischemic_ivt_count'] / joined_avgs['ischemic_count']
-    joined_avgs['lvo_evt_prop'] = joined_avgs['lvo_evt_count'] / joined_avgs['lvo_count']
-    grouped_prop_avg = joined_avgs[['ischemic_ivt_prop', 'lvo_evt_prop']].reset_index(['diagnostic', 'threshold']).groupby(['diagnostic','threshold'])
+    
+    grouped_prop_avg = joined_avgs[['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff']].reset_index(['diagnostic', 'threshold']).groupby(['diagnostic','threshold'])
     grouped_prop_avg_mean = grouped_prop_avg.mean() 
     lower_prop_ci = grouped_prop_avg_mean - stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
     upper_prop_ci = grouped_prop_avg_mean + stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
 
-    joined_avgs.drop(['ischemic_ivt_prop', 'lvo_evt_prop'], axis = 1, inplace = True)
+    joined_avgs.drop(['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff'], axis = 1, inplace = True)
 
     full_grouped_avgs = joined_avgs.drop('map', axis = 1).reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
     means = full_grouped_avgs.mean()
