@@ -83,6 +83,8 @@ def group_all_data(filepath, psc_only = False):
     lower_prop_ci = grouped_prop_avg_mean - stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
     upper_prop_ci = grouped_prop_avg_mean + stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
 
+    joined_avgs.drop(['ischemic_ivt_prop', 'lvo_evt_prop'], axis = 1, inplace = True)
+
     full_grouped_avgs = joined_avgs.reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
     means = full_grouped_avgs.mean()
     vars = full_grouped_avgs.var()
