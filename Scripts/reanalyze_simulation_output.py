@@ -75,17 +75,30 @@ def group_all_data(filepath, psc_only = False):
     joined_avgs = grouped_avgs.join(grouped_avgs_diff, validate = '1:1')
     joined_avgs['map'] = map_number
 
+    k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
+    joined_avgs['ischemic_ivt_prop'] = joined_avgs['ischemic_ivt_count'] / joined_avgs['ischemic_count']
+    joined_avgs['lvo_evt_prop'] = joined_avgs['lvo_evt_count'] / joined_avgs['lvo_count']
+    grouped_prop_avg = joined_avgs[['ischemic_ivt_prop', 'lvo_evt_prop']].reset_index(['diagnostic', 'threshold']).groupby(['diagnostic','threshold'])
+    grouped_prop_avg_mean = grouped_prop_avg.mean() 
+    lower_prop_ci = grouped_prop_avg_mean - stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
+    upper_prop_ci = grouped_prop_avg_mean + stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
+
     full_grouped_avgs = joined_avgs.reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
     means = full_grouped_avgs.mean()
     vars = full_grouped_avgs.var()
-    k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
     lower = means - stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
-    upper = means - stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
+    upper = means + stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
+
+    means = means.join(grouped_prop_avg_mean, validate = '1:1')
+    lower = lower.join(lower_prop_ci, validate = '1:1')
+    upper = upper.join(upper_prop_ci, validate = '1:1')
+
     means.rename(lambda x: x+'_means', inplace = True, axis = 1)
     lower.rename(lambda x: x+'_lower', inplace = True, axis = 1)
     upper.rename(lambda x: x+'_upper', inplace = True, axis = 1)
     intervals = means.join((lower, upper), validate = '1:1')
     intervals = intervals.sort_index(axis = 1)
+    intervals.drop(list(df.filter(regex = 'count')), axis = 1, inplace = True)
     intervals['map'] = map_number
     return joined_avgs.reset_index(['diagnostic', 'threshold']), intervals.reset_index()
 
