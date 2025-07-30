@@ -85,7 +85,7 @@ def group_all_data(filepath, psc_only = False):
 
     joined_avgs.drop(['ischemic_ivt_prop', 'lvo_evt_prop'], axis = 1, inplace = True)
 
-    full_grouped_avgs = joined_avgs.reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
+    full_grouped_avgs = joined_avgs.drop('map', axis = 1).reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
     means = full_grouped_avgs.mean()
     vars = full_grouped_avgs.var()
     lower = means - stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
