@@ -648,70 +648,73 @@ def generate_maps_csv(map_num, maps_csv_path, save = True):
     )
     return get_map_plot(temp_df, map_number = map_num, output_path = maps_csv_path, save = save, save_map_csv = False)
 
-############################
+##############################################
 
-def time_metrics(df, alpha = .05):
-    '''
-    Returns the IVT and EVT measures and confidence intervals
-    '''
-    ivt_times = df.loc[df['IVTtreatment'], ['seed', 'scenario', 'IVTtime']]
-    evt_times = df.loc[df['EVTtreatment'], ['seed', 'scenario', 'EVTtime']]
-    ivt_avg_times = ivt_times.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
-    evt_avg_times = evt_times.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
-    ivt_avg_mean = ivt_avg_times.groupby('scenario').mean()
-    evt_avg_mean = evt_avg_times.groupby('scenario').mean()
-    ivt_avg_var = ivt_avg_times.groupby('scenario').var()
-    evt_avg_var = evt_avg_times.groupby('scenario').var()
-    k = np.unique(df['seed'].values).shape[0]
-    t_coef = 1 - (1 - alpha) / 2
-    ivt_lower = ivt_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ivt_avg_var / k)
-    ivt_upper = ivt_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ivt_avg_var / k)
-    evt_lower = evt_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(evt_avg_var / k)
-    evt_upper = evt_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(evt_avg_var / k)
-    time_ci = pd.concat((ivt_avg_mean, ivt_lower, ivt_upper, evt_avg_mean, evt_lower, evt_upper), axis = 1)
-    return time_ci
-
-def mRS_metrics(df, alpha = .05):
-    '''
-    Returns the mRS measures and confidence intervals
-    '''
-    mRS_ischemic = df.loc[df['ischemic'], ['seed', 'scenario', 'PrOut']]
-    mRS_lvo = df.loc[df['hasLVO'], ['seed', 'scenario', 'PrOut']]
-    mRS_ischemic_avg = mRS_ischemic.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
-    mRS_lvo_avg = mRS_lvo.groupby(['seed','scenario'], observed = True).mean().reset_index('scenario')
-    ischemic_avg_mean = mRS_ischemic_avg.groupby('scenario').mean()
-    lvo_avg_mean = mRS_lvo_avg.groupby('scenario').mean()
-    ischemic_avg_var = mRS_ischemic_avg.groupby('scenario').var()
-    lvo_avg_var = mRS_lvo_avg.groupby('scenario').var()
-    k = np.unique(df['seed'].values).shape[0]
-    t_coef = 1 - (1 - alpha) / 2
-    ischemic_lower = ischemic_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ischemic_avg_var / k)
-    ischemic_upper = ischemic_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(ischemic_avg_var / k)
-    lvo_lower = lvo_avg_mean - stats.t.ppf(t_coef, df = k - 1) * np.sqrt(lvo_avg_var / k)
-    lvo_upper = lvo_avg_mean + stats.t.ppf(t_coef, df = k - 1) * np.sqrt(lvo_avg_var / k)
-    mRS_ci = pd.concat((ischemic_avg_mean, ischemic_lower, ischemic_upper, lvo_avg_mean, lvo_lower, lvo_upper), axis = 1)
-    return mRS_ci
-
-def group_cohort_data(df):
+def preprocess_data(df, config = None):
     '''
     Takes original data and groups it by cohort/scenario
 
     Removes duplicate base cases
     '''
-    df = df.loc[~df['scenario'].isin([8, 15]), :]
-    df['diagnostic'] = df['sensitivity'].astype(str) + ', ' + df['specificity'].astype(str)
+    # map_number = int(filepath.stem.split('_')[1])
+    # df = pd.read_parquet(filepath)
+    df = df.loc[~df['scenario'].isin([8, 15])]
+    df.loc[:, 'diagnostic'] = df['sensitivity'].replace(
+        to_replace = {0.9: 'high', 0.75: 'mid', 0.6: 'low'}
+    )
     df.loc[df['threshold'] == 0, 'diagnostic'] = 'base'
+    df['destination_type'] = df['destination'].copy()
+    try:
+        df.loc[df['destination'].str.contains]
+    df.loc[df['destination'].str.contains('PSC'), 'destination_type'] = 'PSC'
 
-    ivt_times = df.loc[df['IVTtreatment'], ['seed', 'diagnostic', 'IVTtime']]
-    evt_times = df.loc[df['EVTtreatment'], ['seed', 'diagnostic', 'EVTtime']]
-    mRS_ischemic = df.loc[df['ischemic'], ['seed', 'diagnostic', 'PrOut']].rename({'PrOut': 'mRS_ischemic'}, axis = 1)
-    mRS_lvo = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'PrOut']].rename({'PrOut': 'mRS_lvo'}, axis = 1)
+    pass
 
-    ivt_cohort_times = ivt_times.groupby(['seed', 'diagnostic'], observed = True).mean()
-    evt_cohort_times = evt_times.groupby(['seed', 'diagnostic'], observed = True).mean()
-    mRS_ischemic_cohort = mRS_ischemic.groupby(['seed', 'diagnostic'], observed = True).mean()
-    mRS_lvo_cohort = mRS_lvo.groupby(['seed', 'diagnostic'], observed = True).mean()
+def group_all_data(df, psc_only = False):
+    if psc_only:
+        df = df.loc[df['closest_destination'] != 'CSC', :]
 
-    cohort_avgs = pd.concat((ivt_cohort_times, evt_cohort_times,
-                             mRS_ischemic_cohort, mRS_lvo_cohort), axis = 1)
-    return cohort_avgs
+    ############
+    triage_indicators = df.loc[df['closest_destination'] != 'CSC', ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
+    triage_indicators['overtriage'] = (triage_indicators['destination_type'] == 'CSC') & (~triage_indicators['hasLVO'])
+    triage_indicators['undertriage'] = (triage_indicators['destination_type'] != 'CSC') & (triage_indicators['hasLVO'])
+
+    ischemic_indicators = df.loc[df['ischemic'], ['seed', 'diagnostic', 'threshold', 'IVTtime', 'ischemic']]
+    lvo_indicators = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'threshold', 'EVTtime', 'hasLVO']]
+
+    ivt_times = df.loc[(df['ischemic']) & (df['IVTtime'] < 270), ['seed', 'diagnostic', 'threshold', 'IVTtime']]
+    evt_times = df.loc[(df['hasLVO']) & (df['EVTtime'] < 24 * 60), ['seed', 'diagnostic', 'threshold', 'EVTtime']]
+
+    ischemic_mRS = df.loc[(df['ischemic']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_ischemic'}, axis = 1)
+    lvo_mRS = df.loc[(df['hasLVO']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_lvo'}, axis = 1)
+    #############
+    overtriage_undertriage = triage_indicators.drop(['hasLVO', 'destination_type'], axis = 1).groupby(['seed', 'diagnostic', 'threshold']).mean()
+
+    ischemic_count = ischemic_indicators.drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_count'}, axis = 1)
+    ischemic_ivt_count = ischemic_indicators.loc[ischemic_indicators['IVTtime'] < 270, :].drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_ivt_count'}, axis = 1)
+
+    lvo_count = lvo_indicators.drop('EVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_count'}, axis = 1)
+    lvo_evt_count = lvo_indicators.loc[lvo_indicators['EVTtime'] < 24 * 60, :].drop('EVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_evt_count'}, axis = 1)
+
+    ivt_cohort_avg = ivt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
+    evt_cohort_avg = evt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
+    mRS_ischemic_cohort_avg = ischemic_mRS.groupby(['seed', 'diagnostic','threshold']).mean()
+    mRS_lvo_cohort_avg = lvo_mRS.groupby(['seed', 'diagnostic', 'threshold']).mean()
+
+    grouped_avgs = overtriage_undertriage.join(
+        (ischemic_count, ischemic_ivt_count,
+            lvo_count, lvo_evt_count, ivt_cohort_avg, evt_cohort_avg,
+            mRS_ischemic_cohort_avg, mRS_lvo_cohort_avg),
+        validate = '1:1'
+    )
+    #################
+
+    grouped_avgs_diff = grouped_avgs.copy()
+    for i in np.unique(grouped_avgs.index.get_level_values('seed').values):
+        grouped_avgs_diff.loc[pd.IndexSlice[i, :, :], :] = grouped_avgs.loc[pd.IndexSlice[i, :, :], :] - grouped_avgs.loc[pd.IndexSlice[i, 'base', 0], :]
+    grouped_avgs_diff.drop(['ischemic_count', 'lvo_count'], axis = 1, inplace = True)
+    grouped_avgs_diff.rename(lambda x: x+'_diff', axis = 1, inplace = True)
+    
+    joined_avgs = grouped_avgs.join(grouped_avgs_diff, validate = '1:1')
+    # joined_avgs['map'] = map_number
+    return joined_avgs.reset_index(['diagnostic', 'threshold'])

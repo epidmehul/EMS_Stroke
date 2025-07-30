@@ -74,11 +74,28 @@ def group_all_data(filepath, psc_only = False):
     
     joined_avgs = grouped_avgs.join(grouped_avgs_diff, validate = '1:1')
     joined_avgs['map'] = map_number
-    return joined_avgs.reset_index(['diagnostic', 'threshold'])
+
+    full_grouped_avgs = joined_avgs.reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
+    means = full_grouped_avgs.mean()
+    vars = full_grouped_avgs.var()
+    k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
+    lower = means - stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
+    upper = means - stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
+    means.rename(lambda x: x+'_means', inplace = True, axis = 1)
+    lower.rename(lambda x: x+'_lower', inplace = True, axis = 1)
+    upper.rename(lambda x: x+'_upper', inplace = True, axis = 1)
+    intervals = means.join((lower, upper), validate = '1:1')
+    intervals = intervals.sort_index(axis = 1)
+    intervals['map'] = map_number
+    return joined_avgs.reset_index(['diagnostic', 'threshold']), intervals.reset_index()
 
 if __name__ == '__main__':
     with mp.Pool(num_cores) as pool:
         results = pool.starmap(group_all_data, list(zip(parquet_list, [False] * len(parquet_list))))
         psc_results = pool.starmap(group_all_data, list(zip(parquet_list, [True] * len(parquet_list))))
-    pd.concat(results).to_csv(args.output / 'all_cohort_avgs.csv')
-    pd.concat(psc_results).to_csv(args.output / 'psc_cohort_avgs.csv')
+    grouped_avgs, intervals = zip(*results)
+    psc_grouped_avgs, psc_intervals= zip(*results)
+    pd.concat(grouped_avgs).to_csv(args.output / 'all_cohort_avgs.csv')
+    pd.concat(intervals).to_csv(args.output / 'map_scenario_intervals.csv')
+    pd.concat(psc_grouped_avgs).to_csv(args.output / 'psc_cohort_avgs.csv')
+    pd.concat(psc_intervals).to_csv(args.output / 'psc_map_scenario_intervals.csv')

@@ -3,8 +3,8 @@
 #SBATCH -p general
 #SBATCH -N 1
 #SBATCH -n 50
-#SBATCH --mem=60g
-#SBATCH -t 04:00:00
+#SBATCH --mem=40g
+#SBATCH -t 00:05:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J cohort_avgs
 #SBATCH --mail-type=end
