@@ -73,7 +73,7 @@ def group_all_data(filepath, psc_only = False):
         grouped_avgs_diff.loc[pd.IndexSlice[i, :, :], :] = grouped_avgs.loc[pd.IndexSlice[i, :, :], :] - grouped_avgs.loc[pd.IndexSlice[i, 'base', 0], :]
     grouped_avgs_diff.drop(['ischemic_count', 'lvo_count'], axis = 1, inplace = True)
     grouped_avgs_diff.rename(lambda x: x+'_diff', axis = 1, inplace = True)
-    
+
     joined_avgs = grouped_avgs.join(grouped_avgs_diff, validate = '1:1')
     joined_avgs['map'] = map_number
 
