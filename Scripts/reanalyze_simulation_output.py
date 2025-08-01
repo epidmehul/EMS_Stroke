@@ -54,7 +54,7 @@ def group_all_data(filepath, psc_only = False):
     no_lvo_counts.rename({'hasLVO': 'no_lvo_count'}, axis = 1, inplace = True)
     overtriage_undertriage = overtriage_undertriage.join((lvo_counts, no_lvo_counts), validate = '1:1')
     overtriage_undertriage['undertriage'] = overtriage_undertriage['undertriage_ind'] / (overtriage_undertriage['lvo_count'])
-    overtriage_undertriage['overtriage'] = overtriage_undertriage['undertriage_ind'] / overtriage_undertriage['no_lvo_count']
+    overtriage_undertriage['overtriage'] = overtriage_undertriage['overtriage_ind'] / overtriage_undertriage['no_lvo_count']
     overtriage_undertriage = overtriage_undertriage[['overtriage','undertriage']]
 
     ischemic_count = ischemic_indicators.drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_count'}, axis = 1)
