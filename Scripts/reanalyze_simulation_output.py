@@ -33,8 +33,8 @@ def group_all_data(filepath, psc_only = False):
 
     ############
     triage_indicators = df.loc[df['closest_destination'] != 'CSC', ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
-    triage_indicators['overtriage'] = (triage_indicators['destination_type'] == 'CSC') & (~triage_indicators['hasLVO'])
-    triage_indicators['undertriage'] = (triage_indicators['destination_type'] != 'CSC') & (triage_indicators['hasLVO'])
+    triage_indicators['overtriage_ind'] = (triage_indicators['destination_type'] == 'CSC') & (~triage_indicators['hasLVO'])
+    triage_indicators['undertriage_ind'] = (triage_indicators['destination_type'] != 'CSC') & (triage_indicators['hasLVO'])
 
     ischemic_indicators = df.loc[df['ischemic'], ['seed', 'diagnostic', 'threshold', 'IVTtime', 'ischemic']]
     lvo_indicators = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'threshold', 'EVTtime', 'hasLVO']]
@@ -44,8 +44,18 @@ def group_all_data(filepath, psc_only = False):
 
     ischemic_mRS = df.loc[(df['ischemic']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_ischemic'}, axis = 1)
     lvo_mRS = df.loc[(df['hasLVO']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_lvo'}, axis = 1)
-    #############
-    overtriage_undertriage = triage_indicators.drop(['hasLVO', 'destination_type'], axis = 1).groupby(['seed', 'diagnostic', 'threshold']).mean()
+
+    ##################################
+
+    overtriage_undertriage = triage_indicators.drop( 'destination_type', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).sum()
+    lvo_counts = triage_indicators[['seed', 'diagnostic', 'threshold', 'hasLVO']].groupby(['seed', 'diagnostic', 'threshold']).sum()
+    no_lvo_counts = (triage_indicators[['seed', 'diagnostic', 'threshold', 'hasLVO']].groupby(['seed', 'diagnostic', 'threshold']).count() - lvo_counts).rename({'hasLVO': 'no_lvo_count'}, axis = 1)
+    lvo_counts.rename({'hasLVO': 'lvo_count'}, axis = 1, inplace = True)
+    no_lvo_counts.rename({'hasLVO': 'no_lvo_count'}, axis = 1, inplace = True)
+    overtriage_undertriage = overtriage_undertriage.join((lvo_counts, no_lvo_counts), validate = '1:1')
+    overtriage_undertriage['undertriage'] = overtriage_undertriage['undertriage_ind'] / (overtriage_undertriage['lvo_count'])
+    overtriage_undertriage['overtriage'] = overtriage_undertriage['undertriage_ind'] / overtriage_undertriage['no_lvo_count']
+    overtriage_undertriage = overtriage_undertriage[['overtriage','undertriage']]
 
     ischemic_count = ischemic_indicators.drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_count'}, axis = 1)
     ischemic_ivt_count = ischemic_indicators.loc[ischemic_indicators['IVTtime'] < 270, :].drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_ivt_count'}, axis = 1)
@@ -78,7 +88,7 @@ def group_all_data(filepath, psc_only = False):
     joined_avgs['map'] = map_number
 
     k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
-    
+
     grouped_prop_avg = joined_avgs[['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff']].reset_index(['diagnostic', 'threshold']).groupby(['diagnostic','threshold'])
     grouped_prop_avg_mean = grouped_prop_avg.mean() 
     lower_prop_ci = grouped_prop_avg_mean - stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
