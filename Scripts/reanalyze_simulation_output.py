@@ -18,7 +18,7 @@ if not args.output.exists():
 
 parquet_list = sorted(args.input.glob('*.parquet'))
 
-def group_all_data(filepath, psc_only = False):
+def group_all_data(filepath, psc_only):
     map_number = int(filepath.stem.split('_')[1])
     df = pd.read_parquet(filepath)
     df = df.loc[~df['scenario'].isin([8, 15])]

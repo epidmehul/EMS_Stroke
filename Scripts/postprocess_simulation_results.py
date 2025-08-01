@@ -652,9 +652,7 @@ def generate_maps_csv(map_num, maps_csv_path, save = True):
 
 def preprocess_data(df, config = None):
     '''
-    Takes original data and groups it by cohort/scenario
-
-    Removes duplicate base cases
+    Preprocesses raw simulation output for cohort grouping
     '''
     # map_number = int(filepath.stem.split('_')[1])
     # df = pd.read_parquet(filepath)
@@ -670,7 +668,45 @@ def preprocess_data(df, config = None):
         df.loc[df['destination'].str.contains(config['nsc_prefix']), 'destination_type'] = 'NSC'
     except:
         df.loc[df['destination'].str.contains('PSC'), 'destination_type'] = 'PSC'
-    pass
+    return df
+
+def calc_triage(df):
+    '''
+    Calculates over- and undertriage for each cohort and scenario combination
+    '''
+    triage_indicators = df.loc[df['closest_destination'] != 'CSC', ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
+    triage_indicators['overtriage_ind'] = (triage_indicators['destination_type'] == 'CSC') & (~triage_indicators['hasLVO'])
+    triage_indicators['undertriage_ind'] = (triage_indicators['destination_type'] != 'CSC') & (triage_indicators['hasLVO'])
+
+    overtriage_undertriage = triage_indicators.drop( 'destination_type', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).sum()
+    lvo_counts = triage_indicators[['seed', 'diagnostic', 'threshold', 'hasLVO']].groupby(['seed', 'diagnostic', 'threshold']).sum()
+    no_lvo_counts = (triage_indicators[['seed', 'diagnostic', 'threshold', 'hasLVO']].groupby(['seed', 'diagnostic', 'threshold']).count() - lvo_counts).rename({'hasLVO': 'no_lvo_count'}, axis = 1)
+    lvo_counts.rename({'hasLVO': 'lvo_count'}, axis = 1, inplace = True)
+    no_lvo_counts.rename({'hasLVO': 'no_lvo_count'}, axis = 1, inplace = True)
+    overtriage_undertriage = overtriage_undertriage.join((lvo_counts, no_lvo_counts), validate = '1:1')
+    overtriage_undertriage['undertriage'] = overtriage_undertriage['undertriage_ind'] / (overtriage_undertriage['lvo_count'])
+    overtriage_undertriage['overtriage'] = overtriage_undertriage['overtriage_ind'] / overtriage_undertriage['no_lvo_count']
+    return overtriage_undertriage[['overtriage','undertriage']]
+
+def calc_time(df):
+    '''
+    Calculates IVT and EVT time by cohort and scenario combination
+    '''
+    ivt_times = df.loc[(df['ischemic']) & (df['IVTtime'] < 270), ['seed', 'diagnostic', 'threshold', 'IVTtime']]
+    evt_times = df.loc[(df['hasLVO']) & (df['EVTtime'] < 24 * 60), ['seed', 'diagnostic', 'threshold', 'EVTtime']]
+    ivt_cohort_avg = ivt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
+    evt_cohort_avg = evt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
+    return ivt_times.join(evt_times, validate = '1:1')
+
+def calc_mRS(df):
+    '''
+    Calculates probability of good mRS by cohort and scenario combination
+    '''
+    ischemic_mRS = df.loc[(df['ischemic']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_ischemic'}, axis = 1)
+    lvo_mRS = df.loc[(df['hasLVO']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_lvo'}, axis = 1)
+    mRS_ischemic_cohort_avg = ischemic_mRS.groupby(['seed', 'diagnostic','threshold']).mean()
+    mRS_lvo_cohort_avg = lvo_mRS.groupby(['seed', 'diagnostic', 'threshold']).mean()
+    return mRS_ischemic_cohort_avg.join(mRS_lvo_cohort_avg, validate = '1:1')
 
 def group_all_data(df, psc_only = False):
     if psc_only:
