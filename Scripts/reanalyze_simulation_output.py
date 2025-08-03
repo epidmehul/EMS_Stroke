@@ -120,7 +120,7 @@ if __name__ == '__main__':
         results = pool.starmap(group_all_data, list(zip(parquet_list, [False] * len(parquet_list))))
         psc_results = pool.starmap(group_all_data, list(zip(parquet_list, [True] * len(parquet_list))))
     grouped_avgs, intervals = zip(*results)
-    psc_grouped_avgs, psc_intervals= zip(*results)
+    psc_grouped_avgs, psc_intervals= zip(*psc_results)
     pd.concat(grouped_avgs).to_csv(args.output / 'all_cohort_avgs.csv')
     pd.concat(intervals).to_csv(args.output / 'map_scenario_intervals.csv', index = False)
     pd.concat(psc_grouped_avgs).to_csv(args.output / 'psc_cohort_avgs.csv')

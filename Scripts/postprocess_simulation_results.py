@@ -708,6 +708,12 @@ def calc_mRS(df):
     mRS_lvo_cohort_avg = lvo_mRS.groupby(['seed', 'diagnostic', 'threshold']).mean()
     return mRS_ischemic_cohort_avg.join(mRS_lvo_cohort_avg, validate = '1:1')
 
+def process_data(filepath, save = True, plots = True, errorbars = False, additional_filestr = None):
+    '''
+    Analyzes the parquet file
+    '''
+
+
 def group_all_data(df, psc_only = False):
     if psc_only:
         df = df.loc[df['closest_destination'] != 'CSC', :]
