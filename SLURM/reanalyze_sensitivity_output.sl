@@ -12,4 +12,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/reanalyze_simulation_output.py -n 50 -i /work/users/p/w/pwlin/full_output_sens/parquet_files -o /proj/patellab/peter/output
+python ../Scripts/reanalyze_sensitivity_output.py -n 50 -i /work/users/p/w/pwlin/full_output_sens/parquet_files -o /proj/patellab/peter/output
