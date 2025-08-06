@@ -102,9 +102,9 @@ def group_all_data(filepath, psc_only):
     lower = means - stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
     upper = means + stats.t.ppf(1 - (1 - args.width) / 2, df = k - 1) * np.sqrt(vars / k)
 
-    means = means.join(grouped_prop_avg_mean, validate = '1:1')
-    lower = lower.join(lower_prop_ci, validate = '1:1')
-    upper = upper.join(upper_prop_ci, validate = '1:1')
+    # means = means.join(grouped_prop_avg_mean, validate = '1:1')
+    # lower = lower.join(lower_prop_ci, validate = '1:1')
+    # upper = upper.join(upper_prop_ci, validate = '1:1')
 
     means.rename(lambda x: x+'_means', inplace = True, axis = 1)
     lower.rename(lambda x: x+'_lower', inplace = True, axis = 1)
