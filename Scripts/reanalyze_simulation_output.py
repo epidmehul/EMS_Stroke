@@ -89,12 +89,12 @@ def group_all_data(filepath, psc_only):
 
     k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
 
-    grouped_prop_avg = joined_avgs[['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff']].reset_index(['diagnostic', 'threshold']).groupby(['diagnostic','threshold'])
-    grouped_prop_avg_mean = grouped_prop_avg.mean() 
-    lower_prop_ci = grouped_prop_avg_mean - stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
-    upper_prop_ci = grouped_prop_avg_mean + stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
+    # grouped_prop_avg = joined_avgs[['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff']].reset_index(['diagnostic', 'threshold']).groupby(['diagnostic','threshold'])
+    # grouped_prop_avg_mean = grouped_prop_avg.mean() 
+    # lower_prop_ci = grouped_prop_avg_mean - stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
+    # upper_prop_ci = grouped_prop_avg_mean + stats.norm.ppf(1 - (1 - args.width)/ 2) * np.sqrt(grouped_prop_avg_mean * (1 - grouped_prop_avg_mean) / k)
 
-    joined_avgs.drop(['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff'], axis = 1, inplace = True)
+    # joined_avgs.drop(['ischemic_ivt_prop', 'lvo_evt_prop', 'ischemic_ivt_prop_diff', 'lvo_evt_prop_diff'], axis = 1, inplace = True)
 
     full_grouped_avgs = joined_avgs.drop('map', axis = 1).reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
     means = full_grouped_avgs.mean()

@@ -708,47 +708,39 @@ def calc_mRS(df):
     mRS_lvo_cohort_avg = lvo_mRS.groupby(['seed', 'diagnostic', 'threshold']).mean()
     return mRS_ischemic_cohort_avg.join(mRS_lvo_cohort_avg, validate = '1:1')
 
-def process_data(filepath, save = True, plots = True, errorbars = False, additional_filestr = None):
+def process_data(filepath, save = True, plots = True, errorbars = False, additional_filestr = None, config = None, psc_only = False, output_dir = None):
     '''
     Analyzes the parquet file
     '''
-
+    df = preprocess_data(filepath, config = config)
+    grouped_df = group_all_data(df, psc_only)
+    if plots:
+        grouped_df_2 = remove_base_case_and_non_diffs(grouped_df, remove_nondiffs = False)
+    pass
 
 def group_all_data(df, psc_only = False):
     if psc_only:
         df = df.loc[df['closest_destination'] != 'CSC', :]
 
+    triage_group_avgs = calc_triage(df)
+    time_group_avgs = calc_time(df)
+    mRS_group_avgs = calc_mRS(df)
     ############
-    triage_indicators = df.loc[df['closest_destination'] != 'CSC', ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
-    triage_indicators['overtriage'] = (triage_indicators['destination_type'] == 'CSC') & (~triage_indicators['hasLVO'])
-    triage_indicators['undertriage'] = (triage_indicators['destination_type'] != 'CSC') & (triage_indicators['hasLVO'])
-
+    
     ischemic_indicators = df.loc[df['ischemic'], ['seed', 'diagnostic', 'threshold', 'IVTtime', 'ischemic']]
     lvo_indicators = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'threshold', 'EVTtime', 'hasLVO']]
 
-    ivt_times = df.loc[(df['ischemic']) & (df['IVTtime'] < 270), ['seed', 'diagnostic', 'threshold', 'IVTtime']]
-    evt_times = df.loc[(df['hasLVO']) & (df['EVTtime'] < 24 * 60), ['seed', 'diagnostic', 'threshold', 'EVTtime']]
-
-    ischemic_mRS = df.loc[(df['ischemic']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_ischemic'}, axis = 1)
-    lvo_mRS = df.loc[(df['hasLVO']), ['seed', 'diagnostic', 'threshold', 'PrOut']].rename({'PrOut': 'mRS_lvo'}, axis = 1)
     #############
-    overtriage_undertriage = triage_indicators.drop(['hasLVO', 'destination_type'], axis = 1).groupby(['seed', 'diagnostic', 'threshold']).mean()
-
     ischemic_count = ischemic_indicators.drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_count'}, axis = 1)
     ischemic_ivt_count = ischemic_indicators.loc[ischemic_indicators['IVTtime'] < 270, :].drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_ivt_count'}, axis = 1)
 
     lvo_count = lvo_indicators.drop('EVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_count'}, axis = 1)
     lvo_evt_count = lvo_indicators.loc[lvo_indicators['EVTtime'] < 24 * 60, :].drop('EVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_evt_count'}, axis = 1)
 
-    ivt_cohort_avg = ivt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
-    evt_cohort_avg = evt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
-    mRS_ischemic_cohort_avg = ischemic_mRS.groupby(['seed', 'diagnostic','threshold']).mean()
-    mRS_lvo_cohort_avg = lvo_mRS.groupby(['seed', 'diagnostic', 'threshold']).mean()
-
-    grouped_avgs = overtriage_undertriage.join(
+    grouped_avgs = triage_group_avgs.join(
         (ischemic_count, ischemic_ivt_count,
-            lvo_count, lvo_evt_count, ivt_cohort_avg, evt_cohort_avg,
-            mRS_ischemic_cohort_avg, mRS_lvo_cohort_avg),
+            lvo_count, lvo_evt_count, time_group_avgs,
+            mRS_group_avgs),
         validate = '1:1'
     )
     #################
