@@ -790,7 +790,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         upper.rename(lambda x: x+'_upper', inplace = True, axis = 1)
 
         intervals_df = means.join((lower, upper), validate = '1:1')
-        intervals_df = intervals.sort_index(axis = 1)
+        intervals_df = intervals_df.sort_index(axis = 1)
 
         match save_format:
             case 'csv':
