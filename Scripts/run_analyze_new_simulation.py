@@ -10,6 +10,7 @@ parser.add_argument('-p', '--patients', help = 'number of patients', type = int,
 parser.add_argument('-c', '--config', help = 'config file with simulation parameters', type = pathlib.Path, default = None)
 parser.add_argument('-d', '--data', help = 'data file containing patient information on hexes and LKW times', type = pathlib.Path, default = None)
 parser.add_argument('-t', '--times', help = 'data file containing travel times from hexes and hospitals to hospitals', type = pathlib.Path, default = None)
+parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.95)
 parser.add_argument('-m', '--map_seed', help = 'map number to save results under', type = int, default = 0)
 # parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
 parser.add_argument('-o', '--output', help = 'output directory for simulation and analysis', type = pathlib.Path, default = '/work/users/p/w/pwlin/new_output')
