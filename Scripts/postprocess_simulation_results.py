@@ -668,6 +668,7 @@ def preprocess_data(df, config = None):
         df.loc[df['destination'].str.contains(config['nsc_prefix']), 'destination_type'] = 'NSC'
     except:
         df.loc[df['destination'].str.contains('PSC'), 'destination_type'] = 'PSC'
+        df.loc[df['destination'].str.contains('CSC'), 'destination_type'] = 'CSC'
     return df
 
 def calc_triage(df):
@@ -708,49 +709,87 @@ def calc_mRS(df):
     mRS_lvo_cohort_avg = lvo_mRS.groupby(['seed', 'diagnostic', 'threshold']).mean()
     return mRS_ischemic_cohort_avg.join(mRS_lvo_cohort_avg, validate = '1:1')
 
-def process_data(filepath, save = True, plots = True, errorbars = False, additional_filestr = None, config = None, psc_only = False, output_dir = None):
+def calc_counts_props(df):
     '''
-    Analyzes the parquet file
+    Calculates counts and proportions of ischemic and LVO patients who received IVT and EVT
     '''
-    df = preprocess_data(filepath, config = config)
-    grouped_df = group_all_data(df, psc_only)
-    if plots:
-        grouped_df_2 = remove_base_case_and_non_diffs(grouped_df, remove_nondiffs = False)
-    pass
+    ischemic_indicators = df.loc[df['ischemic'], ['seed', 'diagnostic', 'threshold', 'IVTtreatment', 'ischemic']]
+    lvo_indicators = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'threshold', 'EVTtreatment', 'hasLVO']]
 
-def group_all_data(df, psc_only = False):
-    if psc_only:
-        df = df.loc[df['closest_destination'] != 'CSC', :]
+    ischemic_count = ischemic_indicators.drop('IVTtreatment', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_count'}, axis = 1)
+    ischemic_ivt_count = ischemic_indicators.loc[ischemic_indicators['IVTtreatment'], :].drop('IVTtreatment', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_ivt_count'}, axis = 1)
 
-    triage_group_avgs = calc_triage(df)
-    time_group_avgs = calc_time(df)
-    mRS_group_avgs = calc_mRS(df)
-    ############
-    
-    ischemic_indicators = df.loc[df['ischemic'], ['seed', 'diagnostic', 'threshold', 'IVTtime', 'ischemic']]
-    lvo_indicators = df.loc[df['hasLVO'], ['seed', 'diagnostic', 'threshold', 'EVTtime', 'hasLVO']]
+    lvo_count = lvo_indicators.drop('EVTtreatment', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_count'}, axis = 1)
+    lvo_evt_count = lvo_indicators.loc[lvo_indicators['EVTtreatment'], :].drop('EVTtreatment', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_evt_count'}, axis = 1)
 
-    #############
-    ischemic_count = ischemic_indicators.drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_count'}, axis = 1)
-    ischemic_ivt_count = ischemic_indicators.loc[ischemic_indicators['IVTtime'] < 270, :].drop('IVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'ischemic': 'ischemic_ivt_count'}, axis = 1)
-
-    lvo_count = lvo_indicators.drop('EVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_count'}, axis = 1)
-    lvo_evt_count = lvo_indicators.loc[lvo_indicators['EVTtime'] < 24 * 60, :].drop('EVTtime', axis = 1).groupby(['seed', 'diagnostic', 'threshold']).count().rename({'hasLVO': 'lvo_evt_count'}, axis = 1)
-
-    grouped_avgs = triage_group_avgs.join(
-        (ischemic_count, ischemic_ivt_count,
-            lvo_count, lvo_evt_count, time_group_avgs,
-            mRS_group_avgs),
+    retval = ischemic_count.join(
+        (ischemic_ivt_count, lvo_count, lvo_evt_count),
         validate = '1:1'
     )
-    #################
+    retval['ischemic_ivt_prop'] = retval['ischemic_ivt_count'] / retval['ischemic_count']
+    retval['lvo_evt_prop'] = retval['lvo_evt_count'] / retval['lvo_count']
+    return retval
 
+def process_data(filepath, plots = True, errorbars = False, additional_file_name = None, config = None, psc_only = False, output_dir = None, intervals = True, interval_width = 0.95, save_format = 'parquet', df = None):
+    '''
+    Analyzes the simulation output
+
+    Optionally generates confidence intervals
+    '''
+    if not output_dir.exists():
+        output_dir.mkdir(parents = True)
+    if df is None:
+        map_number = int(filepath.stem.split('_')[1])
+        df = pd.read_parquet(filepath)
+    df = preprocess_data(df, config = config)
+    if psc_only:
+        df = df.loc[df['closest_destination'] == 'PSC', :]
+    triage_avgs = calc_triage(df)
+    time_avgs = calc_time(df)
+    mRS_avgs = calc_mRS(df)
+    props = calc_counts_props(df)
+    grouped_avgs = triage_avgs.join(
+        (time_avgs, mRS_avgs, props), validate = '1:1'
+    )
     grouped_avgs_diff = grouped_avgs.copy()
     for i in np.unique(grouped_avgs.index.get_level_values('seed').values):
         grouped_avgs_diff.loc[pd.IndexSlice[i, :, :], :] = grouped_avgs.loc[pd.IndexSlice[i, :, :], :] - grouped_avgs.loc[pd.IndexSlice[i, 'base', 0], :]
     grouped_avgs_diff.drop(['ischemic_count', 'lvo_count'], axis = 1, inplace = True)
     grouped_avgs_diff.rename(lambda x: x+'_diff', axis = 1, inplace = True)
-    
+
     joined_avgs = grouped_avgs.join(grouped_avgs_diff, validate = '1:1')
-    # joined_avgs['map'] = map_number
-    return joined_avgs.reset_index(['diagnostic', 'threshold'])
+    joined_avgs['map'] = map_number
+    match save_format:
+        case 'csv':
+            grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv'
+        case 'parquet':
+            grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+    intervals_df = None
+    if intervals:
+        k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
+        alpha = (1 - interval_width) / 2
+        full_grouped_avgs = joined_avgs.drop('map', axis = 1).reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
+        means = full_grouped_avgs.mean()
+        variance = full_grouped_avgs.var()
+        lower = means - stats.t.ppf(1 - alpha, df = k - 1) * np.sqrt(variance / k)
+        upper = means + stats.t.ppf(1 - alpha, df = k - 1) * np.sqrt(variance / k)
+
+        means.rename(lambda x: x+'_means', inplace = True, axis = 1)
+        lower.rename(lambda x: x+'_lower', inplace = True, axis = 1)
+        upper.rename(lambda x: x+'_upper', inplace = True, axis = 1)
+
+        intervals_df = means.join((lower, upper), validate = '1:1')
+        intervals_df = intervals.sort_index(axis = 1)
+
+        match save_format:
+            case 'csv':
+                intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+            case 'parquet':
+                intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+    # if plots:
+    #     if errorbars:
+    #         errorbar = ('ci', interval_width)
+    #     else:
+    #         errorbar = None
+    #     triage_plot = sns.lineplot()
+    return grouped_avgs, intervals_df

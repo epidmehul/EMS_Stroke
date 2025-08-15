@@ -386,15 +386,28 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     ####################### Outcomes ######################
     try:
-        door2IVT = config['door2IVT']
-        door2EVT = config['door2EVT']
-        IVT2out = config['IVT2out']
-        door2EVT2 = config['door2EVT2']
-    except:
-        door2IVT = 45
-        door2EVT = 90
-        IVT2out = 45
-        door2EVT2 = 45
+        door_times = config['simulations_hospital_times']
+        door2IVT = eval(door_times['door2IVT']['dist'])(size = num_patients, **door_times['door2IVT']['kwargs'])
+        door2EVT = eval(door_times['door2EVT']['dist'])(size = num_patients, **door_times['door2EVT']['kwargs'])
+        IVT2out = eval(door_times['IVT2out']['dist'])(size = num_patients, **door_times['IVT2out']['kwargs'])
+        door2EVT2 = eval(door_times['door2EVT2']['dist'])(size = num_patients, **door_times['door2EVT2']['kwargs'])
+        # door2IVT = config['door2IVT']
+        # door2EVT = config['door2EVT']
+        # IVT2out = config['IVT2out']
+        # door2EVT2 = config['door2EVT2']
+    except: # change to distributions
+        # minimum: 30 mins
+        # maximum for door2IVT, door2EVT, door2EVT2: 2 hours
+        # maximum for IVT2out: 6 hours
+        door2IVT = np.repeat(45, repeats = num_patients)
+        door2EVT = np.repeat(90, repeats = num_patients)
+        IVT2out = np.repeat(45, repeats = num_patients)
+        door2EVT2 = np.repeat(45, repeats = num_patients)
+    door2IVT = np.broadcast_to(np.expand_dims(door2IVT, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    door2EVT = np.broadcast_to(np.expand_dims(door2EVT, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    IVT2out = np.broadcast_to(np.expand_dims(IVT2out, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    door2EVT2 = np.broadcast_to(np.expand_dims(door2EVT2, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+
     transdist1 = np.linalg.norm(med_coords[0,:] - med_coords[1,:]) * geoscale
     transtime1 = (transdist1/drivespeed)*60
     transdist2 = np.linalg.norm(med_coords[0,:] - med_coords[2,:]) * geoscale
@@ -561,7 +574,7 @@ def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, 
             case 'parquet':
                 output_file = output_dir_path / f'{additional_file_name}{'_' if additional_file_name != '' else ''}map_{str(i).zfill(3)}.parquet'
                 map_output_df.to_parquet(output_file, index = False)
-    return None
+    return map_output_df
 
 def run_patient_simulations(map_seeds = [0], num_patients = 1000, patient_seeds = [0], save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
     min_map = min(map_seeds)
