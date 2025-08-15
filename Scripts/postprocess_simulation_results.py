@@ -697,7 +697,7 @@ def calc_time(df):
     evt_times = df.loc[df['EVTtreatment'], ['seed', 'diagnostic', 'threshold', 'EVTtime']]
     ivt_cohort_avg = ivt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
     evt_cohort_avg = evt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
-    return ivt_times.join(evt_times, validate = '1:1')
+    return ivt_cohort_avg.join(evt_cohort_avg, validate = '1:1')
 
 def calc_mRS(df):
     '''
