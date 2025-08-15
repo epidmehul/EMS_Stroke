@@ -793,9 +793,9 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         intervals_df = intervals_df.sort_index(axis = 1)
 
         if filepath is not None:
-                    intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
-                else:
-                    intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
+            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+        else:
+            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
         # match save_format:
         #     case 'csv':
         #         if filepath is not None:
