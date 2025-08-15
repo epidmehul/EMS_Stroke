@@ -730,7 +730,7 @@ def calc_counts_props(df):
     retval['lvo_evt_prop'] = retval['lvo_evt_count'] / retval['lvo_count']
     return retval
 
-def process_data(filepath = None, plots = True, errorbars = False, additional_file_name = None, config = None, psc_only = False, output_dir = None, intervals = True, interval_width = 0.95, save_format = 'parquet', df = None):
+def process_data(filepath = None, plots = True, errorbars = False, additional_file_name = None, config = None, psc_only = False, output_dir = None, intervals = True, interval_width = 0.95, save_format = 'parquet', df = None, map_number = None):
     '''
     Analyzes the simulation output
 
@@ -743,6 +743,9 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     if df is None:
         map_number = int(filepath.stem.split('_')[1])
         df = pd.read_parquet(filepath)
+    else:
+        if map_number is None:
+            raise Exception("Provide a map_number argument so that the output files can be saved accordingly")
     df = preprocess_data(df, config = config)
     if psc_only:
         df = df.loc[df['closest_destination'] == 'PSC', :]

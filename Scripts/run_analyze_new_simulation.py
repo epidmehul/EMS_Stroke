@@ -29,8 +29,8 @@ except:
 
 def run_analyze(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
-    cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results')
-    psc_cohort_avgs, psc_intervals = process_data(df = df, psc_only = True, output_dir = output_dir / 'results')
+    cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed)
+    psc_cohort_avgs, psc_intervals = process_data(df = df, psc_only = True, output_dir = output_dir / 'results', map_number = map_seed)
 
 
 if __name__ == '__main__':
