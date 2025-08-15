@@ -693,8 +693,8 @@ def calc_time(df):
     '''
     Calculates IVT and EVT time by cohort and scenario combination
     '''
-    ivt_times = df.loc[(df['ischemic']) & (df['IVTtime'] < 270), ['seed', 'diagnostic', 'threshold', 'IVTtime']]
-    evt_times = df.loc[(df['hasLVO']) & (df['EVTtime'] < 24 * 60), ['seed', 'diagnostic', 'threshold', 'EVTtime']]
+    ivt_times = df.loc[df['IVTtreatment'], ['seed', 'diagnostic', 'threshold', 'IVTtime']]
+    evt_times = df.loc[df['EVTtreatment'], ['seed', 'diagnostic', 'threshold', 'EVTtime']]
     ivt_cohort_avg = ivt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
     evt_cohort_avg = evt_times.groupby(['seed', 'diagnostic', 'threshold']).mean()
     return ivt_times.join(evt_times, validate = '1:1')
