@@ -761,7 +761,7 @@ def process_data(filepath, plots = True, errorbars = False, additional_file_name
     joined_avgs['map'] = map_number
     match save_format:
         case 'csv':
-            grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv'
+            grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
         case 'parquet':
             grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
     intervals_df = None
