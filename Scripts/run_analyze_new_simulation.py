@@ -36,6 +36,7 @@ def run_analyze(map_seed):
 if __name__ == '__main__':
     if not output_dir.exists():
         output_dir.mkdir(parents = True)
+    run_analyze(args.map_seed)
     # with mp.Pool(args.n_cores) as pool:
         # pool.map(run_single_map, map_seeds)
         # results = pool.map(analyze_parquet, map_seeds)
