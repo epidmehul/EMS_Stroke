@@ -766,9 +766,15 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     joined_avgs['map'] = map_number
     match save_format:
         case 'csv':
-            grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+            if filepath is not None:
+                grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+            else:
+                grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
         case 'parquet':
-            grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+            if filepath is not None:
+                grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+            else:
+                grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     intervals_df = None
     if intervals:
         k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
@@ -788,9 +794,15 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
 
         match save_format:
             case 'csv':
-                intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+                if filepath is not None:
+                    intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+                else:
+                    intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
             case 'parquet':
-                intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+                if filepath is not None:
+                    intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+                else:
+                    intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     # if plots:
     #     if errorbars:
     #         errorbar = ('ci', interval_width)
