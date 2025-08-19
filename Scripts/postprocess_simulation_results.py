@@ -749,7 +749,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     df = preprocess_data(df, config = config)
     if psc_only:
         if config is None:
-            df = df.loc[df['closest_destination'].str.contains('CSC'), :]
+            df = df.loc[~df['closest_destination'].str.contains('CSC'), :]
         else:
             df = df.loc[~df['closest_destination'].str.contains(config['csc_prefix']), :]
     triage_avgs = calc_triage(df)
