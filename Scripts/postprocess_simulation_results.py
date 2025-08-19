@@ -767,14 +767,14 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     match save_format:
         case 'csv':
             if filepath is not None:
-                grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+                joined_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
             else:
-                grouped_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
+                joined_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
         case 'parquet':
             if filepath is not None:
-                grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+                joined_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
             else:
-                grouped_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
+                joined_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     intervals_df = None
     if intervals:
         k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
@@ -793,9 +793,9 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         intervals_df = intervals_df.sort_index(axis = 1)
 
         if filepath is not None:
-            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name if additional_file_name is not None}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
         else:
-            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
+            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name if additional_file_name is not None}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
         # match save_format:
         #     case 'csv':
         #         if filepath is not None:
@@ -807,10 +807,36 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         #             intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
         #         else:
         #             intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
-    # if plots:
-    #     if errorbars:
-    #         errorbar = ('ci', interval_width)
-    #     else:
-    #         errorbar = None
-    #     triage_plot = sns.lineplot()
-    return grouped_avgs, intervals_df
+    if plots:
+        if errorbars:
+            errorbar = ('ci', interval_width)
+        else:
+            errorbar = None
+        diffed_avgs = joined_avgs.drop(joined_avgs.filter(regex = '_diff', axis = 1), axis = 1)
+        diffed_avgs = diffed_avgs.reset_index()
+        diffed_avgs = diffed_avgs.loc[diffed_avgs['threshold'] > 0, :]
+        
+        triage_fig, triage_axes = plt.subplots(1, 2)
+        sns.lineplot(diffed_avgs, x = 'threshold', y = 'overtriage_diff', hue = 'diagnostic', marker = 'o', errorbar = None, ax = triage_axes[0])
+        sns.lineplot(diffed_avgs, x = 'threshold', y = 'undertriage_diff', hue = 'diagnostic', marker = 'o', errorbar = None, ax = triage_axes[1])
+        triage_axes[0].set_title('overtriage')
+        triage_axes[1].set_title('undertriage')
+
+        time_fig, time_axes = plt.subplots(1, 2)
+        sns.lineplot(diffed_avgs, x = 'threshold', y = 'IVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[0])
+        sns.lineplot(diffed_avgs, x = 'threshold', y = 'EVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[1])
+        time_axes[0].set_title('IVT time')
+        time_axes[1].set_title('EVT time')
+
+        mRS_fig, mRS_axes = plt.subplots(1, 2)
+        sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_ischemic_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[0])
+        sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_lvo_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[1])
+        mRS_axes[0].set_title('ischemic')
+        mRS_axes[1].set_title('LVO')
+
+        triage_fig.savefig(output_dir / f'{'psc_' if psc_only}{additional_file_name if additional_file_name is not None}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
+
+        time_fig.savefig(output_dir / f'{'psc_' if psc_only}{additional_file_name if additional_file_name is not None}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
+
+        mRS_fig.savefig(output_dir / f'{'psc_' if psc_only}{additional_file_name if additional_file_name is not None}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
+    return joined_avgs, intervals_df

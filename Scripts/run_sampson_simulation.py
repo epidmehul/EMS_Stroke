@@ -29,8 +29,8 @@ config_dict['hexes'] = dict(hex_info.groupby('Hex').agg(lambda x: x)['n'])
 
 def run_analyze(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
-    cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed)
-    psc_cohort_avgs, psc_intervals = process_data(df = df, psc_only = True, output_dir = output_dir / 'results', map_number = map_seed)
+    cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False)
+    psc_cohort_avgs, psc_intervals = process_data(df = df, psc_only = True, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv')
 
 if __name__ == '__main__':
     if not output_dir.exists():
