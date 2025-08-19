@@ -812,7 +812,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
             errorbar = ('ci', interval_width)
         else:
             errorbar = None
-        diffed_avgs = joined_avgs.drop(joined_avgs.filter(regex = '_diff', axis = 1), axis = 1)
+        # diffed_avgs = joined_avgs.drop(joined_avgs.filter(regex = '_diff', axis = 1), axis = 1)
         diffed_avgs = diffed_avgs.reset_index()
         diffed_avgs = diffed_avgs.loc[diffed_avgs['threshold'] > 0, :]
         
