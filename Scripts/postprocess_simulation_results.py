@@ -813,7 +813,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         else:
             errorbar = None
         # diffed_avgs = joined_avgs.drop(joined_avgs.filter(regex = '_diff', axis = 1), axis = 1)
-        diffed_avgs = diffed_avgs.reset_index()
+        diffed_avgs = joined_avgs.reset_index()
         diffed_avgs = diffed_avgs.loc[diffed_avgs['threshold'] > 0, :]
         
         triage_fig, triage_axes = plt.subplots(1, 2)
