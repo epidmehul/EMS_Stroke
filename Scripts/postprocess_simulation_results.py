@@ -808,6 +808,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         #         else:
         #             intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     if plots:
+        sns.set_theme()
         if errorbars:
             errorbar = ('ci', interval_width)
         else:
