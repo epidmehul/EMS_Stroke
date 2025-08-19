@@ -72,7 +72,14 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'nsc_prefix': 'Z'
     }
     data_config, transport_times, transfer_times = data_to_config(patient_data_filestr, times_filestr)
-    retval = params | config_override | data_config
+    try:
+        retval = params | config_override
+    except:
+        retval = params
+    try:
+        retval = retval | data_config
+    except:
+        pass
     retval['transport_times'] = transport_times
     retval['transfer_times'] = transfer_times
     return retval

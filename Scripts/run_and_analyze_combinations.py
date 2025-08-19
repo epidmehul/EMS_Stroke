@@ -11,7 +11,7 @@ parser.add_argument('-d', '--data', help = 'data file containing patient informa
 parser.add_argument('-t', '--times', help = 'data file containing travel times from hexes and hospitals to hospitals', type = pathlib.Path, default = None)
 parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
 parser.add_argument('-f', '--cohort_file', help = 'file containing the cohort configurations and map seed number', type = pathlib.Path)
-parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.9)
+parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.95)
 parser.add_argument('-o', '--output', help = 'output directory for simulation and analysis', type = pathlib.Path, default = '/work/users/p/w/pwlin/output2/parquet_files')
 args = parser.parse_args()
 
