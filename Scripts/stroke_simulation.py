@@ -14,20 +14,27 @@ def data_to_config(patient_filestr, times_filestr):
     '''
     # Patient level data -- LKW and hex frequencies
     try:
+        patient_retval = {}
         data = pd.read_csv(patient_filestr)
-        hex_config = dict(data.groupby(data['hex']).size())
-        data['lkw_bins'] = pd.cut(data['last_well'], 
-            bins = [0, 1/60, 1/6, 2, 3.5, 8, 24, 48, 72])
-        patient_config = {}
-        lkw_info = data.groupby('lkw_bins').size()
-        for bin in lkw_info.index:
-            patient_config[bin] = {
-                'prob': lkw_info.loc[bin],
-                'dist': 'rng.uniform',
-                'kwargs': {'low': bin.left, 'high': bin.right}
-            }
-        patient_retval = {'hexes': hex_config,
-            'patient_lkw_bins': patient_config}
+        try:
+            hex_config = dict(data.groupby(data['hex']).size())
+            patient_retval['hexes'] = hex_config
+        except:
+            pass
+        try:
+            data['lkw_bins'] = pd.cut(data['last_well'], 
+                bins = [0, 1/60, 1/6, 2, 3.5, 8, 24, 48, 72])
+            patient_config = {}
+            lkw_info = data.groupby('lkw_bins').size()
+            for bin in lkw_info.index:
+                patient_config[bin] = {
+                    'prob': lkw_info.loc[bin],
+                    'dist': 'rng.uniform',
+                    'kwargs': {'low': bin.left, 'high': bin.right}
+                }
+            patient_retval['patient_lkw_bins'] = patient_config
+        except:
+            pass
     except:
         patient_retval = None
 

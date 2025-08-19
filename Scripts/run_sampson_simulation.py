@@ -22,7 +22,10 @@ map_seeds = [args.map_seed]
 patient_seeds = [i for i in range(args.seeds)]
 output_dir = args.output
 
-config_dict = read_config(args.config, args.data, args.times)
+config_dict = read_config(args.config, None, args.times)
+
+hex_info = pd.read_csv(args.data)
+config_dict['hexes'] = dict(hex_info.groupby('Hex').agg(lambda x: x)['n'])
 
 def run_analyze(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
