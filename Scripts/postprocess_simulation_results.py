@@ -748,7 +748,10 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
             raise Exception("Provide a map_number argument so that the output files can be saved accordingly")
     df = preprocess_data(df, config = config)
     if psc_only:
-        df = df.loc[df['closest_destination'] == 'PSC', :]
+        if config is None:
+            df = df.loc[df['closest_destination'].str.contains('CSC'), :]
+        else:
+            df = df.loc[~df['closest_destination'].str.contains(config['csc_prefix']), :]
     triage_avgs = calc_triage(df)
     time_avgs = calc_time(df)
     mRS_avgs = calc_mRS(df)
