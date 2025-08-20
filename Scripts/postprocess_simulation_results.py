@@ -853,6 +853,6 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
 
         time_plots.savefig(output_dir / f'map_{str(map_number).zfill(3)}'/ f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
 
-        mRS_plots.savefig(output_dir / / f'map_{str(map_number).zfill(3)}'f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
+        mRS_plots.savefig(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
 
     return joined_avgs, intervals_df
