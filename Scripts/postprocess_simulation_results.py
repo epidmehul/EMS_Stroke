@@ -746,7 +746,8 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     else:
         if map_number is None:
             raise Exception("Provide a map_number argument so that the output files can be saved accordingly")
-    (output_dir / f'map_{str(map_number).zfill(3)}').mkdir()
+    if not (output_dir / f'map_{str(map_number).zfill(3)}').exists():
+        (output_dir / f'map_{str(map_number).zfill(3)}').mkdir(parents = True)
     df = preprocess_data(df, config = config)
     if psc_only:
         if config is None:
