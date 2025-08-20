@@ -2,8 +2,8 @@
 
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH --mem=4g
-#SBATCH -t 00:05:00
+#SBATCH --mem=16g
+#SBATCH -t 00:10:00
 #SBATCH -o /nas/longleaf/home/pwlin/strokes/output.out
 #SBATCH -J sampson
 #SBATCH --mail-type=end
