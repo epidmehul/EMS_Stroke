@@ -847,6 +847,9 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         mRS_vals = pd.melt(diffed_avgs[['diagnostic','threshold','mRS_ischemic_diff','mRS_lvo_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'mRS', value_name = 'val')
         mRS_plots = sns.relplot(mRS_vals, x = 'threshold', y = 'val', col = 'mRS', hue = 'diagnostic', kind = 'line', marker = 'o', errorbar = errorbar, facet_kws = {'sharey': False})
 
+        prop_vals = pd.melt(diffed_avgs[['diagnostic','threshold','ischemic_ivt_prop_diff','lvo_evt_prop_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'proportion', value_name = 'val')
+        prop_plots = sns.relplot(prop_vals, x = 'threshold', y = 'val', col = 'proportion', hue = 'diagnostic', kind = 'line', marker = 'o', errorbar = errorbar, facet_kws = {'sharey': False})
+
         # triage_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
 
         # time_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
@@ -858,4 +861,5 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
 
         mRS_plots.savefig(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
 
+        prop_plots.savefig(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_treatment_proportions_plot.png')
     return joined_avgs, intervals_df

@@ -44,6 +44,9 @@ def data_to_config(patient_filestr, times_filestr):
         num_hosps = len(times_data.columns) - 1
         hex_hosp_times = times_data[:-num_hosps].set_index(times_data.columns[0])
         hosp_hosp_times = times_data[-num_hosps:].set_index(times_data.columns[0])
+        # times_data = times_data.set_index(times_data.columns[0])
+        # hosp_hosp_times = times_data.loc[times_data.columns, :]
+        # hex_hosp_times = times_data.drop(times_data.columns, axis = 0)
     except:
         hex_hosp_times = None
         hosp_hosp_times = None
