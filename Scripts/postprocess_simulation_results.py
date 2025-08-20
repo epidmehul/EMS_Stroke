@@ -749,9 +749,9 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     df = preprocess_data(df, config = config)
     if psc_only:
         if config is None:
-            df = df.loc[~df['closest_destination'].str.contains('CSC'), :]
+            df = df.loc[~(df['closest_destination'].str.contains('CSC')), :]
         else:
-            df = df.loc[~df['closest_destination'].str.contains(config['csc_prefix']), :]
+            df = df.loc[~(df['closest_destination'].str.contains(config['csc_prefix'])), :]
     triage_avgs = calc_triage(df)
     time_avgs = calc_time(df)
     mRS_avgs = calc_mRS(df)
@@ -820,27 +820,39 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         diffed_avgs = joined_avgs.reset_index()
         diffed_avgs = diffed_avgs.loc[diffed_avgs['threshold'] > 0, :]
         
-        triage_fig, triage_axes = plt.subplots(1, 2)
-        sns.lineplot(diffed_avgs, x = 'threshold', y = 'overtriage_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = triage_axes[0])
-        sns.lineplot(diffed_avgs, x = 'threshold', y = 'undertriage_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = triage_axes[1])
-        triage_axes[0].set_title('overtriage')
-        triage_axes[1].set_title('undertriage')
+        # triage_fig, triage_axes = plt.subplots(1, 2)
+        # sns.lineplot(diffed_avgs, x = 'threshold', y = 'overtriage_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = triage_axes[0])
+        # sns.lineplot(diffed_avgs, x = 'threshold', y = 'undertriage_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = triage_axes[1])
+        # triage_axes[0].set_title('overtriage')
+        # triage_axes[1].set_title('undertriage')
+        triage_vals = pd.melt(diffed_avgs[['diagnostic','threshold','overtriage_diff','undertriage_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'triage', value_name = 'val')
+        triage_plots = sns.relplot(triage_vals, x = 'threshold', y = 'val', col = 'triage', hue = 'diagnostic', kind = 'line', facet_kws = {'sharey': False})
 
-        time_fig, time_axes = plt.subplots(1, 2)
-        sns.lineplot(diffed_avgs, x = 'threshold', y = 'IVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[0])
-        sns.lineplot(diffed_avgs, x = 'threshold', y = 'EVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[1])
-        time_axes[0].set_title('IVT time')
-        time_axes[1].set_title('EVT time')
+        # time_fig, time_axes = plt.subplots(1, 2)
+        # sns.lineplot(diffed_avgs, x = 'threshold', y = 'IVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[0])
+        # sns.lineplot(diffed_avgs, x = 'threshold', y = 'EVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[1])
+        # time_axes[0].set_title('IVT time')
+        # time_axes[1].set_title('EVT time')
+        time_vals = pd.melt(diffed_avgs[['diagnostic','threshold','IVTtime_diff','EVTtime_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'time', value_name = 'val')
+        time_plots = sns.relplot(time_vals, x = 'threshold', y = 'val', col = 'time', hue = 'diagnostic', kind = 'line', facet_kws = {'sharey': False})
 
-        mRS_fig, mRS_axes = plt.subplots(1, 2)
-        sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_ischemic_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[0])
-        sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_lvo_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[1])
-        mRS_axes[0].set_title('ischemic')
-        mRS_axes[1].set_title('LVO')
+        # mRS_fig, mRS_axes = plt.subplots(1, 2)
+        # sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_ischemic_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[0])
+        # sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_lvo_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[1])
+        # mRS_axes[0].set_title('ischemic')
+        # mRS_axes[1].set_title('LVO')
+        mRS_vals = pd.melt(diffed_avgs[['diagnostic','threshold','mRS_ischemic_diff','mRS_lvo_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'mRS', value_name = 'val')
+        mRS_plots = sns.relplot(mRS_vals, x = 'threshold', y = 'val', col = 'mRS', hue = 'diagnostic', kind = 'line', facet_kws = {'sharey': False})
 
-        triage_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
+        # triage_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
 
-        time_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
+        # time_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
 
-        mRS_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
+        # mRS_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
+        triage_plots.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
+
+        time_plots.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
+
+        mRS_plots.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
+
     return joined_avgs, intervals_df
