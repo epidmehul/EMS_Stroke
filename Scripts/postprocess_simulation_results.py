@@ -770,14 +770,14 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     match save_format:
         case 'csv':
             if filepath is not None:
-                joined_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+                joined_avgs.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
             else:
-                joined_avgs.to_csv(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
+                joined_avgs.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
         case 'parquet':
             if filepath is not None:
-                joined_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+                joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
             else:
-                joined_avgs.to_parquet(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
+                joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     intervals_df = None
     if intervals:
         k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
@@ -796,9 +796,9 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         intervals_df = intervals_df.sort_index(axis = 1)
 
         if filepath is not None:
-            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+            intervals_df.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_intervals_' if psc_only else 'intervals_'}{(additional_file_name+'_') if additional_file_name is not None else ''}{filepath.stem}.csv')
         else:
-            intervals_df.to_csv(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
+            intervals_df.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_intervals_' if psc_only else 'intervals_'}{(additional_file_name+'_') if additional_file_name is not None else ''}map_{map_number}.csv')
         # match save_format:
         #     case 'csv':
         #         if filepath is not None:
@@ -849,10 +849,10 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         # time_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
 
         # mRS_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
-        triage_plots.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
+        triage_plots.savefig(output_dir / f'map_{str(map_number).zfill(3)}'/ f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
 
-        time_plots.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
+        time_plots.savefig(output_dir / f'map_{str(map_number).zfill(3)}'/ f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_time_plot.png')
 
-        mRS_plots.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
+        mRS_plots.savefig(output_dir / / f'map_{str(map_number).zfill(3)}'f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_mRS_plot.png')
 
     return joined_avgs, intervals_df
