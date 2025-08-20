@@ -781,8 +781,8 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
             else:
                 joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     intervals_df = None
+    k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
     if intervals:
-        k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
         alpha = (1 - interval_width) / 2
         full_grouped_avgs = joined_avgs.drop('map', axis = 1).reset_index(['diagnostic', 'threshold']).groupby(['diagnostic', 'threshold'])
         means = full_grouped_avgs.mean()
@@ -815,7 +815,8 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     if plots:
         sns.set_theme()
         if errorbars:
-            errorbar = ('ci', interval_width)
+            # errorbar = ('ci', interval_width)
+            errorbar = ('se', stats.t.ppf(1 - (1 - interval_width)/2, k - 1))
         else:
             errorbar = None
         # diffed_avgs = joined_avgs.drop(joined_avgs.filter(regex = '_diff', axis = 1), axis = 1)
@@ -828,7 +829,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         # triage_axes[0].set_title('overtriage')
         # triage_axes[1].set_title('undertriage')
         triage_vals = pd.melt(diffed_avgs[['diagnostic','threshold','overtriage_diff','undertriage_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'triage', value_name = 'val')
-        triage_plots = sns.relplot(triage_vals, x = 'threshold', y = 'val', col = 'triage', hue = 'diagnostic', kind = 'line', facet_kws = {'sharey': False})
+        triage_plots = sns.relplot(triage_vals, x = 'threshold', y = 'val', col = 'triage', hue = 'diagnostic', kind = 'line', marker = 'o', errorbar = errorbar, facet_kws = {'sharey': False})
 
         # time_fig, time_axes = plt.subplots(1, 2)
         # sns.lineplot(diffed_avgs, x = 'threshold', y = 'IVTtime_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = time_axes[0])
@@ -836,7 +837,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         # time_axes[0].set_title('IVT time')
         # time_axes[1].set_title('EVT time')
         time_vals = pd.melt(diffed_avgs[['diagnostic','threshold','IVTtime_diff','EVTtime_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'time', value_name = 'val')
-        time_plots = sns.relplot(time_vals, x = 'threshold', y = 'val', col = 'time', hue = 'diagnostic', kind = 'line', facet_kws = {'sharey': False})
+        time_plots = sns.relplot(time_vals, x = 'threshold', y = 'val', col = 'time', hue = 'diagnostic', kind = 'line', marker = 'o', errorbar = errorbar, facet_kws = {'sharey': False})
 
         # mRS_fig, mRS_axes = plt.subplots(1, 2)
         # sns.lineplot(diffed_avgs, x = 'threshold', y = 'mRS_ischemic_diff', hue = 'diagnostic', marker = 'o', errorbar = errorbar, ax = mRS_axes[0])
@@ -844,7 +845,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         # mRS_axes[0].set_title('ischemic')
         # mRS_axes[1].set_title('LVO')
         mRS_vals = pd.melt(diffed_avgs[['diagnostic','threshold','mRS_ischemic_diff','mRS_lvo_diff']], id_vars = ['diagnostic', 'threshold'], var_name = 'mRS', value_name = 'val')
-        mRS_plots = sns.relplot(mRS_vals, x = 'threshold', y = 'val', col = 'mRS', hue = 'diagnostic', kind = 'line', facet_kws = {'sharey': False})
+        mRS_plots = sns.relplot(mRS_vals, x = 'threshold', y = 'val', col = 'mRS', hue = 'diagnostic', kind = 'line', marker = 'o', errorbar = errorbar, facet_kws = {'sharey': False})
 
         # triage_fig.savefig(output_dir / f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_triage_plot.png')
 
