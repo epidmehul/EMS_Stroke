@@ -772,14 +772,14 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     match save_format:
         case 'csv':
             if filepath is not None:
-                joined_avgs.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.csv')
+                joined_avgs.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name is not None else ''}{filepath.stem}.csv')
             else:
-                joined_avgs.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.csv')
+                joined_avgs.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name is not None else ''}map_{map_number}.csv')
         case 'parquet':
             if filepath is not None:
-                joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}{filepath.stem}.parquet')
+                joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name is not None else ''}{filepath.stem}.parquet')
             else:
-                joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
+                joined_avgs.to_parquet(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name is not None else ''}map_{map_number}.parquet')
     intervals_df = None
     k = np.unique(grouped_avgs.index.get_level_values('seed').values).shape[0]
     if intervals:

@@ -20,7 +20,8 @@ args = parser.parse_args()
 map_seeds = [args.map_seed]
 # map_seeds = [i for i in range(1000)]
 patient_seeds = [i for i in range(args.seeds)]
-output_dir = args.output
+# output_dir = args.output
+output_dir = pathlib.Path('/work/users/p/w/pwlin/sampson_sensitivity')
 
 config_dict = read_config(args.config, None, args.times)
 
@@ -29,9 +30,16 @@ config_dict['hexes'] = dict(hex_info.groupby('Hex').agg(lambda x: x)['n'])
 
 def run_analyze(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
+
+    high_df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict | {'patients_lvo_ischemic': 0.341})
+
+    low_df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict {'patients_lvo_ischemic': 0.141})
     
     cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True)
-    psc_cohort_avgs, psc_intervals = process_data(df = df, psc_only = True, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', config = config_dict, errorbars = True)
+    
+    high_cohort_avgs, high_intervals = process_data(df = high_df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True, additional_file_name = 'high')
+
+    low_cohort_avgs, low_intervals = process_data(df = low_df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True, additional_file_name = 'low')
 
 if __name__ == '__main__':
     if not output_dir.exists():
