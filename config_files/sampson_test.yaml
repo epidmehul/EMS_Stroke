@@ -59,27 +59,27 @@ simulations_hospital_times:
   door2IVT:
     dist: rng.triangular
     kwargs:
-      low: 30
+      left: 30
       mode: 45
-      high: 120
+      right: 120
   door2EVT:
     dist: rng.triangular
     kwargs:
-      low: 30
+      left: 30
       mode: 45
-      high: 120
+      right: 120
   IVT2out:
     dist: rng.triangular
     kwargs:
-      low: 45
+      left: 45
       mode: 90
-      high: 360
+      right: 360
   door2EVT2:
     dist: rng.triangular
     kwargs:
-      low: 30
+      left: 30
       mode: 45
-      high: 90
+      right: 90
 
 
 simulations_ivt_threshold: 270
