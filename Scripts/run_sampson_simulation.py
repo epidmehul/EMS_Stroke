@@ -20,13 +20,15 @@ args = parser.parse_args()
 map_seeds = [args.map_seed]
 # map_seeds = [i for i in range(1000)]
 patient_seeds = [i for i in range(args.seeds)]
-# output_dir = args.output
-output_dir = pathlib.Path('/work/users/p/w/pwlin/sampson_sensitivity')
+output_dir = args.output
+# output_dir = pathlib.Path('/work/users/p/w/pwlin/sampson_sensitivity')
 
 config_dict = read_config(args.config, None, args.times)
 
 hex_info = pd.read_csv(args.data)
 config_dict['hexes'] = dict(hex_info.groupby('Hex').agg(lambda x: x)['n'])
+
+print(config_dict)
 
 def run_analyze_sensitivitity(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
@@ -45,6 +47,7 @@ def run_analyze(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
 
     print(df.shape)
+    df.to_parquet('~/test.parquet')
     df.to_parquet(output_dir / 'parquet_files' / 'test.parquet')
     
     cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True)
