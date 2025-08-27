@@ -45,7 +45,7 @@ def run_analyze(map_seed):
     df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
 
     print(df.shape)
-    df.to_parquet('~/test.parquet')
+    df.to_parquet(output_dir / 'parquet_files' / 'test.parquet')
     
     cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True)
 
