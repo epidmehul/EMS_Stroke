@@ -405,8 +405,10 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     try:
         door_times = config['simulations_hospital_times']
         door2IVT = eval(door_times['door2IVT']['dist'])(size = num_patients, **door_times['door2IVT']['kwargs'])
+        NSCdoor2IVT = eval(door_times['NSCdoor2IVT']['dist'])(size = num_patients, **door_times['NSCdoor2IVT']['kwargs'])
         door2EVT = eval(door_times['door2EVT']['dist'])(size = num_patients, **door_times['door2EVT']['kwargs'])
         IVT2out = eval(door_times['IVT2out']['dist'])(size = num_patients, **door_times['IVT2out']['kwargs'])
+        NSCIVT2out = eval(door_times['NSCIVT2out']['dist'])(size = num_patients, **door_times['NSCIVT2out']['kwargs'])
         door2EVT2 = eval(door_times['door2EVT2']['dist'])(size = num_patients, **door_times['door2EVT2']['kwargs'])
         # door2IVT = config['door2IVT']
         # door2EVT = config['door2EVT']
@@ -417,12 +419,16 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         # maximum for door2IVT, door2EVT, door2EVT2: 2 hours
         # maximum for IVT2out: 6 hours
         door2IVT = np.repeat(45, repeats = num_patients)
+        NSCdoor2IVT = np.repeat(60, repeats = num_patients)
         door2EVT = np.repeat(90, repeats = num_patients)
         IVT2out = np.repeat(45, repeats = num_patients)
+        NSCIVT2out = np.repeat(120, repeats = num_patients)
         door2EVT2 = np.repeat(45, repeats = num_patients)
     door2IVT = np.broadcast_to(np.expand_dims(door2IVT, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    NSCdoor2IVT = np.broadcast_to(np.expand_dims(NSCdoor2IVT, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
     door2EVT = np.broadcast_to(np.expand_dims(door2EVT, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
     IVT2out = np.broadcast_to(np.expand_dims(IVT2out, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+    NSCIVT2out = np.broadcast_to(np.expand_dims(NSCIVT2out, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
     door2EVT2 = np.broadcast_to(np.expand_dims(door2EVT2, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
     transdist1 = np.linalg.norm(med_coords[0,:] - med_coords[1,:]) * geoscale
@@ -434,12 +440,14 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         ivt_time_threshold = config['simulations_ivt_threshold']
         evt_time_threshold = config['simulations_evt_threshold']
         ivt_probability = config['simulations_ivt_probability']
+        nsc_ivt_probability = config['simulations_nsc_ivt_probability']
         evt_probability = config['simulations_evt_probability']
         early_repurfusion_probability = config['simulations_early_repurfusion_probability']
     except:
         ivt_time_threshold = 4.5 * 60
         evt_time_threshold = 24 * 60
         ivt_probability = 0.55
+        nsc_ivt_probability = 0.4
         evt_probability = 0.85
         early_repurfusion_probability = 0.11
 
@@ -457,23 +465,28 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         EVTtime = lvo_status_arr * ((destination_arr == 'CSC') * (lkw_to_door_arr + door2EVT) +
                                 (destination_arr == 'PSC1') * (IVTtime + IVT2out + transtime1 + door2EVT2) +
                                 (destination_arr == 'PSC2') * (IVTtime + IVT2out + transtime2 + door2EVT2))
-    else:
-        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
+    else: # potnetial change for nonspecified hospital
+        # IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
+
+        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT) +
+        ((pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + NSCdoor2IVT)
 
         csc_transfer_times = config['transfer_times'].filter(regex = config['csc_prefix'], axis = 1).min(axis = 1)
         transtime = csc_transfer_times[destination_arr.flatten()].values.reshape((num_patients, num_scenarios, num_thresholds))
 
-        EVTtime = lvo_status_arr * (
-                            ((pd.Series(destination_arr.flatten()).str.contains(config['csc_prefix']).values).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2EVT))
-                            + ((pd.Series(destination_arr.flatten()).str.contains(config['psc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * 
-                            (lkw_to_door_arr + door2IVT + IVT2out + transtime + door2EVT2)
-        )
+        EVTtime = ((pd.Series(destination_arr.flatten()).str.contains(config['csc_prefix']).values).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2EVT)) + ((pd.Series(destination_arr.flatten()).str.contains(config['psc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT + IVT2out + transtime + door2EVT2) + ((pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + NSCdoor2IVT + NSCIVT2out + transtime + door2EVT2)
+        
         
     ### Randomizing whether or not a patient receives IVT
     # try:
     IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values.reshape((num_patients, num_scenarios, num_thresholds))
 
-    IVTrepurfusion = ischemic_arr & IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
+    IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (
+            (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values.reshape((num_patients, num_scenarios, num_thresholds)) |
+            (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values.reshape((num_patients, num_scenarios, num_thresholds))
+        )
+
+    IVTrepurfusion = IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
 
     EVTtreatment = lvo_status_arr & (EVTtime < evt_time_threshold) & (rng.random(EVTtime.shape) < evt_probability) & ~IVTrepurfusion
     # except:

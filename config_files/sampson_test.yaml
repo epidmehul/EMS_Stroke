@@ -62,6 +62,12 @@ simulations_hospital_times:
       left: 30
       mode: 45
       right: 120
+  NSC2IVT:
+    dist: rng.triangular
+    kwargs:
+      left: 45
+      mode: 60
+      right: 180
   door2EVT:
     dist: rng.triangular
     kwargs:
@@ -73,6 +79,12 @@ simulations_hospital_times:
     kwargs:
       left: 45
       mode: 90
+      right: 360
+  NSCIVT2out:
+    dist: rng.triangular
+    kwargs:
+      left: 60
+      mode: 120
       right: 360
   door2EVT2:
     dist: rng.triangular
@@ -86,6 +98,7 @@ simulations_ivt_threshold: 270
 simulations_evt_threshold: 360
 simulations_evt_threshold2: 1440
 simulations_ivt_probability: 0.55
+simulations_nsc_ivt_probability: 0.4
 simulations_evt_probability: 0.85
 simulations_early_repurfusion_probability: 0.11
 
