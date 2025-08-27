@@ -13,4 +13,4 @@ module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
 
-python ../Scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/sampson_test.yaml -t ../input_data/sampson_nsc_times.csv -o /work/users/p/w/pwlin/sampson_output
+python ../Scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/sampson_test.yaml -d ../input_data/sampson_hexes.csv -t ../input_data/sampson_nsc_times.csv -o /work/users/p/w/pwlin/sampson_output
