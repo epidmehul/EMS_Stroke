@@ -85,7 +85,7 @@ simulations_hospital_times:
     kwargs:
       left: 60
       mode: 120
-      right: 360
+      right: 600
   door2EVT2:
     dist: rng.triangular
     kwargs:

@@ -77,9 +77,10 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'simulations_ivt_probability': 0.55,
         'simulations_evt_probability': 0.85,
         'simulations_early_repurfusion': 0.11,
-        'csc_prefix': 'X',
-        'psc_prefix': 'Y',
-        'nsc_prefix': 'Z'
+        'csc_prefix': 'CSC',
+        'psc_prefix': 'PSC',
+        'nsc_prefix': 'Noncertified',
+        'hex_hosp_counts': None
     }
     data_config, transport_times, transfer_times = data_to_config(patient_data_filestr, times_filestr)
     try:
@@ -468,8 +469,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     else: # potnetial change for nonspecified hospital
         # IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
 
-        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT) +
-        ((pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + NSCdoor2IVT)
+        IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT) + ((pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + NSCdoor2IVT)
 
         csc_transfer_times = config['transfer_times'].filter(regex = config['csc_prefix'], axis = 1).min(axis = 1)
         transtime = csc_transfer_times[destination_arr.flatten()].values.reshape((num_patients, num_scenarios, num_thresholds))
