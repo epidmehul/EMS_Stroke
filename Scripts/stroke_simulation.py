@@ -594,7 +594,8 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'xPSC2': geoscale * np.repeat(med_coords[2,0], num_patients * num_scenarios * num_thresholds),
         'yPSC2': geoscale * np.repeat(med_coords[2,1], num_patients * num_scenarios * num_thresholds),
         'geoscale': np.repeat(geoscale, num_patients * num_scenarios * num_thresholds),
-        'drivespeed': np.repeat(drivespeed, num_patients * num_scenarios * num_thresholds)
+        'drivespeed': np.repeat(drivespeed, num_patients * num_scenarios * num_thresholds),
+        'base': np.repeat(base_case, num_patients * num_scenarios * num_thresholds)
     })
     return results_df
 
