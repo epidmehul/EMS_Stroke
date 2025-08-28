@@ -53,7 +53,7 @@ def data_to_config(patient_filestr, times_filestr):
 
     return patient_retval, hex_hosp_times, hosp_hosp_times
 
-def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr = None):
+def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr = None, hex_hosp_counts_filestr = None):
     '''
     Reads in a config dictionary from a YAML file
 
@@ -80,7 +80,7 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'csc_prefix': 'CSC',
         'psc_prefix': 'PSC',
         'nsc_prefix': 'Noncertified',
-        'hex_hosp_counts': None
+        'hex_hosp_probs': None
     }
     data_config, transport_times, transfer_times = data_to_config(patient_data_filestr, times_filestr)
     try:
@@ -93,6 +93,9 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         pass
     retval['transport_times'] = transport_times
     retval['transfer_times'] = transfer_times
+    if hex_hosp_counts_filestr is not None:
+        hex_hosp_probs = pd.read_csv('hex_hosp_probs').set_index('Hex')
+        retval['hex_hosp_probs'] = hex_hosp_probs
     return retval
 
 def get_drivespeed(geoscale: float):
@@ -285,7 +288,7 @@ def generate_map(seed, num_psc = 2, config = None):
             return generate_map(seed, num_psc = 2, config = None)
         
 
-def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([[0.9, 0.6], [0.75, 0.75], [0.6, 0.9]]), thresholds = np.arange(0, 70, 10), config = None):
+def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([[0.9, 0.6], [0.75, 0.75], [0.6, 0.9]]), thresholds = np.arange(0, 70, 10), config = None, base_case = 1):
     '''
     Runs a simulation for a patient-map combination across all desired LVO diagnosis test parameters and transport thresholds
 
@@ -309,17 +312,43 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     drivespeed = get_drivespeed(geoscale)
 
+    rng = np.random.default_rng(patient_seed)
     if config is None:
         patient_coords = patient_df[['x_coord', 'y_coord']].values
         patient_med_dists = geoscale * spatial.distance.cdist(patient_coords, med_coords)
         patient_med_times = patient_med_dists / drivespeed * 60
-        closest_med_ind = np.argmin(patient_med_times, axis = 1)
-        closest_med = med_labels[closest_med_ind]
-        closest_med_times = np.min(patient_med_times, axis = 1)
+        initial_med_ind = np.argmin(patient_med_times, axis = 1)
+        initial_med = med_labels[initial_med_ind]
+        initial_med_times = np.min(patient_med_times, axis = 1)
     else:
         patient_med_times = patient_df[['ID','hex']].set_index('hex').join(config['transport_times']).set_index('ID')
-        closest_med_times = patient_med_times.min(axis = 1).values
-        closest_med = patient_med_times.idxmin(axis = 1).values
+        try:
+            match base_case:
+                case 1:
+                    initial_med_times = patient_med_times.min(axis = 1).values
+                    initial_med = patient_med_times.idxmin(axis = 1).values
+                case 2:
+                    patient_med_probs = patient_df[['ID','hex']].set_index('hex').join(config['hex_hosp_probs']).set_index('ID')
+                    patient_med_probs = patient_med_probs.div(patient_med_probs.sum(axis = 1), axis = 0)
+                    patient_med_cumsum_probs = np.cumsum(patient_med_probs, axis = 1)
+                    patient_dest_rng = np.expand_dims(rng.random(num_patients), axis = 1)
+                    patient_dest_indices = (patient_dest_rng < patient_med_cumsum_probs).argmax(axis = 1)
+                    initial_med_times = patient_med_times[np.arange(num_patients), patient_dest_indices]
+                    initial_med = patient_med_times.columns.values[patient_dest_indices]
+                case 3:
+                    patient_med_times = patient_med_times.loc[:, ~patient_med_times.columns.str.contains(regex = config['nsc_prefix'])]
+                    initial_med_times = patient_med_times.min(axis = 1).values
+                    initial_med = patient_med_times.idxmin(axis = 1).values
+                case _:
+                    initial_med_times = patient_med_times.min(axis = 1).values
+                    initial_med = patient_med_times.idxmin(axis = 1).values
+        except:
+            initial_med_times = patient_med_times.min(axis = 1).values
+            initial_med = patient_med_times.idxmin(axis = 1).values
+
+        # initial_dest_weights = 
+        # closest_dests = np.stack((initial_med, closest_psc_csc))
+
         # is_closest_csc = patient_med_times.idxmin(axis = 1).str.contains(config['csc_prefix'])
         csc_transport_times = patient_med_times.filter(regex = config['csc_prefix'], axis = 1)
         if len(csc_transport_times) == 1:
@@ -328,7 +357,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     last_well = patient_df['last_well'].values
 
-    rng = np.random.default_rng(patient_seed)
+    rng = np.random.default_rng(patient_seed) # reset generator in case it was used in the above else block
     num_scenarios = sens_spec_vals.shape[0]
     num_thresholds = thresholds.shape[0]
 
@@ -345,16 +374,16 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     expanded_lvo_diagnosis = (expanded_lvo_status & (expanded_diagnosis_rng < expanded_sensitivity)) | (~expanded_lvo_status & (expanded_diagnosis_rng > expanded_specificity))
 
     ##################### Destination logic #############################
-    correct_destination = closest_med.copy()    
+    correct_destination = initial_med.copy()    
     if config is None:
-        correct_destination_ind = closest_med_ind.copy()
+        correct_destination_ind = initial_med_ind.copy()
         correct_destination[lvo_status & (last_well <= 24)] = 'CSC'
         correct_destination_ind[lvo_status & (last_well <= 24)] = 0
     else:
         csc_correct_ind = lvo_status & (last_well <= 24)
         correct_destination[csc_correct_ind] = csc_transport_times.iloc[csc_correct_ind].idxmin(axis = 1)
 
-    destination_arr = np.broadcast_to(np.expand_dims(closest_med, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
+    destination_arr = np.broadcast_to(np.expand_dims(initial_med, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
     # Eligible to be redirected to CSC under each scenario type
     eligible_patients = (expanded_lvo_diagnosis) & (np.expand_dims(last_well, axis = 1) <= 24)
@@ -363,12 +392,12 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     thresholds_arr = np.broadcast_to(thresholds, (num_patients, num_scenarios, num_thresholds))
     
     if config is None:
-        additional_transport_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0] - closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+        additional_transport_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0] - initial_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
         redirected_patients = eligibility_arr & (additional_transport_arr <= thresholds_arr)
         destination_arr[redirected_patients] = 'CSC'
     else:
-        additional_transport_arr = np.broadcast_to(np.expand_dims(csc_transport_times.min(axis = 1).values - closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
+        additional_transport_arr = np.broadcast_to(np.expand_dims(csc_transport_times.min(axis = 1).values - initial_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
         redirected_patients = eligibility_arr & (additional_transport_arr <= thresholds_arr)
         destination_arr[redirected_patients] = csc_transport_times.iloc[redirected_patients].idxmin(axis = 1).values
@@ -385,7 +414,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     time_at_scene_arr = np.broadcast_to(np.expand_dims(time_at_scene, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
     # Time from scene to hospital
-    time_to_hospital_arr = np.broadcast_to(np.expand_dims(closest_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
+    time_to_hospital_arr = np.broadcast_to(np.expand_dims(initial_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
     if config is None:
         patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0], axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
@@ -538,7 +567,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'specificity': np.broadcast_to(np.expand_dims(sens_spec_vals[:,1], axis = (0, 2)), (num_patients, num_scenarios, num_thresholds)).flatten(),
         'threshold': thresholds_arr.flatten(),
         'destination': destination_arr.flatten(),
-        'closest_destination': np.broadcast_to(np.expand_dims(closest_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
+        'closest_destination': np.broadcast_to(np.expand_dims(initial_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
         'x_coord': np.repeat(patient_df['x_coord'].values, num_scenarios * num_thresholds),
         'y_coord': np.repeat(patient_df['y_coord'].values, num_scenarios * num_thresholds),
         'hex': np.repeat(patient_df['hex'].values, num_scenarios * num_thresholds),
