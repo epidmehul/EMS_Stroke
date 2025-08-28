@@ -332,8 +332,8 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
                 patient_med_probs = patient_med_probs.div(patient_med_probs.sum(axis = 1), axis = 0)
                 patient_med_cumsum_probs = np.cumsum(patient_med_probs, axis = 1)
                 patient_dest_rng = np.expand_dims(rng.random(num_patients), axis = 1)
-                patient_dest_indices = (patient_dest_rng < patient_med_cumsum_probs).argmax(axis = 1)
-                initial_med_times = patient_med_times[np.arange(num_patients), patient_dest_indices]
+                patient_dest_indices = (patient_dest_rng < patient_med_cumsum_probs).values.argmax(axis = 1)
+                initial_med_times = patient_med_times.values[np.arange(num_patients), patient_dest_indices]
                 initial_med = patient_med_times.columns.values[patient_dest_indices]
             case 3:
                 patient_med_times = patient_med_times.drop(list(patient_med_times.filter(regex = config['nsc_prefix'])), axis = 1)
