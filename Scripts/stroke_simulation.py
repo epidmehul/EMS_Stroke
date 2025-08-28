@@ -324,7 +324,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         patient_med_times = patient_df[['ID','hex']].set_index('hex').join(config['transport_times']).set_index('ID')
         # try:
         match base_case:
-            case 1:
+            case 1: 
                 initial_med_times = patient_med_times.min(axis = 1).values
                 initial_med = patient_med_times.idxmin(axis = 1).values
             case 2:
@@ -336,7 +336,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
                 initial_med_times = patient_med_times[np.arange(num_patients), patient_dest_indices]
                 initial_med = patient_med_times.columns.values[patient_dest_indices]
             case 3:
-                patient_med_times = patient_med_times.loc[:, ~patient_med_times.columns.str.contains(regex = config['nsc_prefix'])]
+                patient_med_times = patient_med_times.drop(list(patient_med_times.filter(regex = config['nsc_prefix'])), axis = 1)
                 initial_med_times = patient_med_times.min(axis = 1).values
                 initial_med = patient_med_times.idxmin(axis = 1).values
             case _:
