@@ -12,7 +12,7 @@ parser.add_argument('-d', '--data', help = 'data file containing patient informa
 parser.add_argument('-t', '--times', help = 'data file containing travel times from hexes and hospitals to hospitals', type = pathlib.Path, default = None)
 parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.95)
 parser.add_argument('-m', '--map_seed', help = 'map number to save results under', type = int, default = 0)
-parser.add_argument('-h', '--hospitals', help = 'contains patient counts for each hex-hosp combination', type = pathlib.Path, default = None)
+parser.add_argument('-l', '--locations', help = 'contains patient counts for each hex-hosp combination', type = pathlib.Path, default = None)
 parser.add_argument('-b', '--base', help = 'argument for which base case should be used to determine initial destination', type = int, default = 1)
 # parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
 parser.add_argument('-o', '--output', help = 'output directory for simulation and analysis', type = pathlib.Path, default = '/work/users/p/w/pwlin/new_output')
@@ -25,7 +25,7 @@ patient_seeds = [i for i in range(args.seeds)]
 output_dir = args.output
 # output_dir = pathlib.Path('/work/users/p/w/pwlin/sampson_sensitivity')
 
-config_dict = read_config(args.config, None, args.times, args.hospitals)
+config_dict = read_config(args.config, None, args.times, args.locations)
 
 hex_info = pd.read_csv(args.data)
 config_dict['hexes'] = dict(hex_info.groupby('Hex').agg(lambda x: x)['n'])
