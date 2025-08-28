@@ -94,7 +94,7 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
     retval['transport_times'] = transport_times
     retval['transfer_times'] = transfer_times
     if hex_hosp_counts_filestr is not None:
-        hex_hosp_probs = pd.read_csv('hex_hosp_probs').set_index('Hex')
+        hex_hosp_probs = pd.read_csv(hex_hosp_counts_filestr).set_index('Hex')
         retval['hex_hosp_probs'] = hex_hosp_probs
     return retval
 
