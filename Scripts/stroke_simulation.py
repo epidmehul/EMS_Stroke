@@ -322,29 +322,29 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         initial_med_times = np.min(patient_med_times, axis = 1)
     else:
         patient_med_times = patient_df[['ID','hex']].set_index('hex').join(config['transport_times']).set_index('ID')
-        try:
-            match base_case:
-                case 1:
-                    initial_med_times = patient_med_times.min(axis = 1).values
-                    initial_med = patient_med_times.idxmin(axis = 1).values
-                case 2:
-                    patient_med_probs = patient_df[['ID','hex']].set_index('hex').join(config['hex_hosp_probs']).set_index('ID')
-                    patient_med_probs = patient_med_probs.div(patient_med_probs.sum(axis = 1), axis = 0)
-                    patient_med_cumsum_probs = np.cumsum(patient_med_probs, axis = 1)
-                    patient_dest_rng = np.expand_dims(rng.random(num_patients), axis = 1)
-                    patient_dest_indices = (patient_dest_rng < patient_med_cumsum_probs).argmax(axis = 1)
-                    initial_med_times = patient_med_times[np.arange(num_patients), patient_dest_indices]
-                    initial_med = patient_med_times.columns.values[patient_dest_indices]
-                case 3:
-                    patient_med_times = patient_med_times.loc[:, ~patient_med_times.columns.str.contains(regex = config['nsc_prefix'])]
-                    initial_med_times = patient_med_times.min(axis = 1).values
-                    initial_med = patient_med_times.idxmin(axis = 1).values
-                case _:
-                    initial_med_times = patient_med_times.min(axis = 1).values
-                    initial_med = patient_med_times.idxmin(axis = 1).values
-        except:
-            initial_med_times = patient_med_times.min(axis = 1).values
-            initial_med = patient_med_times.idxmin(axis = 1).values
+        # try:
+        match base_case:
+            case 1:
+                initial_med_times = patient_med_times.min(axis = 1).values
+                initial_med = patient_med_times.idxmin(axis = 1).values
+            case 2:
+                patient_med_probs = patient_df[['ID','hex']].set_index('hex').join(config['hex_hosp_probs']).set_index('ID')
+                patient_med_probs = patient_med_probs.div(patient_med_probs.sum(axis = 1), axis = 0)
+                patient_med_cumsum_probs = np.cumsum(patient_med_probs, axis = 1)
+                patient_dest_rng = np.expand_dims(rng.random(num_patients), axis = 1)
+                patient_dest_indices = (patient_dest_rng < patient_med_cumsum_probs).argmax(axis = 1)
+                initial_med_times = patient_med_times[np.arange(num_patients), patient_dest_indices]
+                initial_med = patient_med_times.columns.values[patient_dest_indices]
+            case 3:
+                patient_med_times = patient_med_times.loc[:, ~patient_med_times.columns.str.contains(regex = config['nsc_prefix'])]
+                initial_med_times = patient_med_times.min(axis = 1).values
+                initial_med = patient_med_times.idxmin(axis = 1).values
+            case _:
+                initial_med_times = patient_med_times.min(axis = 1).values
+                initial_med = patient_med_times.idxmin(axis = 1).values
+        # except:
+        #     initial_med_times = patient_med_times.min(axis = 1).values
+        #     initial_med = patient_med_times.idxmin(axis = 1).values
 
         # initial_dest_weights = 
         # closest_dests = np.stack((initial_med, closest_psc_csc))
