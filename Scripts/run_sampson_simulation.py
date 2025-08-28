@@ -13,6 +13,7 @@ parser.add_argument('-t', '--times', help = 'data file containing travel times f
 parser.add_argument('-w', '--width', help = 'confidence interval width as a proportion', type = float, default = 0.95)
 parser.add_argument('-m', '--map_seed', help = 'map number to save results under', type = int, default = 0)
 parser.add_argument('-h', '--hospitals', help = 'contains patient counts for each hex-hosp combination', type = pathlib.Path, default = None)
+parser.add_argument('-b', '--base', help = 'argument for which base case should be used to determine initial destination', type = int, default = 1)
 # parser.add_argument('-n', '--n_cores', help = 'number of cores for mp.Pool', type = int, default = 10)
 parser.add_argument('-o', '--output', help = 'output directory for simulation and analysis', type = pathlib.Path, default = '/work/users/p/w/pwlin/new_output')
 
@@ -32,7 +33,7 @@ config_dict['hexes'] = dict(hex_info.groupby('Hex').agg(lambda x: x)['n'])
 print(config_dict)
 
 def run_analyze_sensitivitity(map_seed):
-    df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
+    df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict, base_case = args.base)
 
     high_df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict | {'patients_lvo_ischemic': 0.341})
 
@@ -45,7 +46,7 @@ def run_analyze_sensitivitity(map_seed):
     low_cohort_avgs, low_intervals = process_data(df = low_df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True, additional_file_name = 'low')
 
 def run_analyze(map_seed):
-    df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict)
+    df = run_map_simulations([map_seed], num_patients = args.patients, num_patient_seeds = args.seeds, save_format = 'parquet', output_dir = output_dir / 'parquet_files', config = config_dict, base_case = args.base)
     
     cohort_avgs, intervals = process_data(df = df, output_dir = output_dir / 'results', map_number = map_seed, save_format = 'csv', psc_only = False, config = config_dict, errorbars = True)
 

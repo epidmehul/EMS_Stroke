@@ -598,7 +598,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     })
     return results_df
 
-def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config = None, additional_file_name = ''):
+def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, save_format = 'csv', output_dir = None, config = None, additional_file_name = '', base_case = 1):
     
     min_map = min(map_seeds)
     max_map = max(map_seeds)
@@ -618,7 +618,7 @@ def run_map_simulations(map_seeds, num_patients = 1000, num_patient_seeds = 50, 
     for i in map_seeds:
         map_output_list = []
         for j in range(num_patient_seeds):
-            temp = simulation(num_patients, patient_seed = j, map_seed = i, config = config)
+            temp = simulation(num_patients, patient_seed = j, map_seed = i, config = config, base_case = base_case)
             map_output_list.append(temp)
             # map_df = pd.concat((map_df, temp))
         map_output_df = pd.concat(map_output_list)
