@@ -661,6 +661,7 @@ def preprocess_data(df, config = None):
         to_replace = {0.9: 'high', 0.75: 'mid', 0.6: 'low'}
     )
     df.loc[df['threshold'] == 0, 'diagnostic'] = 'base'
+    df['diagnostic'] = df['diagnostic'].astype('category').cat.set_categories(['base','high','mid','low'])
     df['destination_type'] = df['destination'].copy()
     try:
         df.loc[df['destination'].str.contains(config['csc_prefix']), 'destination_type'] = 'CSC'
