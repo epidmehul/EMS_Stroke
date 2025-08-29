@@ -817,7 +817,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
         #             intervals_df.to_parquet(output_dir / f'{'psc_intervals_' if psc_only else 'intervals_'}{additional_file_name}{'_' if additional_file_name != '' else ''}map_{map_number}.parquet')
     df['EVTcat'] = pd.cut(df['EVTtreatment'].astype(int) * df['EVTtime'] / 60, bins = np.arange(-1, 7))
     evt_time_props = df.loc[df['hasLVO'], ['diagnostic', 'threshold', 'EVTcat']].groupby(['diagnostic', 'threshold', 'EVTcat'], observed = False).size().reset_index().rename({0: 'n'}, axis = 1)
-    evt_time_props = evt_time_props.loc[(evt_time_props['diagnostic'] == 'base') | (evt_time_props['threshold'] != 0), :].pivot(index = ['diagnostic', 'threshold'], values = 'n', columns = 'EVTcat').fillna(0).sort_index(axis = 1)
+    evt_time_props = evt_time_props.loc[((evt_time_props['diagnostic'] == 'base') & (evt_time_props['threshold'] == 0)) | ((evt_time_props['diagnostic'] != 'base') & (evt_time_props['threshold'] != 0)), :].pivot(index = ['diagnostic', 'threshold'], values = 'n', columns = 'EVTcat').fillna(0).sort_index(axis = 1)
     
     if filepath is not None:
         evt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name is not None else ''}evt_time_props_{filepath.stem}.csv')
