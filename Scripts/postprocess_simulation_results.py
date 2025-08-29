@@ -824,8 +824,7 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     else:
         evt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{'psc_' if psc_only else ''}{additional_file_name}{'_' if additional_file_name is not None else ''}evt_time_props_{map_number}.csv')
     
-    evt_time_props.drop('(-1, 0]', axis = 1).plot(kind = 'bar', stacked = True)
-    plt.xticks(fontsize = 8)
+    evt_time_props.plot(kind = 'bar', stacked = True, figsize = (12, 8))
     plt.savefig(output_dir / f'map_{str(map_number).zfill(3)}'/ f'{'psc_' if psc_only else ''}{additional_file_name if additional_file_name is not None else ''}{'_' if additional_file_name != '' else ''}map_{map_number}_evt_time_props.png')
 
     if plots:
