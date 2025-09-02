@@ -504,15 +504,16 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         transtime = csc_transfer_times[destination_arr.flatten()].values.reshape((num_patients, num_scenarios, num_thresholds))
 
         EVTtime = ((pd.Series(destination_arr.flatten()).str.contains(config['csc_prefix']).values).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2EVT)) + ((pd.Series(destination_arr.flatten()).str.contains(config['psc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT + IVT2out + transtime + door2EVT2) + ((pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + NSCdoor2IVT + NSCIVT2out + transtime + door2EVT2)
+
         
         
     ### Randomizing whether or not a patient receives IVT
     # try:
-    IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values.reshape((num_patients, num_scenarios, num_thresholds))
+    # IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values.reshape((num_patients, num_scenarios, num_thresholds))
 
     IVTtreatment = ischemic_arr & (IVTtime < ivt_time_threshold) & (
             (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values.reshape((num_patients, num_scenarios, num_thresholds)) |
-            (rng.random(IVTtime.shape) < ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values.reshape((num_patients, num_scenarios, num_thresholds))
+            (rng.random(IVTtime.shape) < nsc_ivt_probability) & pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values.reshape((num_patients, num_scenarios, num_thresholds))
         )
 
     IVTrepurfusion = IVTtreatment & (rng.random(IVTtreatment.shape) < early_repurfusion_probability)
