@@ -25,4 +25,6 @@ if __name__ == '__main__':
                              save_format = 'parquet',
                              additional_file_name = None,
                              )
-    process_data(df = df, output_dir = args.output / 'results')
+    process_data(df = df, 
+                 output_dir = args.output / 'results',
+                 map_number = args.map_seed)

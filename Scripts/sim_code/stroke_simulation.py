@@ -128,7 +128,7 @@ def generate_patient_cohort(num_patients, seed, config = None):
     rng = np.random.default_rng(seed)
 
     ## Patient spawn locations
-    if config is None:
+    if config is None or config['hexes'] is None:
         patient_hexes = None
         patient_coords_normalized = rng.random((num_patients, 2))
     else:
@@ -316,7 +316,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     drivespeed = get_drivespeed(geoscale)
 
     rng = np.random.default_rng(patient_seed)
-    if config is None:
+    if config is None or config['hexes'] is None:
         patient_coords = patient_df[['x_coord', 'y_coord']].values
         patient_med_dists = geoscale * spatial.distance.cdist(patient_coords, med_coords)
         patient_med_times = patient_med_dists / drivespeed * 60
@@ -378,7 +378,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     ##################### Destination logic #############################
     correct_destination = initial_med.copy()    
-    if config is None:
+    if config is None or config['hexes'] is None:
         correct_destination_ind = initial_med_ind.copy()
         correct_destination[lvo_status & (last_well <= 24)] = 'CSC'
         correct_destination_ind[lvo_status & (last_well <= 24)] = 0
@@ -394,7 +394,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     eligibility_arr = np.broadcast_to(np.expand_dims(eligible_patients, axis = 2), (num_patients, num_scenarios, num_thresholds))
     thresholds_arr = np.broadcast_to(thresholds, (num_patients, num_scenarios, num_thresholds))
     
-    if config is None:
+    if config is None or config['hexes'] is None:
         additional_transport_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0] - initial_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
         redirected_patients = eligibility_arr & (additional_transport_arr <= thresholds_arr)
@@ -419,7 +419,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     # Time from scene to hospital
     time_to_hospital_arr = np.broadcast_to(np.expand_dims(initial_med_times, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds)).copy()
 
-    if config is None:
+    if config is None or config['hexes'] is None:
         patient_csc_times_arr = np.broadcast_to(np.expand_dims(patient_med_times[:,0], axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
         time_to_hospital_arr[redirected_patients] = patient_csc_times_arr[redirected_patients]
@@ -492,7 +492,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
 
     tia_arr = np.broadcast_to(np.expand_dims(patient_df['tia'].values, axis = (1, 2)), (num_patients, num_scenarios, num_thresholds))
 
-    if config is None:
+    if config is None or config['hexes'] is None:
         IVTtime = lvo_status_arr * (lkw_to_door_arr + door2IVT) + ((~lvo_status_arr) & ischemic_arr) * (lkw_to_door_arr + door2IVT)
 
         EVTtime = lvo_status_arr * ((destination_arr == 'CSC') * (lkw_to_door_arr + door2EVT) +

@@ -1,15 +1,15 @@
-from sklearn.metrics import confusion_matrix
+# from sklearn.metrics import confusion_matrix
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib import colors
-import pathlib
-from scipy.spatial import distance
-from scipy.spatial import Voronoi, voronoi_plot_2d
+# from matplotlib import colors
+# import pathlib
+# from scipy.spatial import distance
+# from scipy.spatial import Voronoi, voronoi_plot_2d
 from scipy import stats
-from stroke_simulation import *
-import openpyxl
+# from stroke_simulation import *
+# import openpyxl
 
 # def triage_outcomes(df):
 #     ""'
@@ -731,7 +731,7 @@ def calc_counts_props(df):
     retval['lvo_evt_prop'] = retval['lvo_evt_count'] / retval['lvo_count']
     return retval
 
-def process_data(filepath = None, plots = True, errorbars = False, additional_file_name = None, config = None, psc_only = False, output_dir = None, intervals = True, interval_width = 0.95, save_format = 'parquet', df = None, map_number = None):
+def process_data(filepath = None, plots = True, errorbars = False, additional_file_name = None, config = None, psc_only = False, output_dir = None, intervals = True, interval_width = 0.95, save_format = 'csv', df = None, map_number = None):
     '''
     Analyzes the simulation output
 
@@ -824,12 +824,12 @@ def process_data(filepath = None, plots = True, errorbars = False, additional_fi
     evt_time_props = evt_time_props.loc[((evt_time_props['diagnostic'] == 'base') & (evt_time_props['threshold'] == 0)) | ((evt_time_props['diagnostic'] != 'base') & (evt_time_props['threshold'] != 0)), :].pivot(index = ['diagnostic', 'threshold'], values = 'n', columns = 'EVTcat').fillna(0).sort_index(axis = 1)
     ivt_time_props = ivt_time_props.loc[((ivt_time_props['diagnostic'] == 'base') & (ivt_time_props['threshold'] == 0)) | ((ivt_time_props['diagnostic'] != 'base') & (ivt_time_props['threshold'] != 0)), :].pivot(index = ['diagnostic', 'threshold'], values = 'n', columns = 'IVTcat').fillna(0).sort_index(axis = 1)
 
-    if filepath is not None:
-        evt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{additional_file_name}{"_" if additional_file_name is not None else ""}ivt_time_props_{filepath.stem}.csv')
-        ivt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{additional_file_name}{"_" if additional_file_name is not None else ""}ivt_time_props_{filepath.stem}.csv')
+    if filepath is None:
+        evt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{(additional_file_name + "_") if additional_file_name is not None else ""}evt_time_props_map_{map_number}.csv')
+        ivt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{(additional_file_name + "_") if additional_file_name is not None else ""}ivt_time_props_map_{map_number}.csv')
     else:
-        evt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{additional_file_name}{"_" if additional_file_name is not None else ""}evt_time_props_{map_number}.csv')
-        ivt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{additional_file_name}{"_" if additional_file_name is not None else ""}ivt_time_props_{filepath.stem}.csv')
+        evt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{(additional_file_name + "_") if additional_file_name is not None else ""}evt_time_props_{filepath.stem}.csv')
+        ivt_time_props.to_csv(output_dir / f'map_{str(map_number).zfill(3)}' / f'{"psc_" if psc_only else ""}{(additional_file_name + "_") if additional_file_name is not None else ""}ivt_time_props_{filepath.stem}.csv')
 
     if plots:
         sns.set_theme()
