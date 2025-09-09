@@ -1,4 +1,4 @@
-from postprocess_simulation_results import *
+from sim_code.postprocess_simulation_results import *
 import pathlib
 import multiprocessing as mp
 import warnings

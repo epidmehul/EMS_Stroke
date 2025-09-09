@@ -10,7 +10,8 @@ __pycache__/*
 !ESTTM_old/*
 !docs/*
 !SLURM/*
-!Scripts/*
-Scripts/__pycache__/*
+!scripts/*
+scripts/__pycache__/*
+scripts/sim_code/__pycache__/*
 !config_files/*
 !input_data/*

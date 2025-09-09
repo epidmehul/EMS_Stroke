@@ -1,4 +1,4 @@
-from stroke_simulation import map_to_config
+from sim_code.stroke_simulation import map_to_config
 import argparse
 import pathlib
 

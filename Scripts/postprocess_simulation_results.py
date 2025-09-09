@@ -8,7 +8,7 @@ import pathlib
 from scipy.spatial import distance
 from scipy.spatial import Voronoi, voronoi_plot_2d
 from scipy import stats
-from stroke_simulation import *
+from sim_code.stroke_simulation import *
 import openpyxl
 
 def triage_outcomes(df):

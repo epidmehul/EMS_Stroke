@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import pathlib
-from postprocess_simulation_results import *
+from sim_code.postprocess_simulation_results import *
 
 # map_nums = [711, 126, 244, 984, 671, 414, 701, 31, 93]
 map_nums = [414, 703]

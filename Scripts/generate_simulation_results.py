@@ -1,4 +1,4 @@
-from stroke_simulation import *
+from sim_code.stroke_simulation import *
 import os
 
 # os.chdir('/proj/patellab/Sheps/output')

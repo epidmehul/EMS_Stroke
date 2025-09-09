@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pathlib
-from postprocess_simulation_results import *
+from sim_code.postprocess_simulation_results import *
 import multiprocessing as mp
 import argparse
 import warnings
