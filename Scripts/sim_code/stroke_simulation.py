@@ -59,10 +59,10 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
 
     Merges two dictionaries together, with values kept from YAML file if applicable
     '''
-    if yaml_filestr is not None:
+    try:
         with open(yaml_filestr) as f:
             config_override = yaml.safe_load(f)
-    else:
+    except:
         config_override = {}
     params = {
         'patients_none_all': 0.6765,
@@ -76,7 +76,7 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'patient_lkw_bins': None,
         'hexes': None,
         'simulations_ivt_threshold': 270,
-        'simulations_evt_threshold': 1440,
+        'simulations_evt_threshold': 360,
         'simulations_ivt_probability': 0.55,
         'simulations_evt_probability': 0.85,
         'simulations_early_repurfusion': 0.11,
@@ -498,7 +498,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         EVTtime = lvo_status_arr * ((destination_arr == 'CSC') * (lkw_to_door_arr + door2EVT) +
                                 (destination_arr == 'PSC1') * (IVTtime + IVT2out + transtime1 + door2EVT2) +
                                 (destination_arr == 'PSC2') * (IVTtime + IVT2out + transtime2 + door2EVT2))
-    else: # potnetial change for nonspecified hospital
+    else:
         # IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT)
 
         IVTtime = ((pd.Series(destination_arr.flatten()).str.contains('[' + config['csc_prefix'] + '|' + config['psc_prefix'] + ']').values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + door2IVT) + ((pd.Series(destination_arr.flatten()).str.contains(config['nsc_prefix']).values)).reshape((num_patients, num_scenarios, num_thresholds)) * (lkw_to_door_arr + NSCdoor2IVT)
@@ -547,7 +547,7 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
     PrOut = expit(LogitOut)
     ###
 
-
+    # Old risk equations for probability of mRS 0-1
     # PrOut = (
     #         lvo_status_arr * (((IVTtime < ivt_time_threshold) & (EVTtime >= evt_time_threshold)) * (0.2359 + 0.0000002 * IVTtime**2 - 0.0004  * IVTtime)
     #                       + (((IVTtime >= ivt_time_threshold) & (EVTtime < evt_time_threshold)) * (0.3394 + 0.00000004 * EVTtime**2 - 0.0002*EVTtime)) +
