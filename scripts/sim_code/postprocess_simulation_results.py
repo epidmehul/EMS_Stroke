@@ -662,21 +662,42 @@ def preprocess_data(df, config = None):
     )
     df.loc[df['threshold'] == 0, 'diagnostic'] = 'base'
     df['diagnostic'] = df['diagnostic'].astype('category').cat.set_categories(['base','high','mid','low'])
-    df['destination_type'] = df['destination'].copy()
+    # df['destination_type'] = df['destination'].copy()
+    # df['closest_type'] = df['closest_destination'].copy()
+    # df['initial_type'] = df['initial_destination'].copy()
     try:
-        df.loc[df['destination'].str.contains(config['csc_prefix']), 'destination_type'] = 'CSC'
-        df.loc[df['destination'].str.contains(config['psc_prefix']), 'destination_type'] = 'PSC'
-        df.loc[df['destination'].str.contains(config['nsc_prefix']), 'destination_type'] = 'NSC'
+        # df.loc[df['destination'].str.contains(config['csc_prefix']), 'destination_type'] = 'CSC'
+        # df.loc[df['destination'].str.contains(config['psc_prefix']), 'destination_type'] = 'PSC'
+        # df.loc[df['destination'].str.contains(config['nsc_prefix']), 'destination_type'] = 'NSC'
+
+        df.loc[:, 'destination_type'] = np.select(
+            [df['destination'].str.contains(config['csc_prefix']), df['destination'].str.contains(config['psc_prefix']), df['destination'].str.contains(config['nsc_prefix'])], ['CSC', 'PSC', 'NSC'], default = 'NSC'
+        )
+
+        df.loc[:, 'initial_type'] = np.select(
+            [df['initial_destination'].str.contains(config['csc_prefix']), df['initial_destination'].str.contains(config['psc_prefix']), df['initial_destination'].str.contains(config['nsc_prefix'])], ['CSC', 'PSC', 'NSC'], default = 'NSC'
+        )
+
+        df.loc[:, 'closest_type'] = np.select(
+            [df['closest_destination'].str.contains(config['csc_prefix']), df['closest_destination'].str.contains(config['psc_prefix']), df['closest_destination'].str.contains(config['nsc_prefix'])], ['CSC', 'PSC', 'NSC'], default = 'NSC'
+        )
     except:
         df.loc[df['destination'].str.contains('PSC'), 'destination_type'] = 'PSC'
         df.loc[df['destination'].str.contains('CSC'), 'destination_type'] = 'CSC'
+
+        df.loc[df['initial_destination'].str.contains('PSC'), 'initial_type'] = 'PSC'
+        df.loc[df['initial_destination'].str.contains('CSC'), 'initial_type'] = 'CSC'
+
+        df.loc[df['closest_destination'].str.contains('PSC'), 'closest_type'] = 'PSC'
+        df.loc[df['closest_destination'].str.contains('CSC'), 'closest_type'] = 'CSC'
     return df
 
-def calc_triage(df):
+def calc_triage(df, csc_prefix = 'CSC'):
     '''
     Calculates over- and undertriage for each cohort and scenario combination
     '''
-    triage_indicators = df.loc[df['closest_destination'] != 'CSC', ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
+    # triage_indicators = df.loc[~df['closest_destination'].str.contains(csc_prefix), ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
+    triage_indicators = df.loc[df['initial_type'] != 'CSC', ['seed', 'diagnostic', 'threshold', 'hasLVO', 'destination_type']]
     triage_indicators['overtriage_ind'] = (triage_indicators['destination_type'] == 'CSC') & (~triage_indicators['hasLVO'])
     triage_indicators['undertriage_ind'] = (triage_indicators['destination_type'] != 'CSC') & (triage_indicators['hasLVO'])
 

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Simulation Distributions</title>
+    <meta charset = "utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        var curID = "updates";
+    </script>
+    <style>
+        .table {
+            table-layout: fixed;
+        }
+    </style>
+</head>
+<body>
+    <div id="nav-placeholder">
+    </div>
+    <script type="text/javascript">
+        console.log(curID)
+        $(function(){
+          $("#nav-placeholder").load("nav.html", function() {
+            var element = document.getElementById(curID);
+            element.classList.add("active");
+          });
+        });
+    </script>
+
+    <div class="container-fluid">
+
+
+        <h2>Changes in simulation parameters</h2>
+        <p>Configuration and data files can be provided to the simulation to change the specific distributions being used for LKW and hospital stay times as well as override other simulation parameters. </p>
+        
+        <p>See <a href="https://github.com/epidmehul/EMS_Stroke/blob/main/documentation.md">documentation.md</a> for more information.</p>
+
+        <!-- <h4>Examples of distributions for hospital-related times</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Door-to-needle for IVT (PSC or CSC)</td>
+                    <td>
+                        $$\text{Triangular}(30, 45, 120)$$
+                    </td>
+                </tr>
+                <tr>
+                    <td>Door-to-needle for IVT (Non-certified)</td>
+                    <td>
+                        $$\text{Triangular}(45, 60, 180)$$
+                    </td>
+                </tr>
+                <tr>
+                    <td>Door-to-EVT (CSC, non-transfer)</td>
+                    <td>
+                        $$\text{Triangular}(30, 45, 120$$
+                    </td>
+                </tr>
+            </tbody>
+        </table> -->
+        
+        <h4>Changes to default parameters/behavior</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Parameter</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Threshold for receiving EVT</td>
+                    <td>
+                        6 hours
+                    </td>
+                </tr>
+                <tr>
+                    <td>Probability of receiving IVT</td>
+                    <td>
+                        $$\begin{cases} 0.55 & \text{at PSC or CSC} \\
+                        0.4 & \text{at non-certified} \end{cases}$$
+                    </td>
+                </tr>
+                <tr>
+                    <td>Probability of receiving EVT</td>
+                    <td>
+                        0.85
+                    </td>
+                </tr>
+                <tr>
+                    <td>Probability of early repurfusion</td>
+                    <td>
+                        0.11
+                    </td>
+                </tr>
+                <tr>
+                    <td>Risk equations for mRS</td>
+                    <td>
+                        Good outcome now includes mRS 2 and risk equations have been changed.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</body>

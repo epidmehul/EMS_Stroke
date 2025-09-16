@@ -78,6 +78,7 @@ def read_config(yaml_filestr = None, patient_data_filestr = None, times_filestr 
         'simulations_ivt_threshold': 270,
         'simulations_evt_threshold': 360,
         'simulations_ivt_probability': 0.55,
+        'simulations_nsc_ivt_probability': 0.4,
         'simulations_evt_probability': 0.85,
         'simulations_early_repurfusion': 0.11,
         'csc_prefix': 'CSC',
@@ -330,6 +331,8 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
             case 1: 
                 initial_med_times = patient_med_times.min(axis = 1).values
                 initial_med = patient_med_times.idxmin(axis = 1).values
+
+                closest_med = initial_med.copy()
             case 2:
                 patient_med_probs = patient_df[['ID','hex']].set_index('hex').join(config['hex_hosp_probs']).set_index('ID')
                 patient_med_probs = patient_med_probs.div(patient_med_probs.sum(axis = 1), axis = 0)
@@ -338,10 +341,14 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
                 patient_dest_indices = (patient_dest_rng < patient_med_cumsum_probs).values.argmax(axis = 1)
                 initial_med_times = patient_med_times.values[np.arange(num_patients), patient_dest_indices]
                 initial_med = patient_med_times.columns.values[patient_dest_indices]
+
+                closest_med = patient_med_times.idxmin(axis = 1).values
             case 3:
                 patient_med_times = patient_med_times.drop(list(patient_med_times.filter(regex = config['nsc_prefix'])), axis = 1)
                 initial_med_times = patient_med_times.min(axis = 1).values
                 initial_med = patient_med_times.idxmin(axis = 1).values
+
+                closest_med = initial_med.copy()
             case _:
                 initial_med_times = patient_med_times.min(axis = 1).values
                 initial_med = patient_med_times.idxmin(axis = 1).values
@@ -571,7 +578,8 @@ def simulation(num_patients, patient_seed, map_seed, sens_spec_vals = np.array([
         'specificity': np.broadcast_to(np.expand_dims(sens_spec_vals[:,1], axis = (0, 2)), (num_patients, num_scenarios, num_thresholds)).flatten(),
         'threshold': thresholds_arr.flatten(),
         'destination': destination_arr.flatten(),
-        'closest_destination': np.broadcast_to(np.expand_dims(initial_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
+        'initial_destination': np.broadcast_to(np.expand_dims(initial_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
+        'closest_destination': np.broadcast_to(np.expand_dims(closest_med, axis = (1,2)), shape = (num_patients, num_scenarios, num_thresholds)).flatten(),
         'x_coord': np.repeat(patient_df['x_coord'].values, num_scenarios * num_thresholds),
         'y_coord': np.repeat(patient_df['y_coord'].values, num_scenarios * num_thresholds),
         'hex': np.repeat(patient_df['hex'].values, num_scenarios * num_thresholds),

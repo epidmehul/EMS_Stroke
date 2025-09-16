@@ -55,7 +55,7 @@ The following parameters can be entered in YAML format:
         - simulations_evt_probability: Probability of receiving EVT given EVT time threshold is already met
         - simulations_early_repurfusion_probability: Probability of early repurfusion after IVT
 
-For example, see `config_files/sampson_test.yaml`
+For example, see `config_files/test4.yaml`
 
 #### Transport times
 
@@ -64,14 +64,14 @@ This CSV file should contain a matrix of travel times such that:
 * The hospitals form the last few rows
 * Hospitals are coded using the prefixes in the config file (or the default)
 
-See `input_data/sampson_nsc_times.csv` for an example.
+See `input_data/county_test_all_times.csv` for an example.
 
 #### Transport probabilities
 
 CSV file containing empirical counts or probabilities on where patients are initially sent given the hex they spawn in.
 * Each row corresponds to a hex 
 
-See `input_data/sampson_hex_hosp_probs.csv` for an example
+See `input_data/county_test_hex_hosp_probs.csv` for an example
 
 Contents from the above files get read into a dict that can be modified separately.
 
