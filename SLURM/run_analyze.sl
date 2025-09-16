@@ -13,9 +13,9 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/run_and_analyze.py -s 100 -p 1000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 0
-python ../Scripts/run_and_analyze.py -s 100 -p 5000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 1
-python ../Scripts/run_and_analyze.py -s 100 -p 10000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 2
-python ../Scripts/run_and_analyze.py -s 500 -p 1000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 3
-python ../Scripts/run_and_analyze.py -s 500 -p 5000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 4
-python ../Scripts/run_and_analyze.py -s 500 -p 10000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 5
+python ../scripts/run_and_analyze.py -s 100 -p 1000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 0
+python ../scripts/run_and_analyze.py -s 100 -p 5000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 1
+python ../scripts/run_and_analyze.py -s 100 -p 10000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 2
+python ../scripts/run_and_analyze.py -s 500 -p 1000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 3
+python ../scripts/run_and_analyze.py -s 500 -p 5000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 4
+python ../scripts/run_and_analyze.py -s 500 -p 10000 -n 1 -c ../config_files/test2.yaml -d ../input_data/test_patient2.csv -t ../input_data/test_dists2.csv -m 5

@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/sensitivity_aggregation.py
+python ../scripts/sensitivity_aggregation.py

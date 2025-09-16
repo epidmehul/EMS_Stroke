@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ~/strokes/Scripts/analyze_sensitivity_output.py
+python ~/strokes/scripts/analyze_sensitivity_output.py

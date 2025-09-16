@@ -13,8 +13,8 @@ module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
 
-python ../Scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/test4.yaml -d ../input_data/county_test_hexes.csv -t ../input_data/county_test_all_times.csv -l ../input_data/county_test_hex_hosp_probs.csv -o /work/users/p/w/pwlin/county_output -m 0 -b 1
+python ../scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/test4.yaml -d ../input_data/county_test_hexes.csv -t ../input_data/county_test_all_times.csv -l ../input_data/county_test_hex_hosp_probs.csv -o /work/users/p/w/pwlin/county_output -m 0 -b 1
 
-python ../Scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/test4.yaml -d ../input_data/county_test_hexes.csv -t ../input_data/county_test_all_times.csv -l ../input_data/county_test_hex_hosp_probs.csv -o /work/users/p/w/pwlin/county_output -m 1 -b 2
+python ../scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/test4.yaml -d ../input_data/county_test_hexes.csv -t ../input_data/county_test_all_times.csv -l ../input_data/county_test_hex_hosp_probs.csv -o /work/users/p/w/pwlin/county_output -m 1 -b 2
 
-python ../Scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/test4.yaml -d ../input_data/county_test_hexes.csv -t ../input_data/county_test_all_times.csv -l ../input_data/county_test_hex_hosp_probs.csv -o /work/users/p/w/pwlin/county_output -m 2 -b 3
+python ../scripts/run_sampson_simulation.py -s 100 -p 1000 -c ../config_files/test4.yaml -d ../input_data/county_test_hexes.csv -t ../input_data/county_test_all_times.csv -l ../input_data/county_test_hex_hosp_probs.csv -o /work/users/p/w/pwlin/county_output -m 2 -b 3

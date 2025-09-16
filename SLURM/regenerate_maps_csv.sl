@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/regenerate_maps_csv.py --path /work/users/p/w/pwlin/output/results
+python ../scripts/regenerate_maps_csv.py --path /work/users/p/w/pwlin/output/results

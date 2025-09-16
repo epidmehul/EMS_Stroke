@@ -12,6 +12,6 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-# python ../Scripts/rng_to_config.py -m 0
+# python ../scripts/rng_to_config.py -m 0
 
-python ../Scripts/run_analyze_new_simulation.py -s 100 -p 1000 -c ../config_files/test3.yaml -d ../input_data/patients_0.csv -t ../input_data/map_0.csv -o /work/users/p/w/pwlin/new_output
+python ../scripts/run_analyze_new_simulation.py -s 100 -p 1000 -c ../config_files/test3.yaml -d ../input_data/patients_0.csv -t ../input_data/map_0.csv -o /work/users/p/w/pwlin/new_output

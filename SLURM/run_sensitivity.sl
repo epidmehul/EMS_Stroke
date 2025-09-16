@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/run_simulation_sensitivity_multiprocess.py -s 40 -p 1000 -o /work/users/p/w/pwlin/full_output_sens/parquet_files
+python ../scripts/run_simulation_sensitivity_multiprocess.py -s 40 -p 1000 -o /work/users/p/w/pwlin/full_output_sens/parquet_files

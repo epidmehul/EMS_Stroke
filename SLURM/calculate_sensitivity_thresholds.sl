@@ -13,5 +13,5 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ~/strokes/Scripts/calculate_sensitivity_time_thresholds.py --path /work/users/p/w/pwlin/full_output_sens/all_numbers --output all_scenarios
-python ~/strokes/Scripts/calculate_sensitivity_time_thresholds.py --path /work/users/p/w/pwlin/full_output_sens/psc_all_numbers --output psc_scenarios
+python ~/strokes/scripts/calculate_sensitivity_time_thresholds.py --path /work/users/p/w/pwlin/full_output_sens/all_numbers --output all_scenarios
+python ~/strokes/scripts/calculate_sensitivity_time_thresholds.py --path /work/users/p/w/pwlin/full_output_sens/psc_all_numbers --output psc_scenarios

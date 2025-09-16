@@ -13,4 +13,4 @@
 module purge
 module load python/3.12.4
 source ~/strokes_venv/bin/activate
-python ../Scripts/analyze_simulation_output.py
+python ../scripts/analyze_simulation_output.py
