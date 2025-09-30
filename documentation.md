@@ -32,7 +32,7 @@ Note that the simulation does not need all 4 files to be provided.
 
 #### YAML file
 
-Example file: `config_files/sampson_test.yaml`
+Example file: `config_files/test4.yaml`
 
 The following parameters can be entered in YAML format:
 * Stroke prevalance
