@@ -20,10 +20,8 @@ parser.add_argument('-o', '--output', help = 'output directory for simulation an
 args = parser.parse_args()
 
 map_seeds = [args.map_seed]
-# map_seeds = [i for i in range(1000)]
 patient_seeds = [i for i in range(args.seeds)]
 output_dir = args.output
-# output_dir = pathlib.Path('/work/users/p/w/pwlin/sampson_sensitivity')
 
 config_dict = read_config(args.config, None, args.times, args.locations)
 
