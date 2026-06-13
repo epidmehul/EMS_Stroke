@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stroke Data Pipeline Diagram</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f5f3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    margin: 0;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #1a1a18;
+    margin: 0 0 8px;
+  }
+  p.subtitle {
+    font-size: 13px;
+    color: #5f5e5a;
+    margin: 0 0 24px;
+    text-align: center;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    padding: 24px;
+    max-width: 760px;
+    width: 100%;
+  }
+
+  /* ── Color ramps (light mode) ── */
+  /* coral = PHI/identifiable */
+  .c-coral rect { fill: #FAECE7; stroke: #993C1D; }
+  .c-coral text.th { fill: #712B13; }
+  .c-coral text.ts { fill: #993C1D; }
+  /* amber = quasi-identifier */
+  .c-amber rect { fill: #FAEEDA; stroke: #854F0B; }
+  .c-amber text.th { fill: #633806; }
+  .c-amber text.ts { fill: #854F0B; }
+  /* purple = CCHI linkage step */
+  .c-purple rect { fill: #EEEDFE; stroke: #534AB7; }
+  .c-purple text.th { fill: #3C3489; }
+  .c-purple text.ts { fill: #534AB7; }
+  /* teal = de-identified / analytic */
+  .c-teal rect { fill: #E1F5EE; stroke: #0F6E56; }
+  .c-teal text.th { fill: #085041; }
+  .c-teal text.ts { fill: #0F6E56; }
+  /* gray = de-identification step */
+  .c-gray rect { fill: #F1EFE8; stroke: #5F5E5A; }
+  .c-gray text.th { fill: #444441; }
+  .c-gray text.ts { fill: #5F5E5A; }
+
+  /* text classes */
+  text.th { font-size: 14px; font-weight: 500; }
+  text.ts { font-size: 12px; font-weight: 400; }
+  text.legend-label { font-size: 12px; fill: #3d3d3a; }
+
+  /* arrow line */
+  .arr { stroke: #888780; stroke-width: 1.5; fill: none; }
+
+  /* legend swatches */
+  .swatch-coral { fill: #FAECE7; stroke: #993C1D; }
+  .swatch-amber { fill: #FAEEDA; stroke: #854F0B; }
+  .swatch-purple { fill: #EEEDFE; stroke: #534AB7; }
+  .swatch-teal   { fill: #E1F5EE; stroke: #0F6E56; }
+  .swatch-gray   { fill: #F1EFE8; stroke: #5F5E5A; }
+
+  /* dark mode */
+  @media (prefers-color-scheme: dark) {
+    body { background: #1e1e1c; }
+    h1 { color: #e8e6dc; }
+    p.subtitle { color: #9c9a92; }
+    .card { background: #2c2c2a; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+    .c-coral rect { fill: #4A1B0C; stroke: #F0997B; }
+    .c-coral text.th { fill: #F5C4B3; }
+    .c-coral text.ts { fill: #F0997B; }
+    .c-amber rect { fill: #412402; stroke: #EF9F27; }
+    .c-amber text.th { fill: #FAC775; }
+    .c-amber text.ts { fill: #EF9F27; }
+    .c-purple rect { fill: #26215C; stroke: #AFA9EC; }
+    .c-purple text.th { fill: #CECBF6; }
+    .c-purple text.ts { fill: #AFA9EC; }
+    .c-teal rect { fill: #04342C; stroke: #5DCAA5; }
+    .c-teal text.th { fill: #9FE1CB; }
+    .c-teal text.ts { fill: #5DCAA5; }
+    .c-gray rect { fill: #2C2C2A; stroke: #B4B2A9; }
+    .c-gray text.th { fill: #D3D1C7; }
+    .c-gray text.ts { fill: #B4B2A9; }
+    text.legend-label { fill: #c2c0b6; }
+    .arr { stroke: #888780; }
+    .swatch-coral { fill: #4A1B0C; stroke: #F0997B; }
+    .swatch-amber { fill: #412402; stroke: #EF9F27; }
+    .swatch-purple { fill: #26215C; stroke: #AFA9EC; }
+    .swatch-teal   { fill: #04342C; stroke: #5DCAA5; }
+    .swatch-gray   { fill: #2C2C2A; stroke: #B4B2A9; }
+  }
+</style>
+</head>
+<body>
+<h1>Stroke Continnum of Care Data Pipeline</h1>
+
+	<p style="color: white;"><b>Data Sources</b><br>
+	1. NC EMS Data System (from NC OEMS)<br>
+	2. NC DETECT (from CCHI)<br>
+	3. NC Hospital Discharge Database (from Sheps Center)</p>
+
+<div class="card">
+<svg width="100%" viewBox="0 0 680 1420" role="img">
+<title>Stroke data pipeline and linkage steps</title>
+<desc>Flowchart showing four data sources linked across three steps by CCHI staff, culminating in a de-identified final analytic dataset accessible to the research team.</desc>
+
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- ══ LEGEND ══ -->
+<rect x="40" y="18" width="600" height="44" rx="8" fill="none" stroke="#c8c7bf" stroke-width="0.5"/>
+<rect x="56" y="30" width="12" height="12" rx="2" class="swatch-coral" stroke-width="0.5"/>
+<text class="legend-label" x="74" y="40">PHI / Identifiers</text>
+<rect x="188" y="30" width="12" height="12" rx="2" class="swatch-amber" stroke-width="0.5"/>
+<text class="legend-label" x="206" y="40">State/Sheps</text>
+<rect x="300" y="30" width="12" height="12" rx="2" class="swatch-purple" stroke-width="0.5"/>
+<text class="legend-label" x="318" y="40">Linkage Step (by CCHI)</text>
+<rect x="480" y="30" width="12" height="12" rx="2" class="swatch-teal" stroke-width="0.5"/>
+<text class="legend-label" x="498" y="40">De-identified / analytic</text>
+
+<!-- ══ SECTION LABEL ══ -->
+<text class="th" x="40" y="88" style="font-size:14px;fill:#3d3d3a;"></text>
+
+<!-- ── SOURCE 1: NC EMS ── -->
+<g class="c-coral">
+  <rect x="40" y="98" width="182" height="130" rx="8" stroke-width="0.5"/>
+  <text class="th" x="131" y="122" text-anchor="middle" dominant-baseline="central">EMS Data</text>
+  <text class="ts" x="131" y="142" text-anchor="middle" dominant-baseline="central">Incident census tract</text>
+  <text class="ts" x="131" y="162" text-anchor="middle" dominant-baseline="central">Age, sex, race/ethnicity</text>
+  <text class="ts" x="131" y="182" text-anchor="middle" dominant-baseline="central">Destination facility name</text>
+  <text class="ts" x="131" y="202" text-anchor="middle" dominant-baseline="central">Date-time of arrival</text>
+</g>
+
+<!-- ── SOURCE 2: NC DETECT ── -->
+<g class="c-coral">
+  <rect x="249" y="98" width="182" height="130" rx="8" stroke-width="0.5"/>
+  <text class="th" x="340" y="122" text-anchor="middle" dominant-baseline="central">NC DETECT ED Data</text>
+  <text class="ts" x="340" y="142" text-anchor="middle" dominant-baseline="central">Facility name</text>
+  <text class="ts" x="340" y="159" text-anchor="middle" dominant-baseline="central">Date-time of arrival</text>
+  <text class="ts" x="340" y="176" text-anchor="middle" dominant-baseline="central">Arrival mode</text>
+  <text class="ts" x="340" y="193" text-anchor="middle" dominant-baseline="central">Age, sex, race/ethnicity</text>
+  <text class="ts" x="340" y="210" text-anchor="middle" dominant-baseline="central">ED Disposition</text>
+</g>
+
+<!-- ── SOURCE 3: State ED ── -->
+<g class="c-amber">
+  <rect x="458" y="98" width="182" height="130" rx="8" stroke-width="0.5"/>
+  <text class="th" x="549" y="122" text-anchor="middle" dominant-baseline="central">State ED Data</text>
+  <text class="ts" x="549" y="142" text-anchor="middle" dominant-baseline="central">Facility name</text>
+  <text class="ts" x="549" y="159" text-anchor="middle" dominant-baseline="central">Date of arrival</text>
+  <text class="ts" x="549" y="176" text-anchor="middle" dominant-baseline="central">Age, sex, race/ethnicity</text>
+  <text class="ts" x="549" y="193" text-anchor="middle" dominant-baseline="central">Stroke diagnosis category</text>
+</g>
+
+<!-- ══ STEP 1 arrows ══ -->
+<line x1="340" y1="228" x2="340" y2="290" class="arr" marker-end="url(#arrow)"/>
+<line x1="549" y1="228" x2="549" y2="270" class="arr"/>
+<line x1="549" y1="270" x2="445" y2="270" class="arr"/>
+<line x1="445" y1="270" x2="445" y2="290" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ STEP 1 box ══ -->
+<g class="c-purple">
+  <rect x="240" y="290" width="300" height="90" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="314" text-anchor="middle" dominant-baseline="central">Step 1 — Linkage</text>
+  <text class="ts" x="390" y="334" text-anchor="middle" dominant-baseline="central">NC DETECT × State ED</text>
+  <text class="ts" x="390" y="352" text-anchor="middle" dominant-baseline="central">Match on: facility, arrival date,</text>
+  <text class="ts" x="390" y="368" text-anchor="middle" dominant-baseline="central">age, sex, race</text>
+</g>
+
+<!-- Step 1 output arrow -->
+<line x1="390" y1="380" x2="390" y2="430" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ Step 1 output ══ -->
+<g class="c-amber">
+  <rect x="190" y="430" width="400" height="100" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="454" text-anchor="middle" dominant-baseline="central">Supplemented State ED data</text>
+  <text class="ts" x="390" y="474" text-anchor="middle" dominant-baseline="central">All State ED variables + EMS arrival flag + NC DETECT disposition</text>
+  <text class="ts" x="390" y="492" text-anchor="middle" dominant-baseline="central">Filter to EMS arrivals only</text>
+  <text class="ts" x="390" y="510" text-anchor="middle" dominant-baseline="central">Keep facility name, encounter date, age, sex, race</text>
+</g>
+
+<!-- ══ STEP 2 arrows ══ -->
+<line x1="131" y1="228" x2="131" y2="540" class="arr"/>
+<line x1="131" y1="540" x2="248" y2="540" class="arr"/>
+<line x1="390" y1="530" x2="390" y2="590" class="arr" marker-end="url(#arrow)"/>
+<line x1="248" y1="540" x2="248" y2="590" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ STEP 2 box ══ -->
+<g class="c-purple">
+  <rect x="190" y="590" width="400" height="100" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="614" text-anchor="middle" dominant-baseline="central">Step 2 — Linkage</text>
+  <text class="ts" x="390" y="634" text-anchor="middle" dominant-baseline="central">NC EMS × Suppl. State ED data (EMS arrivals only)</text>
+  <text class="ts" x="390" y="652" text-anchor="middle" dominant-baseline="central">Match on: age, sex, facility name, encounter date</text>
+  <text class="ts" x="390" y="670" text-anchor="middle" dominant-baseline="central">Keep EMS variables</text>
+</g>
+
+<!-- Step 2 output arrow -->
+<line x1="390" y1="690" x2="390" y2="740" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ Step 2 output ══ -->
+<g class="c-amber">
+  <rect x="190" y="740" width="400" height="110" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="764" text-anchor="middle" dominant-baseline="central">Linked EMS + ED dataset</text>
+  <text class="ts" x="390" y="784" text-anchor="middle" dominant-baseline="central">EMS variables + ED variables + NC DETECT disposition</text>
+  <text class="ts" x="390" y="802" text-anchor="middle" dominant-baseline="central">Convert EMS date-times to deidentified variables</text>
+  <text class="ts" x="390" y="820" text-anchor="middle" dominant-baseline="central">PHI: incident census tract, facility name,</text>
+  <text class="ts" x="390" y="836" text-anchor="middle" dominant-baseline="central">arrival date, age, sex, race</text>
+</g>
+
+<!-- ── SOURCE 4: State Inpatient ── -->
+<g class="c-amber">
+  <rect x="458" y="840" width="182" height="110" rx="8" stroke-width="0.5"/>
+  <text class="th" x="549" y="856" text-anchor="middle" dominant-baseline="central">State inpatient data</text>
+  <text class="ts" x="549" y="876" text-anchor="middle" dominant-baseline="central">Facility name</text>
+  <text class="ts" x="549" y="893" text-anchor="middle" dominant-baseline="central">Admission date</text>
+  <text class="ts" x="549" y="910" text-anchor="middle" dominant-baseline="central">Age, sex, race</text>
+  <text class="ts" x="549" y="927" text-anchor="middle" dominant-baseline="central">Stroke dx category</text>
+</g>
+
+<!-- ══ STEP 3 arrows ══ -->
+<line x1="390" y1="850" x2="390" y2="974" class="arr" marker-end="url(#arrow)"/>
+<line x1="458" y1="885" x2="434" y2="885" class="arr"/>
+<line x1="434" y1="885" x2="434" y2="984" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ STEP 3 box ══ -->
+<g class="c-purple">
+  <rect x="190" y="974" width="400" height="100" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="998" text-anchor="middle" dominant-baseline="central">Step 3 — Linkage</text>
+  <text class="ts" x="390" y="1018" text-anchor="middle" dominant-baseline="central">Linked EMS+ED × State Inpatient data</text>
+  <text class="ts" x="390" y="1036" text-anchor="middle" dominant-baseline="central">Filter: NC DETECT disposition = admitted (same hospital)</text>
+  <text class="ts" x="390" y="1054" text-anchor="middle" dominant-baseline="central">Match on: facility, encounter date, age, sex, race</text>
+</g>
+
+<!-- De-id arrow -->
+<line x1="390" y1="1074" x2="390" y2="1114" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ De-identification step ══ -->
+<g class="c-gray">
+  <rect x="170" y="1114" width="440" height="82" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="1138" text-anchor="middle" dominant-baseline="central">De-identification (by CCHI or research team)</text>
+  <text class="ts" x="390" y="1158" text-anchor="middle" dominant-baseline="central">Convert addresses to census tracts</text>
+  <text class="ts" x="390" y="1176" text-anchor="middle" dominant-baseline="central">Convert EMS date-times to time intervals, day of week + 
+	  time-of-day category</text>
+</g>
+
+<!-- Final arrow -->
+<line x1="390" y1="1196" x2="390" y2="1246" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ══ FINAL ANALYTIC DATASET ══ -->
+<g class="c-teal">
+  <rect x="40" y="1246" width="600" height="158" rx="8" stroke-width="0.5"/>
+  <text class="th" x="340" y="1262" text-anchor="middle" dominant-baseline="central">Final Analytic Dataset* — CCHI + research team access only</text>
+  <text class="ts" x="60" y="1288" dominant-baseline="central">PHI:</text>
+  <text class="ts" x="160" y="1288" dominant-baseline="central">EMS incident date · EMS incident census tract · Facility name</text>
+  <text class="ts" x="60" y="1308" dominant-baseline="central">Patient:</text>
+  <text class="ts" x="160" y="1308" dominant-baseline="central">Age (years) · sex · race/ethnicity</text>
+  <text class="ts" x="60" y="1328" dominant-baseline="central">Timing:</text>
+  <text class="ts" x="160" y="1328" dominant-baseline="central">EMS time intervals · day of week · time-of-day category</text>
+  <text class="ts" x="60" y="1348" dominant-baseline="central">EMS:</text>
+  <text class="ts" x="160" y="1348" dominant-baseline="central">Stroke scale · dispatch complaint · prearrival alert · protocols</text>
+	  <text class="ts" x="60" y="1368" dominant-baseline="central">ED/Inpatient:</text>
+  <text class="ts" x="160" y="1368" dominant-baseline="central">Stroke dx category · procedure codes · LOS · dispositions</text>
+</g>
+
+<!-- Footer note -->
+<text class="ts" x="340" y="1393" text-anchor="middle" style="fill:#888780;">*No street addresses or date-times will be in the final analytic dataset</text>
+
+</svg>
+</div>
+
+
+
+</body>
+</html>
