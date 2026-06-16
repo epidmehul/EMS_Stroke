@@ -74,7 +74,7 @@
 <p>Our objective is to develop a decision-analytic systems model that allows stroke system planners to compare potential effects of regionalized EMS triage and transport strategies on rural stroke outcomes and health care resource utilization. Decision-analytic modeling is a rigorous and flexible approach for integrating information sources to conduct in silico testing of system-level strategies under varying contexts. This comparative evidence provides valuable and timely information to decision makers to tailor interventions for real-world implementation and evaluation. Using existing real-world data sources, published evidence, and key stakeholder input, we will build a computer simulation model of regionalized stroke care in rural North Carolina.</p>
 
 <h2>How statewide data inform the simulation model</h2>
-<p>This project uses a discrete event simulation model to compare the effects of alternative EMS stroke triage and transport protocols on patient outcomes and health care resource use within 70 rural North Carolina counties. Because the model must reflect local heterogeneity, linked data on prehospital EMS encounters, emergency department visits, and inpatient admissions are analyzed to quantify stroke care processess and outcomes throughout the continuum of care. Specifically, this integrated dataset is used to parameterize and validate the simulation model.</p>
+<p>This project uses a discrete event simulation model to compare the effects of alternative EMS stroke triage and transport protocols on patient outcomes and health care resource use within 70 rural North Carolina counties. Because the model must reflect the real-world heterogeneity of acute stroke care, it is parameterized and validated using linked statewide data on prehospital EMS encounters, emergency department visits, and inpatient admissions.</p>
 
 <h2>What we do with the data</h2>
 <p>We originally proposed to link statewide data from the NC EMS Data System (from the NC Office of EMS) and the statewide hospital discharge data (from the Sheps Center). There are no direct patient identifiers in these data, so we use an iterative linkage strategy matching on dates, facility names, and patient age/sex/race.</p>
@@ -84,17 +84,28 @@
 <div class="diagram-wrap">
   <iframe
     src="stroke_data_pipeline_phi.html"
-    title="data pipeline diagram"
+    title="Data pipeline and PHI diagram"
     scrolling="no"
     onload="this.style.height = this.contentWindow.document.body.scrollHeight + 40 + 'px'">
   </iframe>
 </div>
 
-	<div style="border: 2px solid #1a4d7a; border-radius: 6px; padding: 20px 24px; margin-top: 28px; background: #f3f7fb;">
-<h2 style="margin-top: 0;">Potential alternative strategies</h2>
-<p style="margin-bottom: 0;">If the above in its entirety is not allowed, there may be other approaches that could still provide valuable information to achieve the project goals. For example, we could remove identifiable geographic and time variables from the EMS data and replace with derived deidentified variables. If EMS data cannot be used at all, we could link the NC DETECT data to state ED to derive aggregate estimates of EMS arrivals for stroke and ED dispositions. There are several alternatives that could support the project's data needs and remain compliant with Shep's agreements with the state data owners.</p>
+<h2>Final analytic dataset</h2>
+<p>The table below lists all variables retained in the final analytic dataset and their source. The dataset is accessible only to CCHI and research team members in a secure computing environment.</p>
+
+<div class="diagram-wrap" style="margin-bottom: 32px;">
+  <iframe
+    src="analytic_dataset.html"
+    title="Final analytic dataset variable table"
+    scrolling="no"
+    onload="this.style.height = this.contentWindow.document.body.scrollHeight + 40 + 'px'">
+  </iframe>
 </div>
-	
-	
+
+<div style="border: 2px solid #1a4d7a; border-radius: 6px; padding: 20px 24px; margin-top: 28px; background: #f3f7fb;">
+<h2 style="margin-top: 0;">Potential alternative strategies</h2>
+<p style="margin-bottom: 0;">If the above in its entirety is not allowed, there may be other approaches that could still provide valuable information to achieve the project goals. For example, we could remove identifiable geographic and time variables from the EMS data and replace with derived deidentified variables. If EMS data cannot be used at all, we could link the NC DETECT data to state ED to derive aggregate estimates of EMS arrivals for stroke and ED dispositions. There may be other alternatives that support the project's data needs and remain compliant with Shep's agreements with the state data owners.</p>
+</div>
+
 </body>
 </html>

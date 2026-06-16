@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Analytic Dataset — R01MD018031</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a1917;
+    background: #ffffff;
+    padding: 32px 24px 48px;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #5f5e5a;
+    margin-bottom: 20px;
+  }
+
+  /* Legend */
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #3a3835;
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: 5px;
+    padding: 8px 14px;
+    margin-bottom: 24px;
+  }
+  .legend-icon { font-size: 15px; }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #dddbd5;
+    border-radius: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  thead tr {
+    background: #1a4d7a;
+    color: #ffffff;
+  }
+
+  thead th {
+    padding: 11px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .group-header td {
+    background: #e8ecf2;
+    color: #1a4d7a;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 8px 16px;
+    border-bottom: 1px solid #dddbd5;
+  }
+
+  tbody tr:not(.group-header):nth-child(even) { background: #f7f5f0; }
+  tbody tr:not(.group-header):hover { background: #eaf0f7; }
+
+  tbody td {
+    padding: 9px 16px;
+    color: #3a3835;
+    vertical-align: top;
+    border-bottom: 1px solid #e8e6e0;
+    line-height: 1.5;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td:first-child {
+    font-weight: 500;
+    color: #1a1917;
+  }
+
+  td:nth-child(2) {
+    font-size: 13px;
+    color: #5f5e5a;
+  }
+
+  .phi-icon {
+    margin-right: 4px;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #7a7874;
+    margin-top: 14px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Final Analytic Dataset</h1>
+<p class="subtitle">R01MD018031 · Accessible to CCHI and research team only · No patient name, date of birth, raw timestamps, or persistent patient identifier retained</p>
+
+<div class="legend">
+  <span class="legend-icon">🔴</span>
+  <span>Data elements that may be considered identifiable or potentially sensitive PHI</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Detail / categories</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- Geography -->
+      <tr class="group-header"><td colspan="3">Geography</td></tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>EMS incident census tract</td>
+        <td>Derived from geocoded street address (not retained)</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>EMS incident county name</td>
+        <td>Derived from geocoded street address (not retained)</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Destination hospital name</td>
+        <td>Used to identify county-level routing and stroke center certification</td>
+        <td>NC EMS</td>
+      </tr>
+
+      <!-- Demographics -->
+      <tr class="group-header"><td colspan="3">Patient demographics</td></tr>
+      <tr>
+        <td>Age (years)</td>
+        <td>Continuous; ages 90+ collapsed into single category</td>
+        <td>NC EMS · State ED · Inpatient</td>
+      </tr>
+      <tr>
+        <td>Sex</td>
+        <td>Female / Male</td>
+        <td>NC EMS · State ED · Inpatient</td>
+      </tr>
+      <tr>
+        <td>Race / ethnicity</td>
+        <td>Black non-Hispanic · White non-Hispanic · Hispanic · Other</td>
+        <td>NC EMS · State ED · Inpatient</td>
+      </tr>
+      <tr>
+        <td>Rurality</td>
+        <td>Urban / suburban / rural (RUCA-based, from EMS incident census tract)</td>
+        <td>NC EMS (derived)</td>
+      </tr>
+
+      <!-- Timing -->
+      <tr class="group-header"><td colspan="3">Timing (de-identified)</td></tr>
+      <tr>
+        <td>911 delay interval</td>
+        <td>Time from symptom onset to 911 call</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>EMS time intervals</td>
+        <td>Call · response · scene · transport (minutes)</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>Day of week</td>
+        <td>Monday–Sunday of EMS notification</td>
+        <td>NC EMS (derived)</td>
+      </tr>
+      <tr>
+        <td>Time of day</td>
+        <td>6am–12pm · 12pm–6pm · 6pm–12am · 12am–6am</td>
+        <td>NC EMS (derived)</td>
+      </tr>
+      <tr>
+        <td>Incident year-month</td>
+        <td>YYYY-MM</td>
+        <td>NC EMS</td>
+      </tr>
+
+      <!-- EMS clinical -->
+      <tr class="group-header"><td colspan="3">EMS clinical</td></tr>
+      <tr>
+        <td>Dispatch complaint</td>
+        <td>Coded category (e.g., weakness, altered mental status)</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>EMS provider impression</td>
+        <td>Coded clinical impression at scene</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>EMS unit level of care</td>
+        <td>ALS / BLS</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>Stroke scale result</td>
+        <td>e.g., CPSS, LAMS score</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>Prearrival stroke alert</td>
+        <td>Yes / No</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>Protocols used</td>
+        <td>Stroke protocol activation, medications administered</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>Service requested</td>
+        <td>911 call / inter-facility transfer</td>
+        <td>NC EMS</td>
+      </tr>
+      <tr>
+        <td>Incident location type</td>
+        <td>Home / facility / public</td>
+        <td>NC EMS</td>
+      </tr>
+
+      <!-- ED -->
+      <tr class="group-header"><td colspan="3">Emergency department (State ED + NC DETECT)</td></tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Stroke diagnosis category</td>
+        <td>Ischemic · TIA · hemorrhagic · mimic (ICD-10-CM)</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Procedure codes</td>
+        <td>CPT-4 (e.g., IV thrombolysis, imaging)</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td>ED length of stay</td>
+        <td>Hours</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td>ED disposition</td>
+        <td>Home · admitted · transferred · expired</td>
+        <td>NC DETECT</td>
+      </tr>
+
+      <!-- Inpatient -->
+      <tr class="group-header"><td colspan="3">Inpatient (admitted to same hospital only)</td></tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Stroke diagnosis category</td>
+        <td>ICD-10-CM, categorized</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Procedure codes</td>
+        <td>CPT-4 (e.g., EVT, carotid endarterectomy)</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>CMS diagnosis-related group</td>
+        <td>DRG (resource use proxy)</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td>Inpatient length of stay</td>
+        <td>Days</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td>Discharge disposition</td>
+        <td>Home · rehab · SNF · hospice · expired</td>
+        <td>State inpatient</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+<p class="note">Transfers out of the index ED are excluded (destination hospital unknown). Street address and raw timestamps are not retained in the final dataset.</p>
+
+</body>
+</html>
