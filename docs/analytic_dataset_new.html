@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Analytic Dataset — R01MD018031</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a1917;
+    background: #ffffff;
+    padding: 32px 24px 48px;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #5f5e5a;
+    margin-bottom: 20px;
+  }
+
+  /* Legend */
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #3a3835;
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: 5px;
+    padding: 8px 14px;
+    margin-bottom: 24px;
+  }
+  .legend-icon { font-size: 15px; }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #dddbd5;
+    border-radius: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  thead tr {
+    background: #1a4d7a;
+    color: #ffffff;
+  }
+
+  thead th {
+    padding: 11px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .group-header td {
+    background: #e8ecf2;
+    color: #1a4d7a;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 8px 16px;
+    border-bottom: 1px solid #dddbd5;
+  }
+
+  tbody tr:not(.group-header):nth-child(even) { background: #f7f5f0; }
+  tbody tr:not(.group-header):hover { background: #eaf0f7; }
+
+  tbody td {
+    padding: 9px 16px;
+    color: #3a3835;
+    vertical-align: top;
+    border-bottom: 1px solid #e8e6e0;
+    line-height: 1.5;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td:first-child {
+    font-weight: 500;
+    color: #1a1917;
+  }
+
+  td:nth-child(2) {
+    font-size: 13px;
+    color: #5f5e5a;
+  }
+
+  .phi-icon {
+    margin-right: 4px;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #7a7874;
+    margin-top: 14px;
+  }
+
+  /* HIPAA banner */
+  .hipaa-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #f0f4f9;
+    border-left: 4px solid #1a4d7a;
+    border-radius: 0 6px 6px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .hipaa-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a4d7a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .hipaa-detail {
+    font-size: 13px;
+    color: #3a3835;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<h1>Final Analytic Dataset</h1>
+<p class="subtitle">R01MD018031 · Accessible to CCHI and research team only · No patient name, date of birth, raw timestamps, or persistent patient identifier retained</p>
+
+<div class="hipaa-banner">
+  <span class="hipaa-label">HIPAA Classification: Limited Data Set</span>
+  <span class="hipaa-detail">This dataset retains hospital names and specific clinical codes (ICD-10, CPT-4, DRG) that prevent full de-identification under the Safe Harbor standard (45 CFR §164.514(b)). A Data Use Agreement (DUA) is required with each covered entity. Access is restricted to authorized personnel in a secure computing environment.</span>
+</div>
+
+<div class="legend">
+  <span class="legend-icon">🔴</span>
+  <span>Data elements that may be considered identifiable or potentially sensitive PHI</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Detail / categories</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- Patient Demographics -->
+      <tr class="group-header"><td colspan="3">Patient demographics</td></tr>
+      <tr>
+        <td>Age (years)</td>
+        <td>Continuous; ages 90+ collapsed into single category</td>
+        <td>State ED · Inpatient</td>
+      </tr>
+      <tr>
+        <td>Sex</td>
+        <td>Female / Male</td>
+        <td>State ED · Inpatient</td>
+      </tr>
+      <tr>
+        <td>Race</td>
+        <td>American Indian · Asian · Black or African American · Pacific Islander · Other</td>
+        <td>State ED · Inpatient</td>
+      </tr>
+      <tr>
+        <td>Ethnicity</td>
+        <td>Hispanic / Non-Hispanic</td>
+        <td>State ED · Inpatient</td>
+      </tr>
+
+      <!-- ED -->
+      <tr class="group-header"><td colspan="3">Emergency department (State ED + NC DETECT)</td></tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Stroke diagnosis category</td>
+        <td>Ischemic · TIA · hemorrhagic · mimic (ICD-10-CM)</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Procedure codes</td>
+        <td>CPT-4 (e.g., IV thrombolysis, imaging)</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td>ED length of stay</td>
+        <td>Hours</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td>ED disposition</td>
+        <td>Home · admitted · transferred · expired</td>
+        <td>NC DETECT</td>
+      </tr>
+
+      <!-- Inpatient -->
+      <tr class="group-header"><td colspan="3">Inpatient (admitted to same hospital only)</td></tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Stroke diagnosis category</td>
+        <td>ICD-10-CM, categorized</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Procedure codes</td>
+        <td>CPT-4 (e.g., EVT, carotid endarterectomy)</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>CMS diagnosis-related group</td>
+        <td>DRG (resource use proxy)</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td>Inpatient length of stay</td>
+        <td>Days</td>
+        <td>State inpatient</td>
+      </tr>
+      <tr>
+        <td>Discharge disposition</td>
+        <td>Home · rehab · SNF · hospice · expired</td>
+        <td>State inpatient</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+<p class="note">Transfers out of the index ED are excluded (destination hospital unknown). No patient name, date of birth, or persistent patient identifier is retained.</p>
+
+</body>
+</html>

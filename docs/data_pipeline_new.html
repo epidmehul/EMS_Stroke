@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Pipeline — R01MD018031</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #1a1917;
+    background: #ffffff;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: normal;
+    line-height: 1.35;
+    color: #1a1917;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #1a4d7a;
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a1917;
+    margin-top: 32px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    color: #3a3835;
+    margin-bottom: 14px;
+  }
+
+  .subheading {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1917;
+    margin-bottom: 28px;
+  }
+
+  .diagram-wrap {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    border: 1px solid #dddbd5;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .diagram-wrap iframe {
+    width: 100%;
+    border: none;
+    display: block;
+    min-height: 1500px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Regionalization of Acute Stroke Care for Rural Populations: A Systems Modeling Approach (R01MD018031)</h1>
+
+<p class="subheading">Data Pipeline Overview</p>
+
+<h2>What we proposed to do</h2>
+<p>Our objective is to develop a decision-analytic systems model that allows stroke system planners to compare potential effects of regionalized EMS triage and transport strategies on rural stroke outcomes and health care resource utilization. Decision-analytic modeling is a rigorous and flexible approach for integrating information sources to conduct in silico testing of system-level strategies under varying contexts. This comparative evidence provides valuable and timely information to decision makers to tailor interventions for real-world implementation and evaluation. Using existing real-world data sources, published evidence, and key stakeholder input, we will build a computer simulation model of regionalized stroke care in rural North Carolina.</p>
+
+<h2>How statewide data inform the simulation model</h2>
+<p>This project uses a discrete event simulation model to compare the effects of alternative EMS stroke triage and transport protocols on patient outcomes and health care resource use within 70 rural North Carolina counties. Because the model must reflect the real-world heterogeneity of acute stroke care, it is parameterized and validated using statewide data on prehospital EMS encounters, emergency department visits, and inpatient admissions.</p>
+
+<h2>What we do with the data</h2>
+<p>We propose to use ED data from the statewide hospital discharge data (from the Sheps Center) to describe patterns of acute stroke care for EMS arrivals by facility. Then, for patients who are admitted to the same hospital, we will describe hospitalizations using the inpatient dataset. There are no direct patient identifiers in these dataset, so we use an iterative linkage strategy matching on dates, facility names, and patient age/sex/race.</p>
+<p>Since the ED visits data from Sheps does not differentiate whether a patient arrived by EMS ambulance or other means, we propose to use the 'arrival mode' data element in NC DETECT by matching NC DETECT data to the state ED dataset and then filtering on EMS arrivals. Secondly, the disposition variable in the state ED dataset appears unreliable, so we will retain the 'ED disposition' variable from NC DETECT. These steps will be performed by Matthew Kerber of the Carolina Center for Health Informatics (CCHI) in the Sheps Center's Secure Research Workspace.</p>
+<p>Our data pipeline and linkage steps are described below:</p>
+
+<div class="diagram-wrap">
+  <iframe
+    src="stroke_data_pipeline_phi.html"
+    title="Data pipeline and PHI diagram"
+    scrolling="no"
+    onload="this.style.height = this.contentWindow.document.body.scrollHeight + 40 + 'px'">
+  </iframe>
+</div>
+
+<h2>Final analytic dataset</h2>
+<p>The table below lists all variables retained in the final analytic dataset and their source. The dataset is accessible only to CCHI and research team members in a secure computing environment.</p>
+<p>This dataset constitutes a <strong>HIPAA Limited Data Set</strong> (45 CFR §164.514(e)), not a fully de-identified dataset. Full de-identification is not achievable because the dataset retains hospital names (a geographic identifier smaller than state level) and specific clinical codes (ICD-10, CPT-4, DRG) that, in combination with patient demographics in small rural populations, carry re-identification risk. </p>
+
+<div class="diagram-wrap" style="margin-bottom: 32px;">
+  <iframe
+    src="analytic_dataset.html"
+    title="Final analytic dataset variable table"
+    scrolling="no"
+    onload="this.style.height = this.contentWindow.document.body.scrollHeight + 40 + 'px'">
+  </iframe>
+</div>
+
+
+
+</body>
+</html>
