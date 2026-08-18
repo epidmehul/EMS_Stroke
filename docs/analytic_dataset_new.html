@@ -147,7 +147,7 @@
 
 <div class="hipaa-banner">
   <span class="hipaa-label">HIPAA Classification: Limited Data Set</span>
-  <span class="hipaa-detail">This dataset retains ED/hospital names and specific clinical codes (ICD-10, CPT-4, DRG) that prevent full de-identification under the Safe Harbor standard (45 CFR §164.514(b)). Access is restricted to authorized personnel in a secure computing environment.</span>
+  <span class="hipaa-detail">This dataset retains hospital names, encounter dates, and specific clinical codes (ICD-10, CPT-4, DRG) that prevent full de-identification under the Safe Harbor standard (45 CFR §164.514(b)). </span>
 </div>
 
 <div class="legend">
@@ -191,6 +191,16 @@
 
       <!-- ED -->
       <tr class="group-header"><td colspan="3">Emergency department (State ED + NC DETECT)</td></tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>ED arrival date</td>
+        <td>Date of ED arrival</td>
+        <td>State ED</td>
+      </tr>
+      <tr>
+        <td><span class="phi-icon">🔴</span>Facility name</td>
+        <td>Name of ED facility</td>
+        <td>State ED</td>
+      </tr>
       <tr>
         <td><span class="phi-icon">🔴</span>Stroke diagnosis category</td>
         <td>Ischemic · TIA · hemorrhagic · mimic (ICD-10-CM)</td>
@@ -243,8 +253,6 @@
     </tbody>
   </table>
 </div>
-
-<p class="note">Transfers out of the index ED are excluded (destination hospital unknown). No patient name, date of birth, or persistent patient identifier is retained.</p>
 
 </body>
 </html>
